@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface ProfileRepository extends CrudRepository<Profile, String> {
+public interface ProfileRepository extends CrudRepository<Profile, Long> {
     Optional<Profile> findByEmailAndVisibleTrue(String username);
 
     Optional<Profile> findByIdAndVisibleTrue(Long id);
