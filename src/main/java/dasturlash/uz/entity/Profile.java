@@ -40,4 +40,6 @@ public class Profile {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProfileStatus status;
+
+    private Boolean visible;
 }
