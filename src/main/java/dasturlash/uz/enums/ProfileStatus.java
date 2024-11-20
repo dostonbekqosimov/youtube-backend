@@ -1,6 +1,5 @@
 package dasturlash.uz.enums;
 
 public enum ProfileStatus {
-    ACTIVE,
-    INACTIVE
+    ACTIVE, INACTIVE, IN_REGISTERED
 }
