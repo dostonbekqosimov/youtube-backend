@@ -10,6 +10,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table(name = "profiles")
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

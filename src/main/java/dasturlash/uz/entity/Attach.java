@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Setter
+@Table(name = "attaches")
 @Getter
 public class Attach {
     @Id
