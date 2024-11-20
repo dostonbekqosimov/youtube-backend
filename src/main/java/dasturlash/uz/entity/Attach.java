@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "attaches")
 @Getter
 public class Attach {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false, name = "origin_name")
