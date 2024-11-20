@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 public class CustomUserDetails implements UserDetails {
 
-    private final String id;
+    private final Long id;
     private final String name;
     private final String surname;
     private final String email;

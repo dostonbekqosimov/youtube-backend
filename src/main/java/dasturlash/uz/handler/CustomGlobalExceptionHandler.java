@@ -1,7 +1,7 @@
 package dasturlash.uz.handler;
 
 
-import dasturlash.uz.exceptions.UnauthorizedException;
+import dasturlash.uz.exceptions.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -41,37 +41,31 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return ResponseEntity.status(401).body(e.getMessage());
     }
 
-//    @ExceptionHandler(DataExistsException.class)
-//    public ResponseEntity<?> exceptionHandler(DataExistsException e) {
-//        return ResponseEntity.badRequest().body(e.getMessage());
-//    }
-//
-//    @ExceptionHandler(DataNotFoundException.class)
-//    public ResponseEntity<?> exceptionHandler(DataNotFoundException e) {
-//        return ResponseEntity.status(404).body(e.getMessage());
-//    }
-//
-//    @ExceptionHandler({IllegalArgumentException.class, AppBadRequestException.class})
-//    public ResponseEntity<?> exceptionHandler(RuntimeException e) {
-//        return ResponseEntity.badRequest().body(e.getMessage());
-//    }
-//
-//    @ExceptionHandler(ForbiddenException.class)
-//    public ResponseEntity<?> exceptionHandler(ForbiddenException e) {
-//        return ResponseEntity.status(403).body(e.getMessage());
-//    }
-//
-//
-//
-//    @ExceptionHandler(ArticleNotFoundException.class)
-//    public ResponseEntity<?> exceptionHandler(ArticleNotFoundException e) {
-//        return ResponseEntity.status(404).body(e.getMessage());
-//    }
-//
-//    @ExceptionHandler(SomethingWentWrongException.class)
-//    public ResponseEntity<?> exceptionHandler(SomethingWentWrongException e) {
-//        return ResponseEntity.status(500).body(e.getMessage());
-//    }
+    @ExceptionHandler(DataExistsException.class)
+    public ResponseEntity<?> exceptionHandler(DataExistsException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity<?> exceptionHandler(DataNotFoundException e) {
+        return ResponseEntity.status(404).body(e.getMessage());
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, AppBadRequestException.class})
+    public ResponseEntity<?> exceptionHandler(RuntimeException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> exceptionHandler(ForbiddenException e) {
+        return ResponseEntity.status(403).body(e.getMessage());
+    }
+
+
+    @ExceptionHandler(SomethingWentWrongException.class)
+    public ResponseEntity<?> exceptionHandler(SomethingWentWrongException e) {
+        return ResponseEntity.status(500).body(e.getMessage());
+    }
 
 
 
