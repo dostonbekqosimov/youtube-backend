@@ -1,5 +1,7 @@
 package dasturlash.uz.controller;
 
+import dasturlash.uz.dto.JwtResponseDTO;
+import dasturlash.uz.dto.LoginDTO;
 import dasturlash.uz.dto.RegistrationDTO;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.service.AuthService;
@@ -41,5 +43,11 @@ public class AuthController {
     ) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
         return ResponseEntity.ok(authService.resendConfirmationEmail(profileId, lang));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponseDTO> login(@RequestBody @Valid LoginDTO loginDTO,
+                                                @RequestHeader(value = "Accept-Language", defaultValue = "uz") LanguageEnum lang) {
+        return ResponseEntity.ok(authService.login(loginDTO.getEmail(), loginDTO.getPassword(), lang));
     }
 }
