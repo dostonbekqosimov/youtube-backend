@@ -9,10 +9,11 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
-@RequiredArgsConstructor
+
 public class FlywayStarterConfig implements CommandLineRunner {
 
-    private final DataSource dataSource;
+    @Autowired
+    private  DataSource dataSource;
 
 
 
