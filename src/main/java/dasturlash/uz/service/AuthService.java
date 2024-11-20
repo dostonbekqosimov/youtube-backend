@@ -42,6 +42,7 @@ public class AuthService {
     }
 
     public String registrationConfirm(Long profileId, LanguageEnum lang) {
+        System.out.println("profileId: " + profileId);
         return emailAuthService.confirmEmail(profileId, lang);
     }
 

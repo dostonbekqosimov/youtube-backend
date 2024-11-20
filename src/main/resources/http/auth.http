@@ -1,7 +1,7 @@
 ### Register new account
 POST http://localhost:8090/auth/registration
 Content-Type: application/json
-Accept-Language: ru
+Accept-Language: en
 
 {
     "name": "salom",
@@ -11,7 +11,7 @@ Accept-Language: ru
 }
 
 ### Login
-POST http://localhost:8080/auth/login
+POST http://localhost:8090/auth/login
 
 {
     "email": "hello@salom.com",
