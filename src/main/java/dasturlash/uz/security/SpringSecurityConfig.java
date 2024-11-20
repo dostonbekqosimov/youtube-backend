@@ -28,7 +28,7 @@ public class SpringSecurityConfig {
 
     private final UserDetailsService userDetailsService;
 
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
