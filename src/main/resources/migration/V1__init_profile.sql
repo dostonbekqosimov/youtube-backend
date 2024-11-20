@@ -1,0 +1,2 @@
+-- insert into profiles ( name, surname, email, password, visible, role, status, created_at)
+-- values ( 'Admin', 'Admin', 'admin@gmail.com', 'admin@gmail.com', '+998930367641', '$2a$10$fnTizqtnjzeg4yiwun4Y0OXOaR7Y8hsyRpHsNkdmKglC2S0nIzJNK', true, 'ROLE_ADMIN', 'ACTIVE', now());
