@@ -59,6 +59,12 @@ public class SpringSecurityConfig {
                             // Authentication APIs - open to all
                             .requestMatchers("/auth/**").permitAll()
 
+                            //Authentication APIs - open to authenticated
+                            .requestMatchers("/profile/changePassword").authenticated()
+                            //Authentication APIs - open to ADMIN role
+                            .requestMatchers("/profile/create").hasRole("ADMIN")
+                            .requestMatchers("/profile/getAll").hasRole("ADMIN")
+
 
                             .anyRequest()
                             .authenticated();
