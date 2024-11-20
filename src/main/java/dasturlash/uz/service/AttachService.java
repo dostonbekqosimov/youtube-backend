@@ -2,11 +2,16 @@ package dasturlash.uz.service;
 
 import dasturlash.uz.dto.AttachDTO;
 import dasturlash.uz.entity.Attach;
+import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.VideoProcessingException;
 import dasturlash.uz.repository.AttachRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AttachService {
 
+    // Attach Service A
 
     private final AttachRepository attachRepository;
 
@@ -35,12 +41,7 @@ public class AttachService {
     private String attachUrl;
 
 
-    /**
-     * Uploads a video file and saves it to the server.
-     *
-     * @param file The MultipartFile representing the uploaded video
-     * @return AttachDTO containing details about the uploaded file
-     */
+
     public AttachDTO videoUpload(MultipartFile file) {
         // Generate a unique path based on current date
         String pathFolder = generateDateBasedFolder();
@@ -65,15 +66,7 @@ public class AttachService {
     }
 
     // All video upload related methods
-    /**
-     * Saves the uploaded video file to the specified directory.
-     *
-     * @param file The MultipartFile to be saved
-     * @param pathFolder The folder path where the file will be saved
-     * @param key Unique identifier for the file
-     * @param extension File extension
-     * @return Full path of the saved file
-     */
+
     private String saveVideoFile(MultipartFile file, String pathFolder, String key, String extension) {
         // Ensure upload directory exists
         Path uploadDir = Path.of(folderName);
@@ -100,16 +93,7 @@ public class AttachService {
         }
     }
 
-    /**
-     * Creates an Attach entity with file metadata.
-     *
-     * @param file The uploaded MultipartFile
-     * @param key Unique file identifier
-     * @param extension File extension
-     * @param pathFolder Folder path where file is saved
-     * @param duration Video duration
-     * @return Attach entity
-     */
+
     private Attach createAttachEntity(MultipartFile file, String key,
                                       String extension, String pathFolder, String duration) {
         Attach entity = new Attach();
@@ -127,11 +111,7 @@ public class AttachService {
         return attachRepository.save(entity);
     }
 
-    /**
-     * Generates a date-based folder path for file storage.
-     *
-     * @return Folder path in format "year/month/day"
-     */
+
     private String generateDateBasedFolder() {
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
@@ -186,12 +166,6 @@ public class AttachService {
         return duration;
     }
 
-    public Attach getById(String id) {
-        return attachRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("File not found with id: " + id));
-    }
-
-
     private String getExtension(String fileName) {
         int lastIndex = fileName.lastIndexOf(".");
         return fileName.substring(lastIndex + 1);
@@ -214,5 +188,50 @@ public class AttachService {
         attachDTO.setUrl(openURL(entity.getId()));
 
         return attachDTO;
+    }
+
+    public ResponseEntity<Resource> openVideo(String attachId) {
+        // Retrieve the file entity from the database using the given filename
+        Attach entity = getById(attachId);
+
+        // Construct the full file path by combining base folder, date path, and file name
+        String path = folderName + "/" + entity.getPath() + "/" + entity.getId();
+
+        // Normalize the file path to handle any potential path manipulation
+        Path filePath = Paths.get(path).normalize();
+
+        Resource resource = null;
+        try {
+            // Convert the file path to a URL resource for streaming
+            resource = new UrlResource(filePath.toUri());
+
+            // Check if the resource actually exists
+            if (!resource.exists()) {
+                throw new DataNotFoundException("File not found: " + entity.getId());
+            }
+
+            // Attempt to determine the content type of the file
+            String contentType = Files.probeContentType(filePath);
+
+            // Fallback to generic binary stream if content type cannot be determined
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            // Return a ResponseEntity with the file resource and appropriate content type
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+        } catch (IOException e) {
+            // Wrap any IO errors in a custom exception for consistent error handling
+            throw new AppBadRequestException("Could not read file: " + attachId);
+        }
+    }
+
+
+    public Attach getById(String id) {
+        // Use Spring Data JPA's findById method with a custom exception if not found
+        return attachRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("File not found with id: " + id));
     }
 }

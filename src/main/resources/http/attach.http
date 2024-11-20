@@ -1,8 +1,9 @@
-###
 POST http://localhost:8090/api/attach/upload
-Content-Type: multipart/form-data
-Accept-Language: ru
+Content-Type: multipart/form-data; boundary=WebAppBoundary
 
-{
-    "file": "file"
-}
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="1728907204404.mp4"
+Content-Type: application/octet-stream
+
+< /home/doston/Videos/1728907204404.mp4
+--WebAppBoundary--
