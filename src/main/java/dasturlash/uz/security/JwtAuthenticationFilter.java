@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String token = header.substring(7).trim();
             JwtDTO dto = JwtUtil.decode(token);
 
-            // load user depending on role
+            // load user depending on email
             String login = dto.getLogin();
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(login);
