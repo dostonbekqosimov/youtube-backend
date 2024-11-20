@@ -44,7 +44,9 @@ public class Profile {
     @Enumerated(EnumType.STRING)
     private ProfileStatus status;
 
+    @Column(nullable = false)
     private LocalDateTime createdDate;
 
+    @Column(nullable = false)
     private Boolean visible;
 }
