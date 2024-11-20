@@ -27,6 +27,9 @@ public class AuthService {
 
     public String registerAccount(RegistrationDTO dto, LanguageEnum lang) {
 
+        // check if the email already exists in database
+        existsByEmail(dto.getEmail(), lang);
+
         Profile profile = new Profile();
         profile.setName(dto.getName());
         profile.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
