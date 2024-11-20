@@ -5,8 +5,8 @@ import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.enums.ProfileStatus;
+import dasturlash.uz.exceptions.DataExistsException;
 import dasturlash.uz.repository.ProfileRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,9 +25,7 @@ public class AuthService {
     private final EmailAuthService emailAuthService;
 
 
-
-
-    public String registerAccount(@Valid RegistrationDTO dto, LanguageEnum lang) {
+    public String registerAccount(RegistrationDTO dto, LanguageEnum lang) {
 
         Profile profile = new Profile();
         profile.setName(dto.getName());
@@ -43,7 +41,21 @@ public class AuthService {
 
     }
 
-    public String resendConfirmationEmail(String id, LanguageEnum lang) {
-        return emailAuthService.resendEmailConfirmation(id, lang);
+    public String registrationConfirm(Long profileId, LanguageEnum lang) {
+        return emailAuthService.confirmEmail(profileId, lang);
+    }
+
+    public String resendConfirmationEmail(Long profileId, LanguageEnum lang) {
+        return emailAuthService.resendEmailConfirmation(profileId, lang);
+    }
+
+    private void existsByEmail(String email, LanguageEnum lang) {
+
+        if (email != null && !email.trim().isEmpty()) {
+            boolean isEmailExist = profileRepository.existsByEmailAndVisibleTrue(email);
+            if (isEmailExist) {
+                throw new DataExistsException(resourceBundleService.getMessage("email.exists", lang));
+            }
+        }
     }
 }

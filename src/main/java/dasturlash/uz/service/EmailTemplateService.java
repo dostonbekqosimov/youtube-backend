@@ -9,6 +9,9 @@ public class EmailTemplateService {
     @Value("${spring.application.name}")
     private String appName;
 
+    @Value("${app.frontend.base-url}")
+    private String frontendBaseUrl;
+
     // Common CSS style for all email templates
     private String getEmailStyles() {
         return """
@@ -114,7 +117,7 @@ public class EmailTemplateService {
         """.formatted(appName);
     }
 
-    public String getRegistrationEmailTemplate(String userId, String userName, int deadlineHours, int remainingAttempts) {
+    public String getRegistrationEmailTemplate(Long userId, String userName, int deadlineHours, int remainingAttempts) {
         String header = getEmailHeader("Welcome to " + appName + "!");
         String content = """
                     <div class="content">
@@ -123,7 +126,7 @@ public class EmailTemplateService {
                         <p>Please click the button below to complete your registration:</p>
                         
                         <div class="button-container">
-                            <a href="http://localhost:8080/auth/registration/confirm/%d" 
+                            <a href="%s/auth/registration/confirm/%s" 
                                class="verify-button" target="_blank">
                                 Verify Your Email
                             </a>
@@ -139,13 +142,20 @@ public class EmailTemplateService {
                         
                         <div class="link-info">
                             <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-                            <p><code>http://localhost:8080/auth/registration/confirm/%d</code></p>
+                            <p><code>%s/auth/registration/confirm/%s</code></p>
                         </div>
                         
-                        <p>If the link has expired, <a href="http://localhost:8080/auth/registration/resend/%d" 
+                        <p>If the link has expired, <a href="%s/auth/registration/resend/%s" 
                            target="_blank">click here to request a new confirmation email</a>.</p>
                     </div>
-                """.formatted(userName, userId, deadlineHours, remainingAttempts, userId, userId);
+                """.formatted(
+                userName,
+                frontendBaseUrl, userId,
+                deadlineHours,
+                remainingAttempts,
+                frontendBaseUrl, userId,
+                frontendBaseUrl, userId
+        );
 
         return header + content + getEmailFooter();
     }
@@ -159,7 +169,7 @@ public class EmailTemplateService {
                         <p>Please click the button below to complete your registration:</p>
                         
                         <div class="button-container">
-                            <a href="http://localhost:8080/auth/registration/confirm/%d" 
+                            <a href="%s/auth/registration/confirm/%s" 
                                class="verify-button" target="_blank">
                                 Verify Your Email
                             </a>
@@ -175,10 +185,16 @@ public class EmailTemplateService {
                         
                         <div class="link-info">
                             <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-                            <p><code>http://localhost:8080/auth/registration/confirm/%d</code></p>
+                            <p><code>%s/auth/registration/confirm/%s</code></p>
                         </div>
                     </div>
-                """.formatted(userName, userId, deadlineHours, remainingAttempts, userId);
+                """.formatted(
+                userName,
+                frontendBaseUrl, userId,
+                deadlineHours,
+                remainingAttempts,
+                frontendBaseUrl, userId
+        );
 
         return header + content + getEmailFooter();
     }

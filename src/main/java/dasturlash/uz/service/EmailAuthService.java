@@ -36,7 +36,7 @@ public class EmailAuthService {
 
     public String registerViaEmail(RegistrationDTO dto, Profile profile, LanguageEnum lang) {
 
-        profile.setEmail(dto.getLogin());
+        profile.setEmail(dto.getEmail());
         profileRepository.save(profile);
 
         String emailContent = emailTemplateService.getRegistrationEmailTemplate(
@@ -47,7 +47,7 @@ public class EmailAuthService {
         );
 
         MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setToAccount(dto.getLogin());
+        messageDTO.setToAccount(dto.getEmail());
         messageDTO.setSubject(resourceBundleService.getMessage("email.set.subject", lang));
         messageDTO.setText(emailContent);
 
@@ -57,7 +57,9 @@ public class EmailAuthService {
         return resourceBundleService.getMessage("email.confirmation.sent", lang);
     }
 
-    public String confirmEmail(String id, LanguageEnum lang) {
+    public String confirmEmail(Long id, LanguageEnum lang) {
+
+        // check qilish kerakmas menimcha!!!
         Profile profile = profileRepository.findByIdAndVisibleTrue(id)
                 .orElseThrow(() -> new DataNotFoundException("Profile not found"));
 
@@ -74,16 +76,16 @@ public class EmailAuthService {
 
         if (!profile.getStatus().equals(ProfileStatus.IN_REGISTERED)) {
             messageHistoryService.updateEmailStatus(emailHistory, EmailStatus.FAILED);
-            return "Not Completed";
+            return resourceBundleService.getMessage("email.registration.not.completed", lang);
         }
 
         profile.setStatus(ProfileStatus.ACTIVE);
         messageHistoryService.updateEmailStatus(emailHistory, EmailStatus.DELIVERED);
         profileRepository.save(profile);
-        return "Completed";
+        return resourceBundleService.getMessage("email.registration.completed", lang);
     }
 
-    public String resendEmailConfirmation(String id, LanguageEnum lang) {
+    public String resendEmailConfirmation(Long id, LanguageEnum lang) {
         Profile profile = profileRepository.findByIdAndVisibleTrue(id)
                 .orElseThrow(() -> new DataNotFoundException("Profile not found"));
 

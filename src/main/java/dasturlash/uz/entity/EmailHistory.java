@@ -42,7 +42,7 @@ public class EmailHistory {
     private String email;
 
     @Column(name = "profile_id")
-    private String profileId;
+    private Long profileId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", updatable = false,insertable = false)
