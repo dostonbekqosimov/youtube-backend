@@ -1,4 +1,4 @@
-package dasturlash.uz.service;
+package dasturlash.uz.service.email;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

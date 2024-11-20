@@ -67,6 +67,10 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return ResponseEntity.status(500).body(e.getMessage());
     }
 
+    @ExceptionHandler(VideoProcessingException.class)
+    public ResponseEntity<?> exceptionHandler(VideoProcessingException e) {
+        return ResponseEntity.status(400).body(e.getMessage());
+    }
 
 
 

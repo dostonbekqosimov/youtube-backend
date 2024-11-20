@@ -1,4 +1,4 @@
-package dasturlash.uz.service;
+package dasturlash.uz.service.email;
 
 import dasturlash.uz.dto.MessageDTO;
 

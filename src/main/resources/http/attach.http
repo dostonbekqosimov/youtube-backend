@@ -1,0 +1,8 @@
+###
+POST http://localhost:8090/api/attach/upload
+Content-Type: multipart/form-data
+Accept-Language: ru
+
+{
+    "file": "file"
+}

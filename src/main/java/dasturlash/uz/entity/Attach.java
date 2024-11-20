@@ -28,9 +28,18 @@ public class Attach {
     private String path;
 
     @Column
-    private Long duration;
+    private String duration;
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
+
+
+    // just add out of curiosity
+    @Column(nullable = false)
+    private String extension;
+
+    @Column(nullable = false)
+    private Boolean visible;
+
 
 }

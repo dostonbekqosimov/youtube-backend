@@ -1,11 +1,10 @@
-package dasturlash.uz.service;
+package dasturlash.uz.service.email;
 
 
 import dasturlash.uz.entity.EmailHistory;
 import dasturlash.uz.entity.Profile;
 
 import dasturlash.uz.enums.EmailStatus;
-import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.repository.EmailHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
