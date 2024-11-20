@@ -58,6 +58,7 @@ public class SpringSecurityConfig {
                     hrr
                             // Authentication APIs - open to all
                             .requestMatchers("/auth/**").permitAll()
+                            .requestMatchers("/profile/changePassword").authenticated()
 
 
                             .anyRequest()
