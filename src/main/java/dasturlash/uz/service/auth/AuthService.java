@@ -1,4 +1,4 @@
-package dasturlash.uz.service;
+package dasturlash.uz.service.auth;
 
 import dasturlash.uz.dto.JwtResponseDTO;
 import dasturlash.uz.dto.RegistrationDTO;
@@ -10,8 +10,8 @@ import dasturlash.uz.exceptions.DataExistsException;
 import dasturlash.uz.exceptions.UnauthorizedException;
 import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.security.CustomUserDetails;
+import dasturlash.uz.service.ResourceBundleService;
 import dasturlash.uz.util.JwtUtil;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

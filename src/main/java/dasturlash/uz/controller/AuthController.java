@@ -4,7 +4,7 @@ import dasturlash.uz.dto.JwtResponseDTO;
 import dasturlash.uz.dto.LoginDTO;
 import dasturlash.uz.dto.RegistrationDTO;
 import dasturlash.uz.enums.LanguageEnum;
-import dasturlash.uz.service.AuthService;
+import dasturlash.uz.service.auth.AuthService;
 import dasturlash.uz.util.LanguageUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

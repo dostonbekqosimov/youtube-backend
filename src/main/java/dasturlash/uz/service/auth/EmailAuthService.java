@@ -1,4 +1,4 @@
-package dasturlash.uz.service;
+package dasturlash.uz.service.auth;
 
 
 import dasturlash.uz.dto.MessageDTO;
@@ -11,6 +11,10 @@ import dasturlash.uz.enums.ProfileStatus;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.repository.EmailHistoryRepository;
 import dasturlash.uz.repository.ProfileRepository;
+import dasturlash.uz.service.ResourceBundleService;
+import dasturlash.uz.service.email.EmailSendingService;
+import dasturlash.uz.service.email.EmailTemplateService;
+import dasturlash.uz.service.email.MessageHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
