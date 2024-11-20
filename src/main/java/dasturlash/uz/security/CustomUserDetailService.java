@@ -1,6 +1,7 @@
 package dasturlash.uz.security;
 
 import dasturlash.uz.entity.Profile;
+import dasturlash.uz.exceptions.UnauthorizedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
