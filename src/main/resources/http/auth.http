@@ -1,0 +1,19 @@
+### Register new account
+POST http://localhost:8090/auth/registration
+Content-Type: application/json
+Accept-Language: ru
+
+{
+    "name": "salom",
+    "surname": "hello",
+    "email": "hello@salom.com",
+    "password": "1"
+}
+
+### Login
+POST http://localhost:8080/auth/login
+
+{
+    "email": "hello@salom.com",
+    "password": "1"
+}

@@ -1,8 +1,6 @@
 INSERT INTO profiles
 (id, name, surname, email, password, photo_id, role, status, created_date, visible)
-VALUES
-    (
-        gen_random_uuid(), -- Generate UUID for the primary key
+VALUES (2,
         'Admin',
         'Admin',
         'admin@gmail.com',
@@ -12,4 +10,4 @@ VALUES
         'ACTIVE',
         now(), -- Current timestamp
         true -- Visible is set to true
-    );
+       );
