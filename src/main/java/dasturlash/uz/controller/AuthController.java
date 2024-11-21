@@ -1,8 +1,8 @@
 package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.JwtResponseDTO;
-import dasturlash.uz.dto.LoginDTO;
-import dasturlash.uz.dto.RegistrationDTO;
+import dasturlash.uz.dto.request.LoginDTO;
+import dasturlash.uz.dto.request.RegistrationDTO;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.service.auth.AuthService;
 import dasturlash.uz.util.LanguageUtil;

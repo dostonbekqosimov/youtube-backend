@@ -11,12 +11,16 @@ import java.time.LocalDateTime;
 @Setter
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    private LocalDateTime updatedDate;
+
+    private Boolean visible;
 }

@@ -1,7 +1,7 @@
 package dasturlash.uz.service.auth;
 
 import dasturlash.uz.dto.JwtResponseDTO;
-import dasturlash.uz.dto.RegistrationDTO;
+import dasturlash.uz.dto.request.RegistrationDTO;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.enums.ProfileRole;
