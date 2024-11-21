@@ -56,4 +56,8 @@ public class Channel {
 
     @Column(name = "visible")
     private Boolean visible;
+
+    // Adding new field for handle
+    @Column(name = "handle", nullable = false, unique = true)
+    private String handle;
 }
