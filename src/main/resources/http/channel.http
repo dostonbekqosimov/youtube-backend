@@ -1,0 +1,10 @@
+### Add new channel
+POST http://localhost:8090/api/channel
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyMjQwOTksImV4cCI6MTczMjgyODg5OX0.uJCIvuq24lh9WldZacitrXTVTzlHnZTfnMYfhMSOzlA
+
+{
+    "name": "Doston Sulaymon",
+    "description": "The best channel",
+    "handle": "doston_sulaymon02"
+}
