@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/channels")
@@ -29,10 +30,21 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/channel")
+    // Get Channel by ID
+    @GetMapping("/id")
     public ResponseEntity<ChannelResponseDTO> getChannelById(@RequestParam("id") String channelId) {
-
         return ResponseEntity.ok().body(channelService.getChannelById(channelId));
+    }
 
+    // Get Channels by Name
+    @GetMapping("/name")
+    public ResponseEntity<List<ChannelResponseDTO>> getChannelListByName(@RequestParam("name") String channelName) {
+        return ResponseEntity.ok().body(channelService.getChannelByName(channelName));
+    }
+
+    // Get Channels by Handle
+    @GetMapping("/handle")
+    public ResponseEntity<List<ChannelResponseDTO>> getChannelListByHandle(@RequestParam("handle") String channelHandle) {
+        return ResponseEntity.ok().body(channelService.getChannelByHandle(channelHandle));
     }
 }

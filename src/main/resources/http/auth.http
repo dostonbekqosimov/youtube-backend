@@ -16,6 +16,15 @@ Content-Type: application/json
 Accept-Language: ru
 
 {
-  "email": "admin@gmail.com",
-  "password": "securePassword123"
+  "email": "hello@salom.com",
+  "password": "doston123"
+}
+
+### Refresh token
+POST http://localhost:8090/api/auth/refresh
+Content-Type: application/json
+Accept-Language: ru
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyMjcyNzQsImV4cCI6MTczNDgxOTI3NH0.6MZ-5QDIdWM2VO4SrPbhZFC8Sysb1Vo4qc7iVxhdscM"
 }
