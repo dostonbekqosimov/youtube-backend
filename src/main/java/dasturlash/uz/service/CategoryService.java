@@ -8,9 +8,14 @@ import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.repository.CategoryRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,7 @@ public class CategoryService {
 
         Category newCategory = new Category();
         newCategory.setName(creationDTO.getName());
+        newCategory.setVisible(Boolean.TRUE);
         newCategory.setCreatedDate(LocalDateTime.now());
 
         categoryRepository.save(newCategory);
@@ -54,8 +60,41 @@ public class CategoryService {
         return toDto(existingCategory);
     }
 
+    public Boolean deleteById(Long id) {
+
+        // check if it exists
+        // get category
+        getById(id);
+
+        // change visible to false
+        Integer result = categoryRepository.changeVisible(id, Boolean.FALSE);
+
+        return result > 0;
+
+
+    }
+
+    public PageImpl<CategoryResponseDTO> getCategoriesList(int page, int size) {
+
+        Pageable pageRequest = PageRequest.of(page, size);
+
+        Page<Category> articleTypePage = categoryRepository.findAllAndVisibleTrue(pageRequest);
+
+        if (articleTypePage.isEmpty()) {
+            throw new DataNotFoundException("No category found");
+        }
+
+        // Convert to DTOs
+        List<CategoryResponseDTO> responseDTOS = articleTypePage
+                .stream()
+                .map(this::toDto)
+                .toList();
+        // Create a new Page with the DTOs
+        return new PageImpl<>(responseDTOS, pageRequest, articleTypePage.getTotalElements());
+    }
+
     public void existsName(String name) {
-        boolean isExist = categoryRepository.existsByName(name);
+        boolean isExist = categoryRepository.existsByNameAndVisibleTrue(name);
 
         if (isExist) {
             throw new DataExistsException("Category with name: " + name + " exists");
@@ -71,9 +110,12 @@ public class CategoryService {
     }
 
 
-
     public Category getById(Long id) {
-        return categoryRepository.findById(id)
+        return categoryRepository.findByIdAndVisibleTrue(id)
                 .orElseThrow(() -> new DataNotFoundException("Category with id: " + id + " not found"));
     }
+
+
+
+
 }

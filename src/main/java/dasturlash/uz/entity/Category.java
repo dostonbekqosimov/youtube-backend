@@ -21,4 +21,6 @@ public class Category {
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedDate;
+
+    private Boolean visible;
 }
