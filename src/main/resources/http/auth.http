@@ -1,21 +1,19 @@
 ### Register new account
-POST http://localhost:8090/auth/registration
+POST http://localhost:8080/auth/registration
 Content-Type: application/json
-Accept-Language: ru
+Accept-Language: en
 
 {
-    "name": "Doston",
+    "name": "salom",
     "surname": "hello",
-    "email": "hello@salom.com",
+    "email": "saidovdiyer777@gmail.com",
     "password": "1"
 }
 
 ### Login
-POST http://localhost:8090/api/auth/login
-Content-Type: application/json
-Accept-Language: ru
+POST http://localhost:8080/auth/login
 
 {
-    "email": "admin@gmail.com",
-    "password": "securePassword123"
+    "email": "ddiiyyoorr009@gmail.com",
+    "password": "1"
 }

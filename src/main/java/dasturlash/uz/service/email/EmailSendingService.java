@@ -26,10 +26,10 @@ public class EmailSendingService {
     public String sendMimeMessage(MessageDTO dto, Profile profile) {
 
         EmailHistory history = messageHistoryService.createEmailHistory(
-                dto.getToAccount(),
-                dto.getSubject(),
-                dto.getText(),
-                profile
+                                                                        dto.getToAccount(),
+                                                                        dto.getSubject(),
+                                                                        dto.getText(),
+                                                                        profile
         );
 
 
@@ -50,7 +50,6 @@ public class EmailSendingService {
             return "Mail was sent successfully";
         } catch (MessagingException e) {
             messageHistoryService.updateEmailStatus(history, EmailStatus.FAILED);
-
             throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
         }
     }

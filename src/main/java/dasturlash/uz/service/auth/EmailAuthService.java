@@ -45,10 +45,10 @@ public class EmailAuthService {
         profileRepository.save(profile);
 
         String emailContent = emailTemplateService.getRegistrationEmailTemplate(
-                profile.getId(),
-                profile.getName(),
-                confirmationDeadlineMinutes,
-                maxResendAttempts
+                                                                                profile.getId(),
+                                                                                profile.getName(),
+                                                                                confirmationDeadlineMinutes,
+                                                                                maxResendAttempts
         );
 
         MessageDTO messageDTO = new MessageDTO();
@@ -110,10 +110,10 @@ public class EmailAuthService {
         }
 
         String emailContent = emailTemplateService.getRegistrationEmailTemplate(
-                profile.getId(),
-                profile.getName(),
-                confirmationDeadlineMinutes,
-                maxResendAttempts - lastHistory.getAttemptCount()
+                                                                                profile.getId(),
+                                                                                profile.getName(),
+                                                                                confirmationDeadlineMinutes,
+                                                                 maxResendAttempts - lastHistory.getAttemptCount()
         );
 
         MessageDTO messageDTO = new MessageDTO();
