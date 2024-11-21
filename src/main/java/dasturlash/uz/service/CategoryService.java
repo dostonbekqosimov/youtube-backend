@@ -25,6 +25,7 @@ public class CategoryService {
 
         Category newCategory = new Category();
         newCategory.setName(creationDTO.getName());
+        newCategory.setVisible(Boolean.TRUE);
         newCategory.setCreatedDate(LocalDateTime.now());
 
         categoryRepository.save(newCategory);
@@ -55,7 +56,7 @@ public class CategoryService {
     }
 
     public void existsName(String name) {
-        boolean isExist = categoryRepository.existsByName(name);
+        boolean isExist = categoryRepository.existsByNameAndVisibleTrue(name);
 
         if (isExist) {
             throw new DataExistsException("Category with name: " + name + " exists");
@@ -71,9 +72,22 @@ public class CategoryService {
     }
 
 
-
     public Category getById(Long id) {
-        return categoryRepository.findById(id)
+        return categoryRepository.findByIdAndVisibleTrue(id)
                 .orElseThrow(() -> new DataNotFoundException("Category with id: " + id + " not found"));
+    }
+
+    public Boolean deleteById(Long id) {
+
+        // check if it exists
+        // get category
+        getById(id);
+
+        // change visible to false
+        Integer result = categoryRepository.changeVisible(id, Boolean.FALSE);
+
+        return result > 0;
+
+
     }
 }
