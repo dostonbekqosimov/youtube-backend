@@ -40,6 +40,7 @@ public class EmailAuthService {
 
     public String registerViaEmail(RegistrationDTO dto, Profile profile, LanguageEnum lang) {
 
+
         profile.setEmail(dto.getEmail());
         profileRepository.save(profile);
 
