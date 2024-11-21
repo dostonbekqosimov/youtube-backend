@@ -1,5 +1,5 @@
 package dasturlash.uz.enums;
 
-public enum PlaylistStatus {
+public enum ContentStatus {
     PRIVATE, PUBLIC
 }

@@ -1,10 +1,9 @@
-package dasturlash.uz.entity;
+package dasturlash.uz.entity.video;
 
-import dasturlash.uz.enums.PlaylistStatus;
+import dasturlash.uz.entity.Channel;
+import dasturlash.uz.enums.ContentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +24,7 @@ public class Playlist {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private PlaylistStatus status;
+    private ContentStatus status;
 
     @Column(name = "order_number", nullable = false)
     private Integer orderNumber;
