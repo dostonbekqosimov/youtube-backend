@@ -10,6 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,11 +24,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -195,7 +202,7 @@ public class AttachService {
         Attach entity = getById(attachId);
 
         // Construct the full file path by combining base folder, date path, and file name
-        String path = folderName + "/" + entity.getPath() + "/" + entity.getId();
+        String path = getPath(entity);
 
         // Normalize the file path to handle any potential path manipulation
         Path filePath = Paths.get(path).normalize();
@@ -228,10 +235,56 @@ public class AttachService {
         }
     }
 
+    public PageImpl<AttachDTO> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Attach> entityPages = attachRepository.findAll(pageable);
+        List<AttachDTO> response = entityPages.stream().map(this::toDTO).toList();
+        return new PageImpl<>(response, pageable, entityPages.getTotalElements());
+    }
+
+    public Boolean delete(String id) {
+        Attach entity = getById(id);
+//        attachRepository.delete(entity);
+        attachRepository.changeVisible(id, Boolean.FALSE);
+        File file = new File(getPath(entity));
+        boolean isDeleted = false;
+        if (file.exists()) {
+            isDeleted = file.delete();
+        }
+        return isDeleted;
+    }
 
     public Attach getById(String id) {
         // Use Spring Data JPA's findById method with a custom exception if not found
         return attachRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("File not found with id: " + id));
     }
+
+    public ResponseEntity<Resource> downloadVideo(String id) {
+
+        try {
+            Attach entity = getById(id);
+            Path filePath = Paths.get(getPath(entity)).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + entity.getOriginName() + "\"").body(resource);
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Could not read the file!");
+        }
+    }
+
+    private String getPath(Attach entity) {
+        return folderName + "/" + entity.getPath() + "/" + entity.getId();
+    }
+
+
+
 }

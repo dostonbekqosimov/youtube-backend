@@ -5,7 +5,9 @@ import dasturlash.uz.service.AttachService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,24 @@ public class AttachController {
     public ResponseEntity<Resource> openVideo(@PathVariable("fileName") String fileName) {
         System.out.println("I'm being called with: " + fileName);
         return attachService.openVideo(fileName);
+    }
+
+    @GetMapping("/download/{fileName}")
+    public ResponseEntity<Resource> downloadVideo(@PathVariable("fileName") String fileName) {
+        return attachService.downloadVideo(fileName);
+    }
+
+    @GetMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<PageImpl<AttachDTO>> getAllVideos(@RequestParam(value = "page", defaultValue = "1") int page,
+                                                            @RequestParam(value = "size", defaultValue = "15") int size) {
+        return ResponseEntity.ok(attachService.getAll(page - 1, size));
+    }
+
+    @DeleteMapping("/{fileName}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Boolean> deleteVideo(@PathVariable("fileName") String id) {
+        return ResponseEntity.ok(attachService.delete(id));
     }
 
 }
