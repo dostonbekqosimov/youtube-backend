@@ -11,7 +11,7 @@ Accept-Language: ru
 }
 
 ### Login
-POST http://localhost:8090/auth/login
+POST http://localhost:8090/api/auth/login
 Content-Type: application/json
 Accept-Language: ru
 

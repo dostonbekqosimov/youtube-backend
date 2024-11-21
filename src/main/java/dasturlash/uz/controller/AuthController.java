@@ -47,7 +47,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDTO> login(@RequestBody @Valid LoginDTO loginDTO,
-                                                @RequestHeader(value = "Accept-Language", defaultValue = "uz") LanguageEnum lang) {
+                                                @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
+
+        LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
         return ResponseEntity.ok(authService.login(loginDTO.getEmail(), loginDTO.getPassword(), lang));
     }
 }

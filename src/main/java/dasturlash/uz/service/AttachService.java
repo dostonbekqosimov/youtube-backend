@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -230,6 +235,12 @@ public class AttachService {
         }
     }
 
+    public PageImpl<AttachDTO> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Attach> entityPages = attachRepository.findAll(pageable);
+        List<AttachDTO> response = entityPages.stream().map(this::toDTO).toList();
+        return new PageImpl<>(response, pageable, entityPages.getTotalElements());
+    }
 
     public Attach getById(String id) {
         // Use Spring Data JPA's findById method with a custom exception if not found
@@ -261,4 +272,6 @@ public class AttachService {
     private String getPath(Attach entity) {
         return folderName + "/" + entity.getPath() + "/" + entity.getId();
     }
+
+
 }
