@@ -1,0 +1,8 @@
+### Change Password
+PUT http://localhost:8090/profile/changePassword
+Content-Type: application/json
+
+{
+    "oldPassword": "1",
+    "newPassword": "doston123"
+}
