@@ -23,12 +23,12 @@ public class EmailSendingService {
     private final JavaMailSender javaMailSender;
     private final EmailHistoryService emailHistoryService;
 
-    public String sendMimeMessage(MessageDTO dto, Profile profile) {
+    public String sendMimeMessage(MessageDTO messageDTO, Profile profile) {
 
         EmailHistory history = emailHistoryService.createEmailHistory(
-                dto.getToAccount(),
-                dto.getSubject(),
-                dto.getText(),
+                messageDTO.getToAccount(),
+                messageDTO.getSubject(),
+                messageDTO.getText(),
                 profile
         );
 
@@ -38,9 +38,9 @@ public class EmailSendingService {
             msg.setFrom(fromAccount);
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
 
-            helper.setTo(dto.getToAccount());
-            helper.setSubject(dto.getSubject());
-            helper.setText(dto.getText(), true);
+            helper.setTo(messageDTO.getToAccount());
+            helper.setSubject(messageDTO.getSubject());
+            helper.setText(messageDTO.getText(), true);
             javaMailSender.send(msg);
 
             // Update status to SENT after successful send
