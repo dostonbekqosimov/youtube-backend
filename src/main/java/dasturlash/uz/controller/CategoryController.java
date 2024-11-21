@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +22,14 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO> create(@RequestBody @Valid CategoryRequestDTO creationDTO) {
 
         return ResponseEntity.status(201).body(categoryService.create(creationDTO));
+    }
+
+    // Update Category by id
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<CategoryResponseDTO> updateById(@PathVariable("id") Long id,
+                                        @RequestBody @Valid CategoryRequestDTO requestDTO) {
+
+        return ResponseEntity.ok().body(categoryService.updateById(id, requestDTO));
     }
 }
