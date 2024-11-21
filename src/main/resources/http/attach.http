@@ -2,8 +2,16 @@ POST http://localhost:8090/api/attach/upload
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="file"; filename="1728907204404.mp4"
+Content-Disposition: form-data; name="file"; filename="video_konsta.mp4"
 Content-Type: application/octet-stream
 
-< /home/doston/Videos/1728907204404.mp4
+< /home/doston/Videos/video_konsta.mp4
 --WebAppBoundary--
+
+### Open video
+GET http://localhost:8090/api/attach/open/077d8b69-a65a-4d68-9edb-7123235e3099.mp4
+Accept: video/*
+
+### Download video
+GET http://localhost:8090/api/attach/download/cdb44480-ca28-461b-946c-693995fe98f2.mp4
+Accept: application/octet-stream

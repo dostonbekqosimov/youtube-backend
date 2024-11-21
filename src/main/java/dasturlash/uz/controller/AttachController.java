@@ -30,4 +30,11 @@ public class AttachController {
         return attachService.openVideo(fileName);
     }
 
+    @GetMapping("/download/{fileName}")
+    public ResponseEntity<Resource> download(@PathVariable("fileName") String fileName) {
+        return attachService.downloadVideo(fileName);
+    }
+
+
+
 }
