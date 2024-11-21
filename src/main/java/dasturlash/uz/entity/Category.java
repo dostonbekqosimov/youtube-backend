@@ -19,4 +19,6 @@ public class Category {
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    private LocalDateTime updatedDate;
 }
