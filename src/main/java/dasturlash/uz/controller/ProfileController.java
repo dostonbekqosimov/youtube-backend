@@ -43,5 +43,7 @@ public class ProfileController {
     }
 
     @PutMapping("/updateDetail")
-    public ResponseEntity<String> updateDetail(@RequestBody @Valid UpdateProfileDetailDTO dto){}
+    public ResponseEntity<String> updateDetail(@RequestBody @Valid UpdateProfileDetailDTO dto){
+        return ResponseEntity.ok(service.updateDetail(dto));
+    }
 }
