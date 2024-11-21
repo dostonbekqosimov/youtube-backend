@@ -242,6 +242,17 @@ public class AttachService {
         return new PageImpl<>(response, pageable, entityPages.getTotalElements());
     }
 
+    public Boolean delete(String id) {
+        Attach entity = getById(id);
+        attachRepository.delete(entity);
+        File file = new File(getPath(entity));
+        boolean isDeleted = false;
+        if (file.exists()) {
+            isDeleted = file.delete();
+        }
+        return isDeleted;
+    }
+
     public Attach getById(String id) {
         // Use Spring Data JPA's findById method with a custom exception if not found
         return attachRepository.findById(id)
@@ -272,6 +283,7 @@ public class AttachService {
     private String getPath(Attach entity) {
         return folderName + "/" + entity.getPath() + "/" + entity.getId();
     }
+
 
 
 }

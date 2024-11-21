@@ -33,15 +33,21 @@ public class AttachController {
     }
 
     @GetMapping("/download/{fileName}")
-    public ResponseEntity<Resource> download(@PathVariable("fileName") String fileName) {
+    public ResponseEntity<Resource> downloadVideo(@PathVariable("fileName") String fileName) {
         return attachService.downloadVideo(fileName);
     }
 
     @GetMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<PageImpl<AttachDTO>> getAll(@RequestParam(value = "page", defaultValue = "1") int page,
-                                                      @RequestParam(value = "size", defaultValue = "15") int size) {
+    public ResponseEntity<PageImpl<AttachDTO>> getAllVideos(@RequestParam(value = "page", defaultValue = "1") int page,
+                                                            @RequestParam(value = "size", defaultValue = "15") int size) {
         return ResponseEntity.ok(attachService.getAll(page - 1, size));
+    }
+
+    @DeleteMapping("/{fileName}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Boolean> deleteVideo(@PathVariable("fileName") String id) {
+        return ResponseEntity.ok(attachService.delete(id));
     }
 
 
