@@ -8,7 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "playlist")
+@Table(name = "channels")
 @Data
 public class Channel {
 
