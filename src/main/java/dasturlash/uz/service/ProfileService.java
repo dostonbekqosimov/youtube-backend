@@ -2,6 +2,7 @@ package dasturlash.uz.service;
 
 import dasturlash.uz.dto.MessageDTO;
 import dasturlash.uz.dto.ProfileDTO;
+import dasturlash.uz.dto.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.ProfileStatus;
@@ -110,5 +111,18 @@ public class ProfileService {
 
         emailSendingService.sendMimeMessage(messageDTO, currentProfile);
         return "Sent code your email";
+    }
+
+    public String updateDetail(@Valid UpdateProfileDetailDTO dto) {
+        Long currentUserId = SpringSecurityUtil.getCurrentUserId();
+        Profile currentProfile = findById(currentUserId);
+
+        if (currentProfile != null) {
+            currentProfile.setName(dto.getName());
+            currentProfile.setSurname(dto.getSurname());
+            repository.save(currentProfile);
+            return "Profile updated successfully";
+        }
+        return "Profile not found";
     }
 }
