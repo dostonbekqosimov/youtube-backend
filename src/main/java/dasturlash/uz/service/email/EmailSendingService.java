@@ -21,15 +21,15 @@ public class EmailSendingService {
     private String fromAccount;
 
     private final JavaMailSender javaMailSender;
-    private final MessageHistoryService messageHistoryService;
+    private final EmailHistoryService emailHistoryService;
 
     public String sendMimeMessage(MessageDTO dto, Profile profile) {
 
-        EmailHistory history = messageHistoryService.createEmailHistory(
-                                                                        dto.getToAccount(),
-                                                                        dto.getSubject(),
-                                                                        dto.getText(),
-                                                                        profile
+        EmailHistory history = emailHistoryService.createEmailHistory(
+                dto.getToAccount(),
+                dto.getSubject(),
+                dto.getText(),
+                profile
         );
 
 
@@ -44,12 +44,12 @@ public class EmailSendingService {
             javaMailSender.send(msg);
 
             // Update status to SENT after successful send
-            messageHistoryService.updateEmailStatus(history, EmailStatus.SENT);
+            emailHistoryService.updateEmailStatus(history, EmailStatus.SENT);
 
 
             return "Mail was sent successfully";
         } catch (MessagingException e) {
-            messageHistoryService.updateEmailStatus(history, EmailStatus.FAILED);
+            emailHistoryService.updateEmailStatus(history, EmailStatus.FAILED);
             throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
         }
     }
