@@ -72,6 +72,11 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return ResponseEntity.status(400).body(e.getMessage());
     }
 
+    @ExceptionHandler(ChannelExistsException.class)
+    public ResponseEntity<?> exceptionHandler(ChannelExistsException e) {
+        return ResponseEntity.status(400).body(e.getMessage());
+    }
+
 
 
 
