@@ -5,6 +5,7 @@ import dasturlash.uz.dto.response.CategoryResponseDTO;
 import dasturlash.uz.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +40,14 @@ public class CategoryController {
     public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id) {
         Boolean result = categoryService.deleteById(id);
         return ResponseEntity.ok(result);
+    }
+
+    // Get the list of Categories with pagination
+    @GetMapping({"", "/"})
+    public ResponseEntity<PageImpl<CategoryResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                                @RequestParam(value = "size", defaultValue = "5") Integer size) {
+
+        return ResponseEntity.ok().body(categoryService.getCategoriesList(page - 1, size));
+
     }
 }

@@ -2,6 +2,8 @@ package dasturlash.uz.repository;
 
 import dasturlash.uz.entity.Category;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -22,4 +24,7 @@ public interface CategoryRepository extends CrudRepository<Category, Long>, Pagi
     Optional<Category> findByIdAndVisibleTrue(Long id);
 
     boolean existsByNameAndVisibleTrue(String name);
+
+    @Query("SELECT c FROM Category c WHERE c.visible = true")
+    Page<Category> findAllAndVisibleTrue(Pageable pageable);
 }
