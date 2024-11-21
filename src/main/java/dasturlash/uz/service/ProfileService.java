@@ -1,5 +1,6 @@
 package dasturlash.uz.service;
 
+import dasturlash.uz.dto.MessageDTO;
 import dasturlash.uz.dto.ProfileDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
 import dasturlash.uz.entity.Profile;
@@ -7,6 +8,9 @@ import dasturlash.uz.enums.ProfileStatus;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.security.SpringSecurityUtil;
+import dasturlash.uz.service.email.EmailSendingService;
+import dasturlash.uz.util.RandomUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +28,7 @@ public class ProfileService {
     private final ProfileRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final ResourceBundleService resourceBundleService;
+    private final EmailSendingService emailSendingService;
 
 
     public String changePassword(ChangePasswordRequest request) {
@@ -87,5 +92,23 @@ public class ProfileService {
             profiles.add(profile);
         }
         return profiles;
+    }
+
+    public String updateEmail(@Valid String email) {
+        Long currentUserId = SpringSecurityUtil.getCurrentUserId();
+        Profile currentProfile = findById(currentUserId);
+        int code = RandomUtil.getRandomInt();
+
+
+        if (email.equals(currentProfile.getEmail())) {
+            return "Email already exists";
+        }
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setToAccount(email);
+        messageDTO.setSubject("");
+        messageDTO.setText("localhost:8080/profile/confirm/"+ code);
+
+        emailSendingService.sendMimeMessage(messageDTO, currentProfile);
+        return "Sent code your email";
     }
 }
