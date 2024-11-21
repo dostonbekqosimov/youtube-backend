@@ -2,6 +2,7 @@ package dasturlash.uz.controller;
 
 
 import dasturlash.uz.dto.ProfileDTO;
+import dasturlash.uz.dto.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.service.ProfileService;
@@ -29,8 +30,18 @@ public class ProfileController {
         return ResponseEntity.ok(service.create(profileDTO));
     }
 
+
+
     @GetMapping("/getAll")
     public ResponseEntity<List<Profile>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
+
+    @PutMapping("/updateEmail")
+    public ResponseEntity<String> updateEmail(@RequestParam @Valid String email){
+        return ResponseEntity.ok(service.updateEmail(email));
+    }
+
+    @PutMapping("/updateDetail")
+    public ResponseEntity<String> updateDetail(@RequestBody @Valid UpdateProfileDetailDTO dto){}
 }
