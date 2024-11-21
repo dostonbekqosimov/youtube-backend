@@ -21,15 +21,15 @@ public class EmailSendingService {
     private String fromAccount;
 
     private final JavaMailSender javaMailSender;
-    private final MessageHistoryService messageHistoryService;
+    private final EmailHistoryService emailHistoryService;
 
-    public String sendMimeMessage(MessageDTO dto, Profile profile) {
+    public String sendMimeMessage(MessageDTO messageDTO, Profile profile) {
 
-        EmailHistory history = messageHistoryService.createEmailHistory(
-                                                                        dto.getToAccount(),
-                                                                        dto.getSubject(),
-                                                                        dto.getText(),
-                                                                        profile
+        EmailHistory history = emailHistoryService.createEmailHistory(
+                messageDTO.getToAccount(),
+                messageDTO.getSubject(),
+                messageDTO.getText(),
+                profile
         );
 
 
@@ -38,18 +38,18 @@ public class EmailSendingService {
             msg.setFrom(fromAccount);
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
 
-            helper.setTo(dto.getToAccount());
-            helper.setSubject(dto.getSubject());
-            helper.setText(dto.getText(), true);
+            helper.setTo(messageDTO.getToAccount());
+            helper.setSubject(messageDTO.getSubject());
+            helper.setText(messageDTO.getText(), true);
             javaMailSender.send(msg);
 
             // Update status to SENT after successful send
-            messageHistoryService.updateEmailStatus(history, EmailStatus.SENT);
+            emailHistoryService.updateEmailStatus(history, EmailStatus.SENT);
 
 
             return "Mail was sent successfully";
         } catch (MessagingException e) {
-            messageHistoryService.updateEmailStatus(history, EmailStatus.FAILED);
+            emailHistoryService.updateEmailStatus(history, EmailStatus.FAILED);
             throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
         }
     }
