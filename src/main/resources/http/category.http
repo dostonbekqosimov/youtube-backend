@@ -1,0 +1,8 @@
+### Create new category
+POST http://localhost:8090/api/category/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8
+
+{
+    "name": "Games"
+}
