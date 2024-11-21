@@ -57,12 +57,11 @@ public class SpringSecurityConfig {
 
         http.authorizeHttpRequests(hrr -> {
                     hrr
-                            // Authentication APIs - open to all
+                            // Authentication APIs - open to all users
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/attach/**").permitAll()
-                            .requestMatchers(HttpMethod.GET, "/api/channel/{id}").permitAll()  // Allow public access to /api/channel/{id}
-                            //Authentication APIs - open to authenticated
-                            .requestMatchers("/api/channel/**").authenticated()
+                            .requestMatchers(HttpMethod.GET, "/api/channels/**").permitAll()  // Allow public access to /api/channel/{id}
+                            //Authentication APIs - open to authenticated users
                             .requestMatchers("profile/updateEmail").authenticated()
                             .requestMatchers("/profile/changePassword").authenticated()
                             .requestMatchers("/profile/updateDetails").authenticated()

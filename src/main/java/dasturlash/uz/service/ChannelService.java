@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 
@@ -79,5 +80,31 @@ public class ChannelService {
 
     private Channel getById(String id) {
         return channelRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Channel not found"));
+    }
+
+    public List<ChannelResponseDTO> getChannelByName(String channelName) {
+
+        List<Channel> channels = channelRepository.findByName((channelName));
+
+        // check if there is channel by given name
+        // Shu yerda agar hech qanday channel topilmasa videolardan nimadur berib yuborish kerak, yoki maslahatlashamiz(Doston)
+        if (channels.isEmpty()) {
+            throw new DataNotFoundException("No channel found");
+        }
+
+        return channels.stream().map(this::toChannelResponseDTO).toList();
+    }
+
+    public List<ChannelResponseDTO> getChannelByHandle(String channelHandle) {
+
+        List<Channel> channels = channelRepository.findByHandle(channelHandle);
+
+        // check if there is channel by given handle
+        // Shu yerda agar hech qanday channel topilmasa videolardan nimadur berib yuborish kerak, yoki maslahatlashamiz(Doston)
+        if (channels.isEmpty()) {
+            throw new DataNotFoundException("No channel found");
+        }
+
+        return channels.stream().map(this::toChannelResponseDTO).toList();
     }
 }
