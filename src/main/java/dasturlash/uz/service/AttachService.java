@@ -244,7 +244,8 @@ public class AttachService {
 
     public Boolean delete(String id) {
         Attach entity = getById(id);
-        attachRepository.delete(entity);
+//        attachRepository.delete(entity);
+        attachRepository.changeVisible(id, Boolean.FALSE);
         File file = new File(getPath(entity));
         boolean isDeleted = false;
         if (file.exists()) {
