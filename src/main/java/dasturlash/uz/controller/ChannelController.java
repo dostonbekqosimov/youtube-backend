@@ -1,6 +1,7 @@
 package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.ChannelCreateRequest;
+import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -8,15 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/channel")
+@RequestMapping("/api/channels")
 @RequiredArgsConstructor
 public class ChannelController {
 
@@ -27,8 +25,14 @@ public class ChannelController {
     @PostMapping({"", "/"})
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Void> create(@RequestBody @Valid ChannelCreateRequest request) {
-
         channelService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/channel")
+    public ResponseEntity<ChannelResponseDTO> getChannelById(@RequestParam("id") String channelId) {
+
+        return ResponseEntity.ok().body(channelService.getChannelById(channelId));
+
     }
 }

@@ -1,9 +1,11 @@
 package dasturlash.uz.service;
 
 import dasturlash.uz.dto.request.ChannelCreateRequest;
+import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ChannelStatus;
 import dasturlash.uz.exceptions.ChannelExistsException;
+import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +50,34 @@ public class ChannelService {
         if (isExist) {
             throw new ChannelExistsException("Channel with handle: " + handle + " exists");
         }
+    }
+
+    public ChannelResponseDTO getChannelById(String channelId) {
+
+        // check if channel exists
+        Channel channel = getById(channelId);
+
+        return toChannelResponseDTO(channel);
+    }
+
+    private ChannelResponseDTO toChannelResponseDTO(Channel channel) {
+        ChannelResponseDTO channelResponseDTO = new ChannelResponseDTO();
+        channelResponseDTO.setId(channel.getId());
+        channelResponseDTO.setName(channel.getName());
+        channelResponseDTO.setDescription(channel.getDescription());
+        channelResponseDTO.setHandle(channel.getHandle());
+        channelResponseDTO.setProfileId(channel.getProfileId());
+        channelResponseDTO.setStatus(channel.getStatus());
+        channelResponseDTO.setCreatedDate(channel.getCreatedDate());
+        channelResponseDTO.setUpdatedDate(channel.getUpdatedDate());
+        channelResponseDTO.setVisible(channel.getVisible());
+        channelResponseDTO.setBannerId(channel.getBannerId());
+        channelResponseDTO.setPhotoId(channel.getPhotoId());
+
+        return channelResponseDTO;
+    }
+
+    private Channel getById(String id) {
+        return channelRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Channel not found"));
     }
 }

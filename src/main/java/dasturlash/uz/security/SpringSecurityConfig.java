@@ -3,6 +3,7 @@ package dasturlash.uz.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -59,7 +60,9 @@ public class SpringSecurityConfig {
                             // Authentication APIs - open to all
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/attach/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/api/channel/{id}").permitAll()  // Allow public access to /api/channel/{id}
                             //Authentication APIs - open to authenticated
+                            .requestMatchers("/api/channel/**").authenticated()
                             .requestMatchers("profile/updateEmail").authenticated()
                             .requestMatchers("/profile/changePassword").authenticated()
                             .requestMatchers("/profile/updateDetails").authenticated()
