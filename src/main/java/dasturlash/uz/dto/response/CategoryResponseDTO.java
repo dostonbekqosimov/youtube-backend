@@ -9,10 +9,6 @@ import java.time.LocalDateTime;
 @Setter
 public class CategoryResponseDTO {
     private Long id;
-    private Integer orderNumber;
-    private String nameUz;
-    private String nameRu;
-    private String nameEn;
-    private Boolean visible;
+    private String name;
     private LocalDateTime createdDate;
 }
