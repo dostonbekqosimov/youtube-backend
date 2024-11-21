@@ -48,6 +48,5 @@ public class CategoryController {
                                                                 @RequestParam(value = "size", defaultValue = "5") Integer size) {
 
         return ResponseEntity.ok().body(categoryService.getCategoriesList(page - 1, size));
-
     }
 }
