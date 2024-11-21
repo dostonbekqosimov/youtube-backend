@@ -100,7 +100,7 @@ public class ProfileService {
         Profile currentProfile = findById(currentUserId);
         int code = RandomUtil.getRandomInt();
 
-
+        
         if (email.equals(currentProfile.getEmail())) {
             return "Email already exists";
         }
