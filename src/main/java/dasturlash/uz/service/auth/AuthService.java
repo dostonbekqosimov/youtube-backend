@@ -1,17 +1,21 @@
 package dasturlash.uz.service.auth;
 
+import dasturlash.uz.dto.JwtDTO;
 import dasturlash.uz.dto.JwtResponseDTO;
+import dasturlash.uz.dto.TokenDTO;
 import dasturlash.uz.dto.request.RegistrationDTO;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.enums.ProfileStatus;
+import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataExistsException;
 import dasturlash.uz.exceptions.UnauthorizedException;
 import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.security.CustomUserDetails;
 import dasturlash.uz.service.ResourceBundleService;
 import dasturlash.uz.util.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -75,7 +79,7 @@ public class AuthService {
     public JwtResponseDTO login(String email, String password, LanguageEnum lang) {
 
 
-        Profile entity = profileRepository.findByEmailAndVisibleTrue(email)
+        profileRepository.findByEmailAndVisibleTrue(email)
                 .orElseThrow(() -> new UnauthorizedException(resourceBundleService.getMessage("login.password.wrong", lang)));
 
 
@@ -111,4 +115,38 @@ public class AuthService {
 
         }
     }
+
+    public TokenDTO getNewAccessToken(TokenDTO dto, LanguageEnum lang) {
+        // First check if refresh token is provided
+        if (dto.getRefreshToken() == null || dto.getRefreshToken().trim().isEmpty()) {
+            throw new AppBadRequestException(resourceBundleService.getMessage("refresh.token.required", lang));
+        }
+
+        // Validate the refresh token
+        JwtUtil.TokenValidationResult validationResult = JwtUtil.validateToken(dto.getRefreshToken());
+        if (!validationResult.isValid()) {
+            throw new UnauthorizedException(validationResult.getMessage());
+        }
+        try {
+            JwtDTO jwtDTO = JwtUtil.decode(dto.getRefreshToken());
+
+            Profile profile = profileRepository.findByEmailAndVisibleTrue(jwtDTO.getLogin())
+                    .orElseThrow(() -> new UnauthorizedException(resourceBundleService.getMessage("refresh.token.invalid", lang)));
+
+            // Check if user is still active
+            if (!profile.getStatus().equals(ProfileStatus.ACTIVE)) {
+                throw new UnauthorizedException(resourceBundleService.getMessage("account.not.active", lang));
+            }
+
+            TokenDTO response = new TokenDTO();
+            response.setAccessToken(JwtUtil.encode(profile.getEmail(), profile.getRole().name()));
+            response.setRefreshToken(JwtUtil.refreshToken(profile.getEmail(), profile.getRole().name()));
+            return response;
+
+        } catch (JwtException e) {
+            throw new UnauthorizedException(resourceBundleService.getMessage("refresh.token.invalid", lang));
+        }
+    }
+
+
 }
