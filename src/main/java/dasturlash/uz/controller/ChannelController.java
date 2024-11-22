@@ -46,6 +46,7 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+
     // Update channel photo
     @PatchMapping("/edit-photo")
     @PreAuthorize("hasRole('ROLE_USER')")
