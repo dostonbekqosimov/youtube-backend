@@ -1,25 +1,45 @@
 ### Add new channel
 POST http://localhost:8090/api/channels
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMjMxNTc4LCJleHAiOjE3MzI4MzYzNzh9.jnCSOyw-FkPNTAWsQznc_noIkZ0f4WOTAuZ-vpw6EOo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyOTE3NDUsImV4cCI6MTczMjg5NjU0NX0.JeK8LFIjtTUTujtitG3rsEd5urE9hTZsvYjR_n2yXXQ
 Accept-Language: ru
 
 {
     "name": "Buyuk insonlar",
     "description": "We will help people help others",
-    "handle": "great_humans"
+    "handle": "updated_handle2"
 }
 
 ### Update channel info by id
 PATCH http://localhost:8090/api/channels/edit-info?id=1c5da01e-184d-430d-aff9-07ca4d3fa028
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJiZWtAc2Fsb20uY29tIiwic3ViIjoiYmVrQHNhbG9tLmNvbSIsImlhdCI6MTczMjI3NDE1MiwiZXhwIjoxNzMyODc4OTUyfQ.It0-0LvkjqXBWxp1YyP42DhFQJiKsDRXG-fRH8WzH2w
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyOTE3NDUsImV4cCI6MTczMjg5NjU0NX0.JeK8LFIjtTUTujtitG3rsEd5urE9hTZsvYjR_n2yXXQ
 Accept-Language: ru
 
 {
   "name": "Updated name",
   "description": "Updated description",
-  "handle": "updated_handle"
+  "handle": "updated_handle2"
+}
+
+### Update channel photo by id
+PATCH http://localhost:8090/api/channels/edit-photo?id=1c5da01e-184d-430d-aff9-07ca4d3fa028
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyOTE3NDUsImV4cCI6MTczMjg5NjU0NX0.JeK8LFIjtTUTujtitG3rsEd5urE9hTZsvYjR_n2yXXQ
+Accept-Language: ru
+
+{
+    "photoId": "6af9e57d-fc8e-4ce5-bf26-820e49fac223.png"
+}
+
+### Update channel banner by id
+PATCH http://localhost:8090/api/channels/edit-banner?id=1c5da01e-184d-430d-aff9-07ca4d3fa028
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyOTE3NDUsImV4cCI6MTczMjg5NjU0NX0.JeK8LFIjtTUTujtitG3rsEd5urE9hTZsvYjR_n2yXXQ
+Accept-Language: ru
+
+{
+    "bannerId": "d0e2b439-4ad2-4faa-81b9-ec5c66f2928f.jpeg"
 }
 
 ### Get channel by id
