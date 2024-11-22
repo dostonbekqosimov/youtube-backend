@@ -4,10 +4,10 @@ Content-Type: application/json
 Accept-Language: ru
 
 {
-  "name": "Bek",
-  "surname": "Bekov",
-  "email": "bek@salom.com",
-  "password": "1"
+  "name": "<name>",
+  "surname": "<surname>",
+  "email": "<email>",
+  "password": "<password>"
 }
 
 ### Login
@@ -16,8 +16,8 @@ Content-Type: application/json
 Accept-Language: uz
 
 {
-  "email": "bek@salom.com",
-  "password": "1"
+  "email": "<email>",
+  "password": "<password>"
 }
 
 ### Refresh token
@@ -26,5 +26,5 @@ Content-Type: application/json
 Accept-Language: ru
 
 {
-    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyMjcyNzQsImV4cCI6MTczNDgxOTI3NH0.6MZ-5QDIdWM2VO4SrPbhZFC8Sysb1Vo4qc7iVxhdscM"
+    "refreshToken": "<refreshToken>"
 }
