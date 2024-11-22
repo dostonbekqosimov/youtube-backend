@@ -5,6 +5,7 @@ import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ChannelStatus;
 import dasturlash.uz.enums.LanguageEnum;
+import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.ChannelExistsException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
@@ -48,22 +49,27 @@ public class ChannelService {
 
     public void updateChannelInfo(String channelId, ChannelCreateRequest updateRequest, LanguageEnum lang) {
 
+
         Channel channel = getById(channelId);
-        try {
-            if (!updateRequest.getName().equals(channel.getName())) {
-                channel.setName(updateRequest.getName());
+        if (getCurrentUserId().equals(channel.getProfileId())) {
+            try {
+                if (!updateRequest.getName().equals(channel.getName())) {
+                    channel.setName(updateRequest.getName());
+                }
+                if (!updateRequest.getDescription().equals(channel.getDescription())) {
+                    channel.setDescription(updateRequest.getDescription());
+                }
+                if (!updateRequest.getHandle().equals(channel.getHandle())) {
+                    existByHandle(updateRequest.getHandle());
+                    channel.setHandle(updateRequest.getHandle());
+                }
+                channel.setUpdatedDate(LocalDateTime.now());
+                channelRepository.save(channel);
+            } catch (Exception e) {
+                throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
             }
-            if (!updateRequest.getDescription().equals(channel.getDescription())) {
-                channel.setDescription(updateRequest.getDescription());
-            }
-            if (!updateRequest.getHandle().equals(channel.getHandle())) {
-                existByHandle(updateRequest.getHandle());
-                channel.setHandle(updateRequest.getHandle());
-            }
-            channel.setUpdatedDate(LocalDateTime.now());
-            channelRepository.save(channel);
-        } catch (Exception e) {
-            throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
+        } else {
+            throw new AppBadRequestException("Nima yuborishni bilmadim, Hullas you can't change this channel info");
         }
 
     }

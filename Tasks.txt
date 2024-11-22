@@ -1,0 +1,5 @@
+ 1. (Doston) Channel info update apida agar murojoat qilayotgan user kanalni egasi bo'lmasa,
+yaxshiroq message jo'natish kerak yoki umuman faqat channel owner ishlata oladigan qilish kerak
+bu api ni   [...]
+
+ 2.
