@@ -42,6 +42,17 @@ Accept-Language: ru
     "bannerId": "<banner_id>"
 }
 
+### Update channel status (Admin, Owner)
+PATCH http://localhost:8090/api/channels/edit-status
+Content-Type: application/json
+Authorization: Bearer token
+Accept-Language: ru
+
+{
+  "channelId": "<channel_id>",
+  "status": "new_status"
+}
+
 ### Get channel by id
 GET http://localhost:8090/api/channels/id?id=<channel_id>
 Accept: application/json
