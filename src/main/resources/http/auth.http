@@ -4,9 +4,9 @@ Content-Type: application/json
 Accept-Language: ru
 
 {
-  "name": "Doston",
-  "surname": "Dostonov",
-  "email": "hello@salom.com",
+  "name": "Bek",
+  "surname": "Bekov",
+  "email": "bek@salom.com",
   "password": "1"
 }
 
@@ -16,7 +16,7 @@ Content-Type: application/json
 Accept-Language: uz
 
 {
-  "email": "hello@salom.com",
+  "email": "bek@salom.com",
   "password": "1"
 }
 
