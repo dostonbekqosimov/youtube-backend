@@ -1,5 +1,6 @@
 package dasturlash.uz.service;
 
+import dasturlash.uz.dto.ChannelMediaUpdateRequest;
 import dasturlash.uz.dto.request.ChannelCreateRequest;
 import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.entity.Channel;
@@ -72,6 +73,42 @@ public class ChannelService {
             throw new AppBadRequestException("Nima yuborishni bilmadim, Hullas you can't change this channel info");
         }
 
+    }
+
+    public void updateChannelPhoto(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
+        Channel channel = getById(channelId);
+        if (getCurrentUserId().equals(channel.getProfileId())) {
+            try {
+                if (updateRequest.getPhotoId() != null &&
+                        !updateRequest.getPhotoId().equals(channel.getPhotoId())) {
+                    channel.setPhotoId(updateRequest.getPhotoId());
+                    channel.setUpdatedDate(LocalDateTime.now());
+                    channelRepository.save(channel);
+                }
+            } catch (Exception e) {
+                throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
+            }
+        } else {
+            throw new AppBadRequestException("You can't change this channel photo");
+        }
+    }
+
+    public void updateChannelBanner(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
+        Channel channel = getById(channelId);
+        if (getCurrentUserId().equals(channel.getProfileId())) {
+            try {
+                if (updateRequest.getBannerId() != null &&
+                        !updateRequest.getBannerId().equals(channel.getBannerId())) {
+                    channel.setBannerId(updateRequest.getBannerId());
+                    channel.setUpdatedDate(LocalDateTime.now());
+                    channelRepository.save(channel);
+                }
+            } catch (Exception e) {
+                throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
+            }
+        } else {
+            throw new AppBadRequestException("You can't change this channel banner");
+        }
     }
 
     private void existByHandle(String handle) {
