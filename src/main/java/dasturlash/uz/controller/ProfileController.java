@@ -30,8 +30,6 @@ public class ProfileController {
         return ResponseEntity.ok(service.create(profileDTO));
     }
 
-
-
     @GetMapping("/getAll")
     public ResponseEntity<List<Profile>> getAll() {
         return ResponseEntity.ok(service.getAll());
