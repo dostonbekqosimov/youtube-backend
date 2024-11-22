@@ -53,3 +53,8 @@ Accept: application/json
 ### Get channel by handle or handle characters
 GET http://localhost:8090/api/channels/handle?handle=<channel_handle>
 Accept: application/json
+
+### Get all channels with pagination (Admin)
+GET http://localhost:8090/api/channels?size=10&page=1
+Accept: application/json
+Authorization: Bearer token

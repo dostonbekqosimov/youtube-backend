@@ -12,6 +12,10 @@ import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +29,7 @@ public class ChannelService {
 
     private final ResourceBundleService resourceBundleService;
     private final ChannelRepository channelRepository;
+    private final AttachService attachService;
 
     public void create(ChannelCreateRequest request, LanguageEnum lang) {
 
@@ -138,8 +143,8 @@ public class ChannelService {
         channelResponseDTO.setCreatedDate(channel.getCreatedDate());
         channelResponseDTO.setUpdatedDate(channel.getUpdatedDate());
         channelResponseDTO.setVisible(channel.getVisible());
-        channelResponseDTO.setBannerId(channel.getBannerId());
-        channelResponseDTO.setPhotoId(channel.getPhotoId());
+        channelResponseDTO.setBanner(attachService.getUrlOfMedia(channel.getBannerId()));
+        channelResponseDTO.setPhoto(attachService.getUrlOfMedia(channel.getPhotoId()));
 
         return channelResponseDTO;
     }
@@ -175,4 +180,22 @@ public class ChannelService {
     }
 
 
+    public PageImpl<ChannelResponseDTO> getChannelsList(int page, Integer size) {
+
+        Pageable pageRequest = PageRequest.of(page, size);
+
+        Page<Channel> channelPage = channelRepository.findAllByVisibleTrue(pageRequest);
+
+        if (channelPage.isEmpty()) {
+            throw new DataNotFoundException("No channel found");
+        }
+
+        // Convert to DTOs
+        List<ChannelResponseDTO> responseDTOS = channelPage
+                .stream()
+                .map(this::toChannelResponseDTO)
+                .toList();
+        // Create a new Page with the DTOs
+        return new PageImpl<>(responseDTOS, pageRequest, channelPage.getTotalElements());
+    }
 }
