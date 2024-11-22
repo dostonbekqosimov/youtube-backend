@@ -2,11 +2,13 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.ChannelMediaUpdateRequest;
 import dasturlash.uz.dto.request.ChannelCreateRequest;
+import dasturlash.uz.dto.request.UpdateChannelStatusRequest;
 import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.service.ChannelService;
 import dasturlash.uz.util.LanguageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,6 +72,17 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    // Change channel status(Admin, Owner)
+    @PatchMapping("/edit-status")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<Void> updateChannelStatus(
+                                                    @RequestBody @Valid UpdateChannelStatusRequest request,
+                                                    @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
+        LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
+        channelService.updateChannelStatus( request, lang);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     // Get Channel by ID
     @GetMapping("/id")
     public ResponseEntity<ChannelResponseDTO> getChannelById(@RequestParam("id") String channelId) {
@@ -86,5 +99,13 @@ public class ChannelController {
     @GetMapping("/handle")
     public ResponseEntity<List<ChannelResponseDTO>> getChannelListByHandle(@RequestParam("handle") String channelHandle) {
         return ResponseEntity.ok().body(channelService.getChannelByHandle(channelHandle));
+    }
+
+    // Get Channels List with pagination
+    @GetMapping({"", "/"})
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<PageImpl<ChannelResponseDTO>> getChannelsList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                                        @RequestParam(value = "size", defaultValue = "25") Integer size) {
+        return ResponseEntity.ok().body(channelService.getChannelsList(page - 1, size));
     }
 }

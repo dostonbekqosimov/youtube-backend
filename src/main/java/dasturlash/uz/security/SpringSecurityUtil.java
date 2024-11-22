@@ -1,5 +1,6 @@
 package dasturlash.uz.security;
 
+import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,4 +19,16 @@ public class SpringSecurityUtil {
         }
         throw new AppBadRequestException("http://localhost:8090/api/auth/login");
     }
+
+    public static CustomUserDetails getCurrentEntity() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetail = (CustomUserDetails) authentication.getPrincipal();
+
+        return userDetail;
+    }
+
+    public static ProfileRole getCurrentUserRole() {
+        return getCurrentEntity().getRole();
+    }
+
 }
