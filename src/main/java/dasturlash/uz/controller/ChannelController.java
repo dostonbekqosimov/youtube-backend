@@ -59,7 +59,7 @@ public class ChannelController {
     }
 
     // Update channel banner
-    @PatchMapping("/edit-photo")
+    @PatchMapping("/edit-banner")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Void> updateChannelBanner(@RequestParam("id") String channelId,
                                                     @RequestBody ChannelMediaUpdateRequest updateRequest,

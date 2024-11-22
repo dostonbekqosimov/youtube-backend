@@ -1,26 +1,26 @@
 ### Create new category
 POST http://localhost:8090/api/category/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8
+Authorization: Bearer token
 
 {
-    "name": "Music"
+    "name": "<category name>"
 }
 
 ### Update category by id
-PUT http://localhost:8090/api/category/1
+PUT http://localhost:8090/api/category/<category id>
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8
+Authorization: Bearer token
 
 {
-    "name": "Interesting games"
+    "name": "< new category name >"
 }
 
 ### Delete category by id (Admin)
-DELETE http://localhost:8090/api/category/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8
+DELETE http://localhost:8090/api/category/<category id>
+Authorization: Bearer token
 
 ### Get category list with pagination (Admin)
 GET http://localhost:8090/api/category?size=10&page=1
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8
+Authorization: Bearer token
