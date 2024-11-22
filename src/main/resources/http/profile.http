@@ -12,3 +12,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luI
 GET http://localhost:8090/profile/getAll
 Accept: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMjMxMDM0LCJleHAiOjE3MzI4MzU4MzR9.8OfMG_ZK2fpz-usGGZBg3GKU8BS6ByfY2cBNONeRh_w
+
+###
+PUT http://localhost:8090/profile/updateDetail
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "name": "",
+  "surname": ""
+}
