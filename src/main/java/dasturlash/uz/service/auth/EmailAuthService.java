@@ -14,7 +14,7 @@ import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.service.ResourceBundleService;
 import dasturlash.uz.service.email.EmailSendingService;
 import dasturlash.uz.service.email.EmailTemplateService;
-import dasturlash.uz.service.email.MessageHistoryService;
+import dasturlash.uz.service.email.EmailHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class EmailAuthService {
     private final EmailHistoryRepository emailHistoryRepository;
     private final EmailSendingService emailSendingService;
     private final EmailTemplateService emailTemplateService;
-    private final MessageHistoryService messageHistoryService;
+    private final EmailHistoryService emailHistoryService;
     private final ResourceBundleService resourceBundleService;
 
 
@@ -74,18 +74,18 @@ public class EmailAuthService {
         LocalDateTime exp = LocalDateTime.now().minusMinutes(confirmationDeadlineMinutes);
         if (exp.isAfter(emailHistory.getCreatedDate())) {
             profile.setStatus(ProfileStatus.IN_REGISTERED);
-            messageHistoryService.updateEmailStatus(emailHistory, EmailStatus.EXPIRED);
+            emailHistoryService.updateEmailStatus(emailHistory, EmailStatus.EXPIRED);
             profileRepository.save(profile);
             return resourceBundleService.getMessage("email.confirmation.expired", lang);
         }
 
         if (!profile.getStatus().equals(ProfileStatus.IN_REGISTERED)) {
-            messageHistoryService.updateEmailStatus(emailHistory, EmailStatus.FAILED);
+            emailHistoryService.updateEmailStatus(emailHistory, EmailStatus.FAILED);
             return resourceBundleService.getMessage("email.registration.not.completed", lang);
         }
 
         profile.setStatus(ProfileStatus.ACTIVE);
-        messageHistoryService.updateEmailStatus(emailHistory, EmailStatus.DELIVERED);
+        emailHistoryService.updateEmailStatus(emailHistory, EmailStatus.DELIVERED);
         profileRepository.save(profile);
         return resourceBundleService.getMessage("email.registration.completed", lang);
     }
@@ -98,14 +98,14 @@ public class EmailAuthService {
                 .orElseThrow(() -> new DataNotFoundException("No email history found"));
 
         if (lastHistory.getAttemptCount() >= maxResendAttempts) {
-            messageHistoryService.updateEmailStatus(lastHistory, EmailStatus.FAILED);
+            emailHistoryService.updateEmailStatus(lastHistory, EmailStatus.FAILED);
             profile.setStatus(ProfileStatus.BLOCKED);
             profileRepository.save(profile);
             throw new DataNotFoundException(resourceBundleService.getMessage("email.max.resend.attempts.exceeded", lang));
         }
 
         if (profile.getStatus().equals(ProfileStatus.ACTIVE)) {
-            messageHistoryService.updateEmailStatus(lastHistory, EmailStatus.FAILED);
+            emailHistoryService.updateEmailStatus(lastHistory, EmailStatus.FAILED);
             return "Profile is already active";
         }
 

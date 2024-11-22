@@ -1,21 +1,30 @@
 ### Register new account
-POST http://localhost:8090/auth/registration
+POST http://localhost:8090/api/auth/registration
 Content-Type: application/json
 Accept-Language: ru
 
 {
-  "name": "Doston",
-  "surname": "hello",
-  "email": "hello@salom.com",
+  "name": "Bek",
+  "surname": "Bekov",
+  "email": "bek@salom.com",
   "password": "1"
 }
 
 ### Login
 POST http://localhost:8090/api/auth/login
 Content-Type: application/json
+Accept-Language: uz
+
+{
+  "email": "bek@salom.com",
+  "password": "1"
+}
+
+### Refresh token
+POST http://localhost:8090/api/auth/refresh
+Content-Type: application/json
 Accept-Language: ru
 
 {
-  "email": "admin@gmail.com",
-  "password": "securePassword123"
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyMjcyNzQsImV4cCI6MTczNDgxOTI3NH0.6MZ-5QDIdWM2VO4SrPbhZFC8Sysb1Vo4qc7iVxhdscM"
 }

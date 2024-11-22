@@ -33,7 +33,6 @@ public class EmailHistory {
 
     private Integer attemptCount = 0;
 
-
     @Column(columnDefinition = "TEXT")
     private String errorMessage;
 

@@ -1,6 +1,8 @@
 package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.JwtResponseDTO;
+import dasturlash.uz.dto.TokenDTO;
+import dasturlash.uz.dto.TokenRefreshRequestDTO;
 import dasturlash.uz.dto.request.LoginDTO;
 import dasturlash.uz.dto.request.RegistrationDTO;
 import dasturlash.uz.enums.LanguageEnum;
@@ -51,5 +53,13 @@ public class AuthController {
 
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
         return ResponseEntity.ok(authService.login(loginDTO.getEmail(), loginDTO.getPassword(), lang));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenDTO> refreshToken(@Valid @RequestBody TokenRefreshRequestDTO request,
+                                                 @RequestHeader(value = "Accept-Language", defaultValue = "uz") LanguageEnum lang) {
+        TokenDTO tokenDTO = new TokenDTO();
+        tokenDTO.setRefreshToken(request.getRefreshToken());
+        return ResponseEntity.ok(authService.getNewAccessToken(tokenDTO, lang));
     }
 }
