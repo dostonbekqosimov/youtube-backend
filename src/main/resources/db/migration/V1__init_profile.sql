@@ -1,6 +1,6 @@
 INSERT INTO profiles
 (id, name, surname, email, password, photo_id, role, status, created_date, visible)
-VALUES (2,
+VALUES (12,
         'Admin',
         'Admin',
         'admin@gmail.com',
