@@ -1,12 +1,25 @@
 ### Add new channel
 POST http://localhost:8090/api/channels
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyMjQwOTksImV4cCI6MTczMjgyODg5OX0.uJCIvuq24lh9WldZacitrXTVTzlHnZTfnMYfhMSOzlA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMjMxNTc4LCJleHAiOjE3MzI4MzYzNzh9.jnCSOyw-FkPNTAWsQznc_noIkZ0f4WOTAuZ-vpw6EOo
+Accept-Language: ru
 
 {
-    "name": "Better ideas",
+    "name": "Buyuk insonlar",
     "description": "We will help people help others",
-    "handle": "better_ideas"
+    "handle": "great_humans"
+}
+
+### Update channel info by id
+PATCH http://localhost:8090/api/channels?id=1c5da01e-184d-430d-aff9-07ca4d3fa028
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJoZWxsb0BzYWxvbS5jb20iLCJzdWIiOiJoZWxsb0BzYWxvbS5jb20iLCJpYXQiOjE3MzIyNzM0NzgsImV4cCI6MTczMjg3ODI3OH0.sq2ZsGNT8tyIyTBs-pD9Yr5HGsV_LJBZFC3ZUVjFJQY
+Accept-Language: ru
+
+{
+  "name": "Updated name",
+  "description": "Updated description",
+  "handle": "updated_handle"
 }
 
 ### Get channel by id
@@ -14,9 +27,9 @@ GET http://localhost:8090/api/channels/id?id=f2513e56-1bdb-4120-8b45-83123509487
 Accept: application/json
 
 ### Get channel by name
-GET http://localhost:8090/api/channels/name?name=d
+GET http://localhost:8090/api/channels/name?name=inson
 Accept: application/json
 
 ### Get channel by handle
-GET http://localhost:8090/api/channels/handle?handle=wwwqw
+GET http://localhost:8090/api/channels/handle?handle=t
 Accept: application/json
