@@ -2,7 +2,7 @@ package dasturlash.uz.service;
 
 import dasturlash.uz.dto.MessageDTO;
 import dasturlash.uz.dto.ProfileDTO;
-import dasturlash.uz.dto.UpdateProfileDetailDTO;
+import dasturlash.uz.dto.request.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.ProfileStatus;
@@ -13,7 +13,6 @@ import dasturlash.uz.service.email.EmailSendingService;
 import dasturlash.uz.util.RandomUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

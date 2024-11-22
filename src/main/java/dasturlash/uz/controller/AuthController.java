@@ -2,7 +2,7 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.JwtResponseDTO;
 import dasturlash.uz.dto.TokenDTO;
-import dasturlash.uz.dto.TokenRefreshRequestDTO;
+import dasturlash.uz.dto.request.TokenRefreshRequestDTO;
 import dasturlash.uz.dto.request.LoginDTO;
 import dasturlash.uz.dto.request.RegistrationDTO;
 import dasturlash.uz.enums.LanguageEnum;

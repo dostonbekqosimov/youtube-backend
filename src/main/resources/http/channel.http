@@ -11,7 +11,7 @@ Accept-Language: ru
 }
 
 ### Update channel info by id
-PATCH http://localhost:8090/api/channels?id=1c5da01e-184d-430d-aff9-07ca4d3fa028
+PATCH http://localhost:8090/api/channels/edit-info?id=1c5da01e-184d-430d-aff9-07ca4d3fa028
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwibG9naW4iOiJiZWtAc2Fsb20uY29tIiwic3ViIjoiYmVrQHNhbG9tLmNvbSIsImlhdCI6MTczMjI3NDE1MiwiZXhwIjoxNzMyODc4OTUyfQ.It0-0LvkjqXBWxp1YyP42DhFQJiKsDRXG-fRH8WzH2w
 Accept-Language: ru
