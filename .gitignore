@@ -40,3 +40,4 @@ build/
 /src/main/resources/application-local.properties
 /uploads/
 /attaches/
+/src/main/resources/http/local/
