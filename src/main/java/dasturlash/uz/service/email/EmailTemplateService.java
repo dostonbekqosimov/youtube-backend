@@ -126,7 +126,7 @@ public class EmailTemplateService {
                         <p>Please click the button below to complete your registration:</p>
                         
                         <div class="button-container">
-                            <a href="%s/auth/registration/confirm/%s" 
+                            <a href="%s/api/auth/registration/confirm/%s" 
                                class="verify-button" target="_blank">
                                 Verify Your Email
                             </a>
@@ -142,7 +142,7 @@ public class EmailTemplateService {
                         
                         <div class="link-info">
                             <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-                            <p><code>%s/auth/registration/confirm/%s</code></p>
+                            <p><code>%s/api/auth/registration/confirm/%s</code></p>
                         </div>
                         
                         <p>If the link has expired, <a href="%s/auth/registration/resend/%s" 
@@ -169,7 +169,7 @@ public class EmailTemplateService {
                         <p>Please click the button below to complete your registration:</p>
                         
                         <div class="button-container">
-                            <a href="%s/auth/registration/confirm/%s" 
+                            <a href="%s/api/auth/registration/confirm/%s" 
                                class="verify-button" target="_blank">
                                 Verify Your Email
                             </a>
@@ -185,7 +185,7 @@ public class EmailTemplateService {
                         
                         <div class="link-info">
                             <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-                            <p><code>%s/auth/registration/confirm/%s</code></p>
+                            <p><code>%s/api/auth/registration/confirm/%s</code></p>
                         </div>
                     </div>
                 """.formatted(
