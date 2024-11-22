@@ -1,6 +1,7 @@
 package dasturlash.uz.service;
 
 import dasturlash.uz.dto.AttachDTO;
+import dasturlash.uz.dto.response.ChannelMediaDTO;
 import dasturlash.uz.entity.Attach;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
@@ -46,7 +47,6 @@ public class AttachService {
     private String folderName;
     @Value("${attach.url}")
     private String attachUrl;
-
 
 
     public AttachDTO videoUpload(MultipartFile file) {
@@ -286,6 +286,15 @@ public class AttachService {
         return folderName + "/" + entity.getPath() + "/" + entity.getId();
     }
 
+    public ChannelMediaDTO getUrlOfMedia(String attachId) {
+        if (attachId == null) {
+            return null;
+        }
+        ChannelMediaDTO channelMediaDTO = new ChannelMediaDTO();
+        channelMediaDTO.setId(attachId);
+        channelMediaDTO.setUrl(openURL(attachId));
+        return channelMediaDTO;
+    }
 
 
 }
