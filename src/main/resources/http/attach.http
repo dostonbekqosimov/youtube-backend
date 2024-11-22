@@ -10,11 +10,11 @@ Content-Type: application/octet-stream
 --WebAppBoundary--
 
 ### Open video
-GET http://localhost:8090/api/attach/open/077d8b69-a65a-4d68-9edb-7123235e3099.mp4
+GET http://localhost:8090/api/attach/open/0447aa9d-a5d2-467f-b75d-ebda830674e4.mp4
 Accept: video/*
 
 ### Download video
-GET http://localhost:8090/api/attach/download/cdb44480-ca28-461b-946c-693995fe98f2.mp4
+GET http://localhost:8090/api/attach/download/0447aa9d-a5d2-467f-b75d-ebda830674e4.mp4
 Accept: application/octet-stream
 
 ### Get all videos with pagination (Admin)
@@ -23,5 +23,5 @@ Accept: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8
 
 ### Delete video (Admin)
-DELETE http://localhost:8090/api/attach/19e33504-f38e-4e10-b553-355e008283e2.mp4
+DELETE http://localhost:8090/api/attach/0447aa9d-a5d2-467f-b75d-ebda830674e4.mp4
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8

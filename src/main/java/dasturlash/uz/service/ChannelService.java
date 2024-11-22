@@ -4,14 +4,13 @@ import dasturlash.uz.dto.request.ChannelCreateRequest;
 import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ChannelStatus;
+import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.exceptions.ChannelExistsException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import javax.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,9 +21,10 @@ import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 @RequiredArgsConstructor
 public class ChannelService {
 
+    private final ResourceBundleService resourceBundleService;
     private final ChannelRepository channelRepository;
 
-    public void create(ChannelCreateRequest request) {
+    public void create(ChannelCreateRequest request, LanguageEnum lang) {
 
         // check if channel with handle exists
         existByHandle(request.getHandle());
@@ -40,9 +40,31 @@ public class ChannelService {
 
             channelRepository.save(newChannel);
         } catch (Exception e) {
-            throw new SomethingWentWrongException("Something went wrong");
+            throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
         }
 
+
+    }
+
+    public void updateChannelInfo(String channelId, ChannelCreateRequest updateRequest, LanguageEnum lang) {
+
+        Channel channel = getById(channelId);
+        try {
+            if (!updateRequest.getName().equals(channel.getName())) {
+                channel.setName(updateRequest.getName());
+            }
+            if (!updateRequest.getDescription().equals(channel.getDescription())) {
+                channel.setDescription(updateRequest.getDescription());
+            }
+            if (!updateRequest.getHandle().equals(channel.getHandle())) {
+                existByHandle(updateRequest.getHandle());
+                channel.setHandle(updateRequest.getHandle());
+            }
+            channel.setUpdatedDate(LocalDateTime.now());
+            channelRepository.save(channel);
+        } catch (Exception e) {
+            throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
+        }
 
     }
 
@@ -52,6 +74,7 @@ public class ChannelService {
             throw new ChannelExistsException("Channel with handle: " + handle + " exists");
         }
     }
+
 
     public ChannelResponseDTO getChannelById(String channelId) {
 
@@ -107,4 +130,6 @@ public class ChannelService {
 
         return channels.stream().map(this::toChannelResponseDTO).toList();
     }
+
+
 }
