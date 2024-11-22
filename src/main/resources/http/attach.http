@@ -3,25 +3,25 @@ POST http://localhost:8090/api/attach/upload
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="file"; filename="video_konsta.mp4"
+Content-Disposition: form-data; name="file"; filename="<filename>"
 Content-Type: application/octet-stream
 
-< /home/diyorbek/Videos/live.mp4
+< /home/doston/Videos/<filename>
 --WebAppBoundary--
 
 ### Open video
-GET http://localhost:8090/api/attach/open/46f61622-8efa-4c3d-bba1-8153847e36a3.mp4
+GET http://localhost:8090/api/attach/open/<attachId>
 Accept: video/*
 
 ### Download video
-GET http://localhost:8090/api/attach/download/46f61622-8efa-4c3d-bba1-8153847e36a3.mp4
+GET http://localhost:8090/api/attach/download/<attachId>
 Accept: application/octet-stream
 
 ### Get all videos with pagination (Admin)
 GET http://localhost:8090/api/attach?size=10&page=1
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMTg0MjU4LCJleHAiOjE3MzI3ODkwNTh9.dHT0zetJT4Mk8_QjJUCgSb0HJEjJSADBMmmdVX7sGz8
+Authorization: Bearer token
 
 ### Delete video (Admin)
-DELETE http://localhost:8090/api/attach/46f61622-8efa-4c3d-bba1-8153847e36a3.mp4
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BRE1JTiIsImxvZ2luIjoiYWRtaW5AZ21haWwuY29tIiwic3ViIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyMjAxMTU0LCJleHAiOjE3MzI4MDU5NTR9.jyjvyqHTnLI2Rbol-LJygmY3fF4D6cZ6KZKO01xzOik
+DELETE http://localhost:8090/api/attach/<attachId>
+Authorization: Bearer token
