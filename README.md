@@ -84,10 +84,15 @@ attach.upload.folder=attaches   # Specify your preferred upload directory
 ```
 
 ### Setup Instructions
-1. **Clone the Repository**
+1. **Clone the Repository with ssh**
    ```bash
-   git clone [repository-url]
-   cd [project-directory]
+   git clone git@github.com:dostonbekqosimov/youtube-backend.git
+   cd youtube-backend
+   ```
+    1. **Clone the Repository with https**
+   ```bash
+   git clone https://github.com/dostonbekqosimov/youtube-backend.git
+   cd youtube-backend
    ```
 
 2. **Database Preparation**
