@@ -2,7 +2,7 @@ package dasturlash.uz.controller;
 
 
 import dasturlash.uz.dto.ProfileDTO;
-import dasturlash.uz.dto.request.UpdateProfileDetailDTO;
+import dasturlash.uz.dto.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.service.ProfileService;
