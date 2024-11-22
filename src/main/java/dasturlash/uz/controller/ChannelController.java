@@ -7,6 +7,7 @@ import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.service.ChannelService;
 import dasturlash.uz.util.LanguageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -86,5 +87,13 @@ public class ChannelController {
     @GetMapping("/handle")
     public ResponseEntity<List<ChannelResponseDTO>> getChannelListByHandle(@RequestParam("handle") String channelHandle) {
         return ResponseEntity.ok().body(channelService.getChannelByHandle(channelHandle));
+    }
+
+    // Get Channels List with pagination
+    @GetMapping({"", "/"})
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<PageImpl<ChannelResponseDTO>> getChannelsList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                                        @RequestParam(value = "size", defaultValue = "25") Integer size) {
+        return ResponseEntity.ok().body(channelService.getChannelsList(page - 1, size));
     }
 }
