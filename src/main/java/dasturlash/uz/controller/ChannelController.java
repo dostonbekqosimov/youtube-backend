@@ -2,6 +2,7 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.ChannelMediaUpdateRequest;
 import dasturlash.uz.dto.request.ChannelCreateRequest;
+import dasturlash.uz.dto.request.UpdateChannelStatusRequest;
 import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.service.ChannelService;
@@ -68,6 +69,17 @@ public class ChannelController {
 
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
         channelService.updateChannelBanner(channelId, updateRequest, lang);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    // Change channel status(Admin, Owner)
+    @PatchMapping("/edit-status")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<Void> updateChannelStatus(
+                                                    @RequestBody @Valid UpdateChannelStatusRequest request,
+                                                    @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
+        LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
+        channelService.updateChannelStatus( request, lang);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
