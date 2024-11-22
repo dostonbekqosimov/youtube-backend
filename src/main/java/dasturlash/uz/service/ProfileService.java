@@ -95,7 +95,7 @@ public class ProfileService {
         return profiles;
     }
 
-    public String updateEmail(@Valid String email) {
+    public String updateEmail( String email) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Profile currentProfile = findById(currentUserId);
         int code = RandomUtil.getRandomInt();
@@ -113,7 +113,7 @@ public class ProfileService {
         return "Sent code your email";
     }
 
-    public String updateDetail(@Valid UpdateProfileDetailDTO dto) {
+    public String updateDetail( UpdateProfileDetailDTO dto) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Profile currentProfile = findById(currentUserId);
 
