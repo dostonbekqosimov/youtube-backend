@@ -28,5 +28,5 @@ public interface EmailHistoryRepository extends JpaRepository<EmailHistory, Stri
     @Query("update EmailHistory set attemptCount = attemptCount + 1 where id = ?1")
     void increaseAttemptCount(String id);
 
-    Optional<EmailHistory> findTopByEmailOrderByCreatedDateDesc(String email);
+    Optional<EmailHistory> findTopByEmailOrderBySentAtDesc(String email);
 }

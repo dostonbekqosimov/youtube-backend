@@ -8,6 +8,7 @@ import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.EmailStatus;
 import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.enums.ProfileStatus;
+import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.repository.EmailHistoryRepository;
 import dasturlash.uz.repository.ProfileRepository;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
+import static dasturlash.uz.util.RandomUtil.getRandomInt;
 
 @Service
 @RequiredArgsConstructor
@@ -44,11 +47,14 @@ public class EmailAuthService {
         profile.setEmail(dto.getEmail());
         profileRepository.save(profile);
 
+        Integer verificationCode = getRandomInt();
+
         String emailContent = emailTemplateService.getRegistrationEmailTemplate(
-                                                                                profile.getId(),
-                                                                                profile.getName(),
-                                                                                confirmationDeadlineMinutes,
-                                                                                maxResendAttempts
+                dto.getEmail(),
+                profile.getName(),
+                confirmationDeadlineMinutes,
+                maxResendAttempts,
+                verificationCode
         );
 
         MessageDTO messageDTO = new MessageDTO();
@@ -56,23 +62,27 @@ public class EmailAuthService {
         messageDTO.setSubject(resourceBundleService.getMessage("email.set.subject", lang));
         messageDTO.setText(emailContent);
 
-        emailSendingService.sendMimeMessage(messageDTO, profile);
+        emailSendingService.sendMimeMessage(messageDTO, profile, verificationCode);
         // Note: EmailSendingService will handle creating and updating the history
 
         return resourceBundleService.getMessage("email.confirmation.sent", lang);
     }
 
-    public String confirmEmail(Long id, LanguageEnum lang) {
+    public String confirmEmail(Profile profile, Integer code, LanguageEnum lang) {
 
-        // check qilish kerakmas menimcha!!!
-        Profile profile = profileRepository.findByIdAndVisibleTrue(id)
-                .orElseThrow(() -> new DataNotFoundException("Profile not found"));
 
-        EmailHistory emailHistory = emailHistoryRepository.findTopByEmailOrderByCreatedDateDesc(profile.getEmail())
+        EmailHistory emailHistory = emailHistoryRepository.findTopByEmailOrderBySentAtDesc(profile.getEmail())
                 .orElseThrow(() -> new DataNotFoundException("No email history found"));
 
+        // Check if code matches
+        if (!emailHistory.getVerificationCode().equals(code)) {
+            emailHistoryService.updateEmailStatus(emailHistory, EmailStatus.FAILED);
+            throw new AppBadRequestException(resourceBundleService.getMessage("email.invalid.verification.code", lang));
+        }
+
+        // Check expiration
         LocalDateTime exp = LocalDateTime.now().minusMinutes(confirmationDeadlineMinutes);
-        if (exp.isAfter(emailHistory.getCreatedDate())) {
+        if (exp.isAfter(emailHistory.getSentAt())) {
             profile.setStatus(ProfileStatus.IN_REGISTERED);
             emailHistoryService.updateEmailStatus(emailHistory, EmailStatus.EXPIRED);
             profileRepository.save(profile);
@@ -90,39 +100,53 @@ public class EmailAuthService {
         return resourceBundleService.getMessage("email.registration.completed", lang);
     }
 
-    public String resendEmailConfirmation(Long id, LanguageEnum lang) {
-        Profile profile = profileRepository.findByIdAndVisibleTrue(id)
-                .orElseThrow(() -> new DataNotFoundException("Profile not found"));
+    public String resendEmailConfirmation(Profile profile, String email, LanguageEnum lang) {
 
-        EmailHistory lastHistory = emailHistoryRepository.findTopByEmailOrderByCreatedDateDesc(profile.getEmail())
-                .orElseThrow(() -> new DataNotFoundException("No email history found"));
+        // Verify profile status
+        if (profile.getStatus().equals(ProfileStatus.ACTIVE)) {
+            throw new AppBadRequestException(resourceBundleService.getMessage("profile.already.active", lang));
+        }
 
+        if (profile.getStatus().equals(ProfileStatus.BLOCKED)) {
+            throw new AppBadRequestException(resourceBundleService.getMessage("profile.blocked", lang));
+        }
+
+        // Get last email history and validate attempts
+        EmailHistory lastHistory = emailHistoryRepository.findTopByEmailOrderBySentAtDesc(email)
+                .orElseThrow(() -> new DataNotFoundException(resourceBundleService.getMessage("email.history.not.found", lang)));
+
+        // Check if there's a recent verification code that hasn't expired
+        LocalDateTime expirationTime = lastHistory.getSentAt().plusMinutes(confirmationDeadlineMinutes);
+        if (LocalDateTime.now().isBefore(expirationTime) &&
+                !lastHistory.getStatus().equals(EmailStatus.EXPIRED) &&
+                !lastHistory.getStatus().equals(EmailStatus.FAILED)) {
+            throw new AppBadRequestException(resourceBundleService.getMessage("verification.code.still.valid", lang));
+        }
+
+        // Check maximum attempts
         if (lastHistory.getAttemptCount() >= maxResendAttempts) {
-            emailHistoryService.updateEmailStatus(lastHistory, EmailStatus.FAILED);
             profile.setStatus(ProfileStatus.BLOCKED);
             profileRepository.save(profile);
-            throw new DataNotFoundException(resourceBundleService.getMessage("email.max.resend.attempts.exceeded", lang));
+            throw new AppBadRequestException(resourceBundleService.getMessage("email.max.resend.attempts.exceeded", lang));
         }
 
-        if (profile.getStatus().equals(ProfileStatus.ACTIVE)) {
-            emailHistoryService.updateEmailStatus(lastHistory, EmailStatus.FAILED);
-            return "Profile is already active";
-        }
-
-        String emailContent = emailTemplateService.getRegistrationEmailTemplate(
-                                                                                profile.getId(),
-                                                                                profile.getName(),
-                                                                                confirmationDeadlineMinutes,
-                                                                 maxResendAttempts - lastHistory.getAttemptCount()
+        // Generate new verification code and prepare email
+        Integer verificationCode = getRandomInt();
+        String emailContent = emailTemplateService.getResendConfirmationEmailTemplate(
+                email,
+                profile.getName(),
+                confirmationDeadlineMinutes,
+                maxResendAttempts - lastHistory.getAttemptCount(),
+                verificationCode
         );
 
         MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setToAccount(profile.getEmail());
-        messageDTO.setSubject("Registration Confirmation - New Link");
+        messageDTO.setToAccount(email);
+        messageDTO.setSubject(resourceBundleService.getMessage("email.set.subject", lang));
         messageDTO.setText(emailContent);
 
-        emailSendingService.sendMimeMessage(messageDTO, profile);
-        // Note: EmailSendingService will handle creating and updating the history
+        // Send email and create new history
+        emailSendingService.sendMimeMessage(messageDTO, profile, verificationCode);
 
         return resourceBundleService.getMessage("email.confirmation.resent", lang);
     }

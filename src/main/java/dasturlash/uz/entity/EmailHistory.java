@@ -36,9 +36,9 @@ public class EmailHistory {
     @Column(columnDefinition = "TEXT")
     private String errorMessage;
 
-    private LocalDateTime createdDate;
-
     private String email;
+
+    private Integer verificationCode;
 
     @Column(name = "profile_id")
     private Long profileId;

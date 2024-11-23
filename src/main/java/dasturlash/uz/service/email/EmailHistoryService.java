@@ -17,17 +17,17 @@ public class EmailHistoryService {
     private final EmailHistoryRepository emailHistoryRepository;
 
 
-    public EmailHistory createEmailHistory(String toEmail, String subject, String message, Profile profile) {
+    public EmailHistory createEmailHistory(String toEmail, String subject, String message, Profile profile, Integer verificationCode) {
         EmailHistory history = new EmailHistory();
         history.setToAccount(toEmail);
         history.setSubject(subject);
         history.setMessage(message);
         history.setSentAt(LocalDateTime.now());
         history.setProfile(profile);
-        history.setCreatedDate(LocalDateTime.now());
         history.setAttemptCount(1);
         history.setStatus(EmailStatus.PENDING);
         history.setEmail(toEmail);
+        history.setVerificationCode(verificationCode);
         return emailHistoryRepository.save(history);
     }
 
