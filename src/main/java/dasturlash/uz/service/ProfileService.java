@@ -4,11 +4,13 @@ import dasturlash.uz.dto.MessageDTO;
 import dasturlash.uz.dto.ProfileDTO;
 import dasturlash.uz.dto.request.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
+import dasturlash.uz.dto.response.ResponseCustom;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.ProfileStatus;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.security.SpringSecurityUtil;
+import dasturlash.uz.service.email.EmailHistoryService;
 import dasturlash.uz.service.email.EmailSendingService;
 import dasturlash.uz.util.RandomUtil;
 import jakarta.validation.Valid;
@@ -29,6 +31,7 @@ public class ProfileService {
     private final PasswordEncoder passwordEncoder;
     private final ResourceBundleService resourceBundleService;
     private final EmailSendingService emailSendingService;
+    private final EmailHistoryService emailHistoryService;
 
 
     public String changePassword(ChangePasswordRequest request) {
@@ -106,7 +109,7 @@ public class ProfileService {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setToAccount(email);
         messageDTO.setSubject("");
-        messageDTO.setText("localhost:8080/profile/confirm/"+ code);
+        messageDTO.setText("Your code is: "+ code);
 
         emailSendingService.sendMimeMessage(messageDTO, currentProfile, code);
         return "Sent code your email";
@@ -123,5 +126,18 @@ public class ProfileService {
             return "Profile updated successfully";
         }
         return "Profile not found";
+    }
+
+    public String confirm(String code) {
+        ResponseCustom responseCustom = emailHistoryService.getHistoryByCode(code);
+        Long currentUserId = SpringSecurityUtil.getCurrentUserId();
+        Profile currentProfile = findById(currentUserId);
+
+        if (responseCustom.getSuccess() && currentProfile != null) {
+            currentProfile.setEmail(responseCustom.getMessage());
+            repository.save(currentProfile);
+            return "Profile updated successfully";
+        }
+        return responseCustom.getMessage();
     }
 }

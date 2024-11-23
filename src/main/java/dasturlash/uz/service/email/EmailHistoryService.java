@@ -1,10 +1,12 @@
 package dasturlash.uz.service.email;
 
 
+import dasturlash.uz.dto.response.ResponseCustom;
 import dasturlash.uz.entity.EmailHistory;
 import dasturlash.uz.entity.Profile;
 
 import dasturlash.uz.enums.EmailStatus;
+import dasturlash.uz.mapper.EmailHistoryInfoMapper;
 import dasturlash.uz.repository.EmailHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,5 +41,22 @@ public class EmailHistoryService {
         emailHistoryRepository.save(history);
     }
 
+    public ResponseCustom getHistoryByCode(String code){
+        EmailHistoryInfoMapper emailAndTime = emailHistoryRepository.getEmailAndSentAtByCode(code);
+        ResponseCustom responseCustom = new ResponseCustom();
 
+        LocalDateTime now = LocalDateTime.now().minusMinutes(3);
+        //check expire
+        if (emailAndTime != null && emailAndTime.getTime().isAfter(now)) {
+
+
+            responseCustom.setMessage(emailAndTime.getEmail());
+            responseCustom.setSuccess(true);
+            return responseCustom;
+        }
+
+        responseCustom.setMessage("Code is incorrect");
+        responseCustom.setSuccess(false);
+        return responseCustom;
+    }
 }
