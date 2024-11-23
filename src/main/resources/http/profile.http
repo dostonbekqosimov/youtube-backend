@@ -12,3 +12,11 @@ Authorization: Bearer token
 GET http://localhost:8090/profile/getAll
 Accept: application/json
 Authorization: Bearer token
+
+### Update Email
+PUT localhost:8090/profile/updateEmail?email=<email>
+Authorization: Bearer token
+
+### Confirm Email
+GET http://localhost:8090/profile/confirm/<code>
+Authorization: Bearer token
