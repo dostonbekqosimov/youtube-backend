@@ -296,5 +296,23 @@ public class AttachService {
         return channelMediaDTO;
     }
 
+    public AttachDTO updateProfileAttach(MultipartFile file) {
+        String pathFolder = generateDateBasedFolder();
+        String key = UUID.randomUUID().toString();
+        String extension = getExtension(file.getOriginalFilename());
+        String fullPath = saveVideoFile(file, pathFolder, key, extension);
+
+        Attach entity = new Attach();
+        entity.setId(key + "." + extension);
+        entity.setPath(pathFolder);
+        entity.setSize(file.getSize());
+        entity.setType(file.getContentType());
+        entity.setOriginName(file.getOriginalFilename());entity.setExtension(extension);
+        entity.setVisible(true);
+        entity.setCreatedDate(LocalDateTime.now());
+        attachRepository.save(entity);
+        return toDTO(entity);
+    }
+
 
 }
