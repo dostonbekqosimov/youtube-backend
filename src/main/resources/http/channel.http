@@ -69,3 +69,8 @@ Accept: application/json
 GET http://localhost:8090/api/channels?size=10&page=1
 Accept: application/json
 Authorization: Bearer token
+
+### Get all channels with pagination (Owner)
+GET http://localhost:8090/api/channels/my-channels
+Accept: application/json
+Authorization: Bearer token
