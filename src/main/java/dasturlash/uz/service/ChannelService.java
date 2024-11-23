@@ -206,6 +206,27 @@ public class ChannelService {
         return new PageImpl<>(responseDTOS, pageRequest, channelPage.getTotalElements());
     }
 
+    public PageImpl<ChannelResponseDTO> getUserChannelList(int page, Integer size) {
+
+        Pageable pageRequest = PageRequest.of(page, size);
+
+        Long currentUserId = getCurrentUserId();
+
+        Page<Channel> channelPage = channelRepository.findAllByProfileIdAndVisibleTrue(currentUserId, pageRequest);
+
+        if (channelPage.isEmpty()) {
+            throw new DataNotFoundException("No channel found");
+        }
+
+        // Convert to DTOs
+        List<ChannelResponseDTO> responseDTOS = channelPage
+                .stream()
+                .map(this::toChannelResponseDTO)
+                .toList();
+        // Create a new Page with the DTOs
+        return new PageImpl<>(responseDTOS, pageRequest, channelPage.getTotalElements());
+    }
+
     private void existByHandle(String handle) {
         boolean isExist = channelRepository.existsByHandle(handle);
         if (isExist) {
@@ -233,4 +254,5 @@ public class ChannelService {
 
         return channelResponseDTO;
     }
+
 }
