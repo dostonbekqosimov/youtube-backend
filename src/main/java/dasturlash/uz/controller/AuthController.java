@@ -10,6 +10,7 @@ import dasturlash.uz.enums.LanguageEnum;
 import dasturlash.uz.service.auth.AuthService;
 import dasturlash.uz.util.LanguageUtil;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,13 +40,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.registrationConfirm(verificationDTO, lang));
     }
 
-    @PostMapping("/registration/resend/{profileId}")
-    public ResponseEntity<String> resendConfirmation(
-            @PathVariable Long profileId,
+    @GetMapping("/registration/resend")
+    public ResponseEntity<String> resendVerificationCode(
+            @RequestParam("email") String email,
             @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader
     ) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        return ResponseEntity.ok(authService.resendConfirmationEmail(profileId, lang));
+        return ResponseEntity.ok(authService.resendConfirmationEmail(email, lang));
     }
 
     @PostMapping("/login")

@@ -18,6 +18,7 @@ import dasturlash.uz.security.CustomUserDetails;
 import dasturlash.uz.service.ResourceBundleService;
 import dasturlash.uz.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -61,13 +62,22 @@ public class AuthService {
 
     public String registrationConfirm(VerificationDTO dto, LanguageEnum lang) {
         Profile profile = profileRepository.findByEmailAndVisibleTrue(dto.getEmail())
-                .orElseThrow(() -> new DataNotFoundException("Profile not found"));
+                .orElseThrow(() -> new DataNotFoundException(resourceBundleService.getMessage("profile.not.found", lang)));
 
         return emailAuthService.confirmEmail(profile, dto.getCode(), lang);
     }
 
-    public String resendConfirmationEmail(Long profileId, LanguageEnum lang) {
-        return emailAuthService.resendEmailConfirmation(profileId, lang);
+    public String resendConfirmationEmail(String email, LanguageEnum lang) {
+        // First verify if profile exists and is in correct state
+        Profile profile = profileRepository.findByEmailAndVisibleTrue(email)
+                .orElseThrow(() -> new DataNotFoundException(resourceBundleService.getMessage("profile.not.found", lang)));
+
+        // Only allow resend if profile is not yet active
+        if (profile.getStatus().equals(ProfileStatus.ACTIVE)) {
+            throw new AppBadRequestException(resourceBundleService.getMessage("profile.already.active", lang));
+        }
+
+        return emailAuthService.resendEmailConfirmation(profile, email, lang);
     }
 
     private void existsByEmail(String email, LanguageEnum lang) {
