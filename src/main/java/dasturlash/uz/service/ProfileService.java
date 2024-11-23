@@ -1,5 +1,6 @@
 package dasturlash.uz.service;
 
+import dasturlash.uz.dto.AttachDTO;
 import dasturlash.uz.dto.MessageDTO;
 import dasturlash.uz.dto.ProfileDTO;
 import dasturlash.uz.dto.request.UpdateProfileDetailDTO;
@@ -15,8 +16,10 @@ import dasturlash.uz.service.email.EmailSendingService;
 import dasturlash.uz.util.RandomUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,6 +35,10 @@ public class ProfileService {
     private final ResourceBundleService resourceBundleService;
     private final EmailSendingService emailSendingService;
     private final EmailHistoryService emailHistoryService;
+    private final AttachService attachService;
+
+    @Value("${attach.url}")
+    private String attachUrl;
 
 
     public String changePassword(ChangePasswordRequest request) {
@@ -139,5 +146,20 @@ public class ProfileService {
             return "Profile updated successfully";
         }
         return responseCustom.getMessage();
+    }
+
+    public String updateProfilePhoto(String photoId) {
+        Long currentUserId = SpringSecurityUtil.getCurrentUserId();
+        Profile currentProfile = findById(currentUserId);
+
+        if (currentProfile != null) {
+            if(currentProfile.getPhotoId() != null) {
+                attachService.delete(currentProfile.getPhotoId());
+            }
+            currentProfile.setPhotoId(photoId);
+            repository.save(currentProfile);
+            return "Profile updated successfully";
+        }
+        throw new AppBadRequestException("Profile not found(updateProfilePhoto in profileService)");
     }
 }
