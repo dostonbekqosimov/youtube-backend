@@ -10,6 +10,16 @@ Accept-Language: ru
   "password": "<password>"
 }
 
+### Registration confirmation (code in Integer)
+POST http://localhost:8090/api/auth/registration/confirm
+Content-Type: application/json
+Accept-Language: en
+
+{
+  "email": "<email>",
+  "code": 111111
+}
+
 ### Login
 POST http://localhost:8090/api/auth/login
 Content-Type: application/json
