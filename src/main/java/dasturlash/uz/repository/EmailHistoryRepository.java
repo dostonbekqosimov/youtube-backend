@@ -3,6 +3,7 @@ package dasturlash.uz.repository;
 
 import dasturlash.uz.entity.EmailHistory;
 import dasturlash.uz.enums.EmailStatus;
+import dasturlash.uz.mapper.EmailHistoryInfoMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,4 +30,7 @@ public interface EmailHistoryRepository extends JpaRepository<EmailHistory, Stri
     void increaseAttemptCount(String id);
 
     Optional<EmailHistory> findTopByEmailOrderBySentAtDesc(String email);
+
+    @Query("select e.toAccount as email, e.sentAt as time from EmailHistory e where e.verificationCode = ?1")
+    EmailHistoryInfoMapper getEmailAndSentAtByCode(String code);
 }
