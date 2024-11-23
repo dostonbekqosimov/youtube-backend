@@ -74,6 +74,7 @@ public class EmailAuthService {
         EmailHistory emailHistory = emailHistoryRepository.findTopByEmailOrderBySentAtDesc(profile.getEmail())
                 .orElseThrow(() -> new DataNotFoundException("No email history found"));
 
+        // code bilan email historiyni qidirish [...]
         // Check if code matches
         if (!emailHistory.getVerificationCode().equals(code)) {
             emailHistoryService.updateEmailStatus(emailHistory, EmailStatus.FAILED);

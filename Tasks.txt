@@ -1,5 +1,8 @@
  1. (Doston) Channel info update apida agar murojoat qilayotgan user kanalni egasi bo'lmasa,
 yaxshiroq message jo'natish kerak yoki umuman faqat channel owner ishlata oladigan qilish kerak
-bu api ni   [...]
+bu api ni   [done] (frontend qilarkan)
 
- 2.
+ 2. Video larni stream qilib ochib berish kerak video controller da va attach ni
+open qismida videoni stream qilib berish kerak [...]
+
+ 3. (Doston) code bilan email historiyni qidirish [...]
