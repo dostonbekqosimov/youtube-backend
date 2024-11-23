@@ -45,4 +45,9 @@ public class ProfileController {
     public ResponseEntity<String> updateDetail(@RequestBody @Valid UpdateProfileDetailDTO dto){
         return ResponseEntity.ok(service.updateDetail(dto));
     }
+
+    @GetMapping("/confirm/{code}")
+    public ResponseEntity<String> confirm(@PathVariable String code){
+        return ResponseEntity.ok(service.confirm(code));
+    }
 }

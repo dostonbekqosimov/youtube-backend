@@ -124,4 +124,8 @@ public class ProfileService {
         }
         return "Profile not found";
     }
+
+    public String confirm(String code) {
+        return null;
+    }
 }
