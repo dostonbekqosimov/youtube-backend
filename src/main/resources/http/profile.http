@@ -20,3 +20,7 @@ Authorization: Bearer token
 ### Confirm Email
 GET http://localhost:8090/profile/confirm/<code>
 Authorization: Bearer token
+
+### Update Photo
+PUT http://localhost:8090/profile/updateAttach/<attach-id>
+Authorization: Bearer token
