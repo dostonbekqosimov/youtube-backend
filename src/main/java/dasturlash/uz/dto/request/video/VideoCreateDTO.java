@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class VideoCreateDTO {
     @NotBlank(message = "Your video needs a title")
@@ -24,4 +26,6 @@ public class VideoCreateDTO {
     private VideoType type;
 
     private ContentStatus status = ContentStatus.PRIVATE;
+
+    private LocalDateTime publishedDate;
 }
