@@ -20,4 +20,10 @@ public class VideoController {
     public ResponseEntity<VideoCreateResponseDTO> createVideo(@RequestBody VideoCreateDTO dto) {
         return ResponseEntity.ok(videoService.createVideo(dto));
     }
+
+    @GetMapping("/watch")
+    public ResponseEntity<VideoDTO> watchVideo(@RequestParam("v") String videoId) {
+        return ResponseEntity.ok(videoService.getVideoById(videoId));
+    }
+
 }

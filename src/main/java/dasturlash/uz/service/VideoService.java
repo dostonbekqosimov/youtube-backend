@@ -108,5 +108,38 @@ public class VideoService {
         return response;
     }
 
+    public VideoDTO getVideoById(String videoId) {
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new DataNotFoundException("Video not found"));
+
+        // Check visibility and permissions
+        if (!video.getVisible() || video.getStatus() == ContentStatus.PRIVATE) {
+            throw new ForbiddenException("Video is not accessible");
+        }
+
+        // Increment view count
+        video.setViewCount(video.getViewCount() + 1);
+        videoRepository.save(video);
+
+        return toDTO(video);
+    }
+
+    private VideoDTO toDTO(Video video) {
+        VideoDTO videoDTO = new VideoDTO();
+        videoDTO.setId(video.getId());
+        videoDTO.setTitle(video.getTitle());
+        videoDTO.setDescription(video.getDescription());
+        videoDTO.setPreviewUrl(domain + "/api/attach/open/" + video.getPreviewAttachId());
+        videoDTO.setVideoUrl(domain + "/api/attach/open/" + video.getAttachId());
+        videoDTO.setViewCount(video.getViewCount());
+        videoDTO.setLikeCount(video.getLikeCount());
+        videoDTO.setDislikeCount(video.getDislikeCount());
+        videoDTO.setSharedCount(video.getSharedCount());
+        videoDTO.setStatus(video.getStatus());
+        videoDTO.setCreatedDate(video.getCreatedDate());
+        videoDTO.setPublishedDate(video.getPublishedDate());
+        return videoDTO;
+    }
+
 
 }
