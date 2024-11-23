@@ -65,15 +65,3 @@ public class AuthController {
         return ResponseEntity.ok(authService.getNewAccessToken(tokenDTO, lang));
     }
 }
-
-/*
-   // Endpoint for resending verification code
-    @PostMapping("/verify/resend")
-    public ResponseEntity<String> resendVerificationCode(
-            @RequestParam @Email String email,
-            @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader
-    ) {
-        LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        return ResponseEntity.ok(authService.resendVerificationCode(email, lang));
-    }
-* */
