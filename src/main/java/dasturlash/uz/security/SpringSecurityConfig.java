@@ -67,6 +67,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("/profile/updateDetails").authenticated()
                             .requestMatchers("/profile/confirm/**").authenticated()
                             .requestMatchers("/profile/updateAttach/**").authenticated()
+                            .requestMatchers("/profile/getProfileDetails/**").authenticated()
                             //Authentication APIs - open to ADMIN role
                             .requestMatchers("/profile/create").hasRole("ADMIN")
                             .requestMatchers("/profile/getAll").hasRole("ADMIN")

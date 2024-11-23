@@ -3,6 +3,7 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.AttachDTO;
 import dasturlash.uz.dto.ProfileDTO;
+import dasturlash.uz.dto.ProfileShortInfo;
 import dasturlash.uz.dto.request.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
 import dasturlash.uz.entity.Profile;
@@ -59,5 +60,10 @@ public class ProfileController {
     @PutMapping("/updateAttach/{photoId}")
     public ResponseEntity<String> updatePhoto(@PathVariable String photoId){
         return ResponseEntity.ok(service.updateProfilePhoto(photoId));
+    }
+
+    @GetMapping("/getProfileDetail")
+    public ResponseEntity<ProfileShortInfo> getProfileDetail(){
+        return ResponseEntity.ok(service.getProfileShortInfo()  );
     }
 }
