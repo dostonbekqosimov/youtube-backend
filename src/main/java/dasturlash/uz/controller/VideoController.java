@@ -4,6 +4,7 @@ import dasturlash.uz.dto.request.video.VideoCreateDTO;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoDTO;
 import dasturlash.uz.service.VideoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +18,7 @@ public class VideoController {
     private final VideoService videoService;
 
     @PostMapping("")
-    public ResponseEntity<VideoCreateResponseDTO> createVideo(@RequestBody VideoCreateDTO dto) {
+    public ResponseEntity<VideoCreateResponseDTO> createVideo(@RequestBody @Valid VideoCreateDTO dto) {
         return ResponseEntity.ok(videoService.createVideo(dto));
     }
 

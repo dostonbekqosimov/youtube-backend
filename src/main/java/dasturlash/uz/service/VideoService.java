@@ -5,11 +5,13 @@ import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoDTO;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
+import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.exceptions.UnauthorizedException;
 import dasturlash.uz.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -41,12 +43,18 @@ public class VideoService {
         video.setPreviewAttachId(dto.getPreviewAttachId());
         video.setDescription(dto.getDescription());
         video.setType(dto.getType());
+        video.setChannelId(dto.getChannelId());
         video.setCreatedDate(LocalDateTime.now());
 
-        // Handle status and published date
-        if (dto.getStatus() == ContentStatus.SCHEDULED && dto.getPublishedDate() != null) {
+
+        // handle status and published date
+        if (dto.getStatus() == ContentStatus.SCHEDULED) {
+
+            // First validate scheduled video if applicable
+            validateScheduledVideo(dto);
+
             video.setStatus(ContentStatus.SCHEDULED);
-            video.setPublishedDate(dto.getPublishedDate());
+            video.setPublishedDate(dto.getPublishedDate());  // Safe because validation ensures it's not null
         } else if (dto.getStatus() != null) {
             video.setStatus(dto.getStatus());
             if (dto.getStatus() == ContentStatus.PUBLIC) {
@@ -106,6 +114,17 @@ public class VideoService {
         }
 
         return response;
+    }
+
+    private void validateScheduledVideo(VideoCreateDTO dto) {
+        if (dto.getStatus() == ContentStatus.SCHEDULED) {
+            if (dto.getPublishedDate() == null) {
+                throw new AppBadRequestException("Published date is required for scheduled videos");
+            }
+            if (dto.getPublishedDate().isBefore(LocalDateTime.now())) {
+                throw new AppBadRequestException("Published date must be in the future");
+            }
+        }
     }
 
     public VideoDTO getVideoById(String videoId) {

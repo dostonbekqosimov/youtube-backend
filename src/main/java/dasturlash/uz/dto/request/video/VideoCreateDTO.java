@@ -25,7 +25,12 @@ public class VideoCreateDTO {
     @NotNull
     private VideoType type;
 
-    private ContentStatus status = ContentStatus.PRIVATE;
+    @NotBlank(message = "Channel ID is required")
+    @NotNull
+    private String channelId;
+
+    @NotNull(message = "Status is required")
+    private ContentStatus status;
 
     private LocalDateTime publishedDate;
 }
