@@ -8,7 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ChannelRepository extends CrudRepository<Channel, String> {
     boolean existsByHandle(String handle);
@@ -20,4 +19,6 @@ public interface ChannelRepository extends CrudRepository<Channel, String> {
     List<Channel> findByHandle(@Param("handle")String channelHandle);
 
     Page<Channel> findAllByVisibleTrue(Pageable pageable);
+
+    Page<Channel> findAllByProfileIdAndVisibleTrue(Long currentUserId, Pageable pageRequest);
 }

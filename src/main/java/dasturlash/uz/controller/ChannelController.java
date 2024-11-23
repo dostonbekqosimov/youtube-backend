@@ -108,4 +108,11 @@ public class ChannelController {
                                                                         @RequestParam(value = "size", defaultValue = "25") Integer size) {
         return ResponseEntity.ok().body(channelService.getChannelsList(page - 1, size));
     }
+
+    @GetMapping("/my-channels")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<PageImpl<ChannelResponseDTO>> getUserChannelList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                                        @RequestParam(value = "size", defaultValue = "25") Integer size) {
+        return ResponseEntity.ok().body(channelService.getUserChannelList(page - 1, size));
+    }
 }
