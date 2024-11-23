@@ -106,7 +106,7 @@ public class ProfileService {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setToAccount(email);
         messageDTO.setSubject("");
-        messageDTO.setText("localhost:8080/profile/confirm/"+ code);
+        messageDTO.setText("Your code is: "+ code);
 
         emailSendingService.sendMimeMessage(messageDTO, currentProfile, code);
         return "Sent code your email";
