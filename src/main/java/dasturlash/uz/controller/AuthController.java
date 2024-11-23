@@ -2,6 +2,7 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.JwtResponseDTO;
 import dasturlash.uz.dto.TokenDTO;
+import dasturlash.uz.dto.VerificationDTO;
 import dasturlash.uz.dto.request.TokenRefreshRequestDTO;
 import dasturlash.uz.dto.request.LoginDTO;
 import dasturlash.uz.dto.request.RegistrationDTO;
@@ -29,13 +30,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.registerAccount(dto, lang));
     }
 
-    @GetMapping("/registration/confirm/{profileId}")
+    @PostMapping("/registration/confirm")
     public ResponseEntity<String> registrationConfirm(
-            @PathVariable Long profileId,
+            @RequestBody @Valid VerificationDTO verificationDTO,
             @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader
     ) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        return ResponseEntity.ok(authService.registrationConfirm(profileId, lang));
+        return ResponseEntity.ok(authService.registrationConfirm(verificationDTO, lang));
     }
 
     @PostMapping("/registration/resend/{profileId}")
@@ -63,3 +64,15 @@ public class AuthController {
         return ResponseEntity.ok(authService.getNewAccessToken(tokenDTO, lang));
     }
 }
+
+/*
+   // Endpoint for resending verification code
+    @PostMapping("/verify/resend")
+    public ResponseEntity<String> resendVerificationCode(
+            @RequestParam @Email String email,
+            @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader
+    ) {
+        LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
+        return ResponseEntity.ok(authService.resendVerificationCode(email, lang));
+    }
+* */

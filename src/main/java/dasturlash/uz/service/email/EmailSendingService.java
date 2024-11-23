@@ -23,13 +23,14 @@ public class EmailSendingService {
     private final JavaMailSender javaMailSender;
     private final EmailHistoryService emailHistoryService;
 
-    public String sendMimeMessage(MessageDTO messageDTO, Profile profile) {
+    public String sendMimeMessage(MessageDTO messageDTO, Profile profile, Integer verificationCode) {
 
         EmailHistory history = emailHistoryService.createEmailHistory(
                 messageDTO.getToAccount(),
                 messageDTO.getSubject(),
                 messageDTO.getText(),
-                profile
+                profile,
+                verificationCode
         );
 
 

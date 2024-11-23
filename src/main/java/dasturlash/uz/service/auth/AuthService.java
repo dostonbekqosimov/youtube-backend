@@ -3,6 +3,7 @@ package dasturlash.uz.service.auth;
 import dasturlash.uz.dto.JwtDTO;
 import dasturlash.uz.dto.JwtResponseDTO;
 import dasturlash.uz.dto.TokenDTO;
+import dasturlash.uz.dto.VerificationDTO;
 import dasturlash.uz.dto.request.RegistrationDTO;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.LanguageEnum;
@@ -10,6 +11,7 @@ import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.enums.ProfileStatus;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataExistsException;
+import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.UnauthorizedException;
 import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.security.CustomUserDetails;
@@ -57,9 +59,11 @@ public class AuthService {
 
     }
 
-    public String registrationConfirm(Long profileId, LanguageEnum lang) {
-        System.out.println("profileId: " + profileId);
-        return emailAuthService.confirmEmail(profileId, lang);
+    public String registrationConfirm(VerificationDTO dto, LanguageEnum lang) {
+        Profile profile = profileRepository.findByEmailAndVisibleTrue(dto.getEmail())
+                .orElseThrow(() -> new DataNotFoundException("Profile not found"));
+
+        return emailAuthService.confirmEmail(profile, dto.getCode(), lang);
     }
 
     public String resendConfirmationEmail(Long profileId, LanguageEnum lang) {
