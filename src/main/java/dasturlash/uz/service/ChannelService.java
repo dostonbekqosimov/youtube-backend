@@ -14,6 +14,7 @@ import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,9 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
     private final AttachService attachService;
 
+    @Value("${app.domain}")
+    private String domain;
+
     public void create(ChannelCreateRequest request, LanguageEnum lang) {
 
         // check if channel with handle exists
@@ -42,7 +46,7 @@ public class ChannelService {
             Channel newChannel = new Channel();
             newChannel.setName(request.getName());
             newChannel.setDescription(request.getDescription());
-            newChannel.setHandle(request.getHandle());
+            newChannel.setHandle("@" + request.getHandle());
             newChannel.setProfileId(getCurrentUserId());
             newChannel.setStatus(ChannelStatus.ACTIVE);
             newChannel.setCreatedDate(LocalDateTime.now());
@@ -174,17 +178,17 @@ public class ChannelService {
         return channels.stream().map(this::toChannelResponseDTO).toList();
     }
 
-    public List<ChannelResponseDTO> getChannelByHandle(String channelHandle) {
+    public ChannelResponseDTO getChannelByHandle(String channelHandle) {
 
-        List<Channel> channels = channelRepository.findByHandle(channelHandle);
+        Channel channel = channelRepository.findByHandle(channelHandle);
 
         // check if there is channel by given handle
         // Shu yerda agar hech qanday channel topilmasa videolardan nimadur berib yuborish kerak, yoki maslahatlashamiz(Doston)
-        if (channels.isEmpty()) {
+        if (channel == null) {
             throw new DataNotFoundException("No channel found");
         }
 
-        return channels.stream().map(this::toChannelResponseDTO).toList();
+        return toChannelResponseDTO(channel);
     }
 
     public PageImpl<ChannelResponseDTO> getChannelsList(int page, Integer size) {
@@ -255,4 +259,17 @@ public class ChannelService {
         return channelResponseDTO;
     }
 
+    // shuni optimal qilish kerak
+    // keyin handle qo'shayotganda @ qo'shimchasi bilan qo'shish kerek
+    public String shareChannel(String channelId) {
+
+
+        Channel channel = getById(channelId);
+
+        return makeShareLink(channel.getHandle());
+    }
+
+    private String makeShareLink(String handle) {
+        return domain + "/api/channels/handle/" + handle;
+    }
 }

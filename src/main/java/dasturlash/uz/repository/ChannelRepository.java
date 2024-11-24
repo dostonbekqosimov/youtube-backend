@@ -16,9 +16,11 @@ public interface ChannelRepository extends CrudRepository<Channel, String> {
     List<Channel> findByName(@Param("name") String name);
 
     @Query("select c from Channel c where lower(c.handle) like lower(concat('%', :handle, '%')) and c.visible = true")
-    List<Channel> findByHandle(@Param("handle")String channelHandle);
+    List<Channel> findByHandleWithSearchForAll(@Param("handle")String channelHandle);
 
     Page<Channel> findAllByVisibleTrue(Pageable pageable);
 
     Page<Channel> findAllByProfileIdAndVisibleTrue(Long currentUserId, Pageable pageRequest);
+
+    Channel findByHandle(String handle);
 }
