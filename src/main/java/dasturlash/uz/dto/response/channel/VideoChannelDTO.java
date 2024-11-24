@@ -7,5 +7,5 @@ import lombok.Data;
 public class VideoChannelDTO {
     private String id;
     private String name;
-    private MediaUrlDTO photoUrl;
+    private String photoUrl;
 }

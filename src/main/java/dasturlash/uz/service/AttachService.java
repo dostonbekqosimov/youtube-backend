@@ -69,18 +69,30 @@ public class AttachService {
     }
 
     public String openURL(String fileName) {
-        log.debug("Generating open URL for file: {}", fileName);
+        if (fileName == null) {
+            log.warn("Attempt to open URL with null fileName"); // Clear warning for null input
+            return null;
+        }
+
+        log.debug("Attempting to open URL for file: {}", fileName);
+
         if (isExist(fileName)) {
             String url = attachUrl + "/open/" + fileName;
-            log.debug("URL generated: {}", url);
+            log.debug("Successfully generated URL: {}", url);
             return url;
         }
-        log.warn("File does not exist: {}", fileName);
+
+        log.warn("File not found: {}", fileName); // Changed from debug to warn since this is an error condition
         return null;
     }
 
     public ResponseEntity<Resource> open(String attachId) {
         log.info("Opening file with ID: {}", attachId);
+        if (attachId == null) {
+            log.error("Null attachId provided 1");
+            throw new AppBadRequestException("The given id must not be null");
+        }
+
         Attach entity = getById(attachId);
         String path = getPath(entity);
         Path filePath = Paths.get(path).normalize();
@@ -118,6 +130,11 @@ public class AttachService {
 
     public Boolean delete(String id) {
         log.info("Attempting to delete file with ID: {}", id);
+        if (id == null) {
+            log.error("Null id provided for deletion");
+            throw new AppBadRequestException("The given id must not be null");
+        }
+
         Attach entity = getById(id);
         attachRepository.changeVisible(id, Boolean.FALSE);
         File file = new File(getPath(entity));
@@ -133,6 +150,11 @@ public class AttachService {
 
     public Attach getById(String id) {
         log.debug("Retrieving attach by ID: {}", id);
+        if (id == null) {
+            log.error("Null id provided for retrieval");
+            throw new AppBadRequestException("The given id must not be null");
+        }
+
         return attachRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("File not found with ID: {}", id);
@@ -142,6 +164,11 @@ public class AttachService {
 
     public ResponseEntity<Resource> download(String id) {
         log.info("Starting download for file ID: {}", id);
+        if (id == null) {
+            log.error("Null id provided for download");
+            throw new AppBadRequestException("The given id must not be null");
+        }
+
         try {
             Attach entity = getById(id);
             Path filePath = Paths.get(getPath(entity)).normalize();
@@ -164,7 +191,7 @@ public class AttachService {
     public MediaUrlDTO getUrlOfMedia(String attachId) {
         log.debug("Getting media URL for ID: {}", attachId);
         if (attachId == null) {
-            log.warn("Null attachId provided");
+            log.warn("Null attachId provided 2");
             return null;
         }
 
@@ -178,7 +205,7 @@ public class AttachService {
     public VideoMediaDTO getUrlOfVideo(String attachId) {
         log.debug("Getting video URL for ID: {}", attachId);
         if (attachId == null) {
-            log.warn("Null attachId provided");
+            log.warn("Null attachId provided 3");
             return null;
         }
 

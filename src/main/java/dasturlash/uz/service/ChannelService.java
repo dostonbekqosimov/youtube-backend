@@ -280,12 +280,12 @@ public class ChannelService {
         return makeShareLink(channel.getHandle());
     }
 
-    public VideoChannelDTO getVideoShortInfo(String videoId) {
-        ChannelShortInfoMapper video = channelRepository.getShortInfo(videoId);
+    public VideoChannelDTO getVideoShortInfo(String channelId) {
+        ChannelShortInfoMapper result = channelRepository.getShortInfo(channelId);
         VideoChannelDTO videoChannelDTO = new VideoChannelDTO();
-        videoChannelDTO.setId(video.getId());
-        videoChannelDTO.setName(video.getName());
-        videoChannelDTO.setPhotoUrl(attachService.getUrlOfMedia(video.getPhotoId()));
+        videoChannelDTO.setId(result.getId());
+        videoChannelDTO.setName(result.getName());
+        videoChannelDTO.setPhotoUrl(attachService.openURL(result.getPhotoId()));
         return videoChannelDTO;
     }
 
