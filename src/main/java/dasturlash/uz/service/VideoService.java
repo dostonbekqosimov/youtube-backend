@@ -1,9 +1,10 @@
 package dasturlash.uz.service;
 
 import dasturlash.uz.dto.request.video.*;
-import dasturlash.uz.dto.response.channel.MediaUrlDTO;
+import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
+import dasturlash.uz.dto.response.video.VideoMediaDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
@@ -260,11 +261,7 @@ public class VideoService {
 
         // get media urls
         MediaUrlDTO previewAttach = attachService.getUrlOfMedia(video.getPreviewAttachId());
-
-        // setting duration null because preview attach doesn't need duration for now!
-        previewAttach.setDuration(null);
-
-        MediaUrlDTO videoAttach = attachService.getUrlOfMedia(video.getAttachId());
+        VideoMediaDTO videoAttach = attachService.getUrlOfVideo(video.getAttachId());
 
         // set media urls
         videoFullInfoDTO.setPreviewAttach(previewAttach);

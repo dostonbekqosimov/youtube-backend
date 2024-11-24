@@ -1,7 +1,6 @@
-package dasturlash.uz.dto.response.channel;
+package dasturlash.uz.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
@@ -9,5 +8,4 @@ import lombok.Data;
 public class MediaUrlDTO {
     private String id;
     private String url;
-    private String duration;
 }

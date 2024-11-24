@@ -1,5 +1,6 @@
 package dasturlash.uz.dto.response.channel;
 
+import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.enums.ChannelStatus;
 import lombok.Data;
 

@@ -1,7 +1,8 @@
 package dasturlash.uz.service;
 
 import dasturlash.uz.dto.AttachDTO;
-import dasturlash.uz.dto.response.channel.MediaUrlDTO;
+import dasturlash.uz.dto.response.MediaUrlDTO;
+import dasturlash.uz.dto.response.video.VideoMediaDTO;
 import dasturlash.uz.entity.Attach;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
@@ -328,9 +329,21 @@ public class AttachService {
         MediaUrlDTO mediaUrlDTO = new MediaUrlDTO();
         mediaUrlDTO.setId(attachId);
         mediaUrlDTO.setUrl(openURL(attachId));
-        mediaUrlDTO.setDuration(getDurationFromEntity(attachId));
 
         return mediaUrlDTO;
+    }
+
+    public VideoMediaDTO getUrlOfVideo(String attachId) {
+        if (attachId == null) {
+            return null;
+        }
+
+        VideoMediaDTO videoMediaDTO = new VideoMediaDTO();
+        videoMediaDTO.setVideoId(attachId);
+        videoMediaDTO.setUrl(openURL(attachId));
+        videoMediaDTO.setDuration(getDurationFromEntity(attachId));
+
+        return videoMediaDTO;
     }
 
     private String getDurationFromEntity(String attachId) {
@@ -349,7 +362,8 @@ public class AttachService {
         entity.setPath(pathFolder);
         entity.setSize(file.getSize());
         entity.setType(file.getContentType());
-        entity.setOriginName(file.getOriginalFilename());entity.setExtension(extension);
+        entity.setOriginName(file.getOriginalFilename());
+        entity.setExtension(extension);
         entity.setVisible(true);
         entity.setCreatedDate(LocalDateTime.now());
         attachRepository.save(entity);

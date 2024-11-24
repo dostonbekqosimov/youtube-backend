@@ -3,6 +3,7 @@ package dasturlash.uz.service;
 import dasturlash.uz.dto.request.channel.ChannelMediaUpdateRequest;
 import dasturlash.uz.dto.request.channel.ChannelCreateRequest;
 import dasturlash.uz.dto.request.UpdateChannelStatusRequest;
+import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ChannelStatus;
@@ -253,8 +254,16 @@ public class ChannelService {
         channelResponseDTO.setCreatedDate(channel.getCreatedDate());
         channelResponseDTO.setUpdatedDate(channel.getUpdatedDate());
         channelResponseDTO.setVisible(channel.getVisible());
-        channelResponseDTO.setBanner(attachService.getUrlOfMedia(channel.getBannerId()));
-        channelResponseDTO.setPhoto(attachService.getUrlOfMedia(channel.getPhotoId()));
+
+        // get media urls
+        MediaUrlDTO banner = attachService.getUrlOfMedia(channel.getPhotoId());
+        MediaUrlDTO photo = attachService.getUrlOfMedia(channel.getBannerId());
+
+
+        // set media urls
+        channelResponseDTO.setBanner(banner);
+        channelResponseDTO.setPhoto(photo);
+
 
         return channelResponseDTO;
     }

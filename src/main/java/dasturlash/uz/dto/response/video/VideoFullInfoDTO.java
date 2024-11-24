@@ -1,10 +1,14 @@
 package dasturlash.uz.dto.response.video;
 
-import dasturlash.uz.dto.response.channel.MediaUrlDTO;
+import dasturlash.uz.dto.response.CategoryResponseDTO;
+import dasturlash.uz.dto.response.MediaUrlDTO;
+import dasturlash.uz.dto.response.TagResponseDTO;
+import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.enums.ContentStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class VideoFullInfoDTO {
@@ -12,7 +16,11 @@ public class VideoFullInfoDTO {
     private String title;
     private String description;
     private MediaUrlDTO previewAttach;
-    private MediaUrlDTO videoAttach;
+    private VideoMediaDTO videoAttach;
+    private CategoryResponseDTO category;
+    private List<TagResponseDTO> tags;
+    private VideoChannelDTO channel;
+    private VideoLikeDTO likeDetails;
     private Integer viewCount;
     private Integer likeCount;
     private Integer dislikeCount;
