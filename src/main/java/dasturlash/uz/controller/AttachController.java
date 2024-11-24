@@ -24,26 +24,26 @@ public class AttachController {
     private final AttachService attachService;
 
     @PostMapping("/upload")
-    public ResponseEntity<AttachDTO> videoUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<AttachDTO> upload(@RequestParam("file") MultipartFile file) {
         log.warn("New file uploaded: {}", file.getOriginalFilename());
-        return ResponseEntity.ok().body(attachService.videoUpload(file));
+        return ResponseEntity.ok().body(attachService.upload(file));
 
     }
 
     @GetMapping("/open/{fileName}")
-    public ResponseEntity<Resource> openVideo(@PathVariable("fileName") String fileName) {
+    public ResponseEntity<Resource> open(@PathVariable("fileName") String fileName) {
         System.out.println("I'm being called with: " + fileName);
-        return attachService.openVideo(fileName);
+        return attachService.open(fileName);
     }
 
     @GetMapping("/download/{fileName}")
-    public ResponseEntity<Resource> downloadVideo(@PathVariable("fileName") String fileName) {
-        return attachService.downloadVideo(fileName);
+    public ResponseEntity<Resource> download(@PathVariable("fileName") String fileName) {
+        return attachService.download(fileName);
     }
 
     @GetMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<PageImpl<AttachDTO>> getAllVideos(@RequestParam(value = "page", defaultValue = "1") int page,
+    public ResponseEntity<PageImpl<AttachDTO>> getAllAttaches(@RequestParam(value = "page", defaultValue = "1") int page,
                                                             @RequestParam(value = "size", defaultValue = "15") int size) {
         return ResponseEntity.ok(attachService.getAll(page - 1, size));
     }
