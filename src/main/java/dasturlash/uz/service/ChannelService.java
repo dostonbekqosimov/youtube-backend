@@ -285,7 +285,7 @@ public class ChannelService {
         VideoChannelDTO videoChannelDTO = new VideoChannelDTO();
         videoChannelDTO.setId(video.getId());
         videoChannelDTO.setName(video.getName());
-        videoChannelDTO.setPhotoUrl(attachService.openURL(video.getPhotoId()));
+        videoChannelDTO.setPhotoUrl(attachService.getUrlOfMedia(video.getPhotoId()));
         return videoChannelDTO;
     }
 

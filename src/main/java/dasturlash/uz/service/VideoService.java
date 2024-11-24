@@ -264,33 +264,44 @@ public class VideoService {
         videoFullInfoDTO.setDescription(video.getDescription());
 
         // get media urls
+        log.debug("Fetching media URLs for video ID: {}", video.getId());
         MediaUrlDTO previewAttach = attachService.getUrlOfMedia(video.getPreviewAttachId());
+        log.debug("Retrieved preview attachment for video ID: {}, preview ID: {}",
+                video.getId(), video.getPreviewAttachId());
         VideoMediaDTO videoAttach = attachService.getUrlOfVideo(video.getAttachId());
+        log.debug("Retrieved video attachment for video ID: {}, attachment ID: {}",
+                video.getId(), video.getAttachId());
 
         // set media urls
         videoFullInfoDTO.setPreviewAttach(previewAttach);
         videoFullInfoDTO.setVideoAttach(videoAttach);
 
         // get category short info by using category id
+        log.debug("Fetching category info for video ID: {}, category ID: {}",
+                video.getId(), video.getCategoryId());
         CategoryResponseDTO category = categoryService.getCategoryShortInfoById(video.getCategoryId());
 
         // set category short info
         videoFullInfoDTO.setCategory(category);
 
-
         // get tags by using tag ids
 //        List<TagResponseDTO> tags = tagService.getTagsByTagIds(video.getTagIds());
 
         // set tags
+        log.debug("Setting empty tag list for video ID: {}", video.getId());
         videoFullInfoDTO.setTags(List.of());
 
         // get channel by using channel id
+        log.debug("Fetching channel info for video ID: {}, channel ID: {}",
+                video.getId(), video.getChannelId());
         VideoChannelDTO channel = channelService.getVideoShortInfo(video.getChannelId());
 
         // set channel
         videoFullInfoDTO.setChannel(channel);
 
         // setting like details
+        log.debug("Setting like details for video ID: {}, likes: {}, dislikes: {}",
+                video.getId(), video.getLikeCount(), video.getDislikeCount());
         VideoLikeDTO likeDetails = new VideoLikeDTO();
         likeDetails.setLikeCount(video.getLikeCount());
         likeDetails.setDislikeCount(video.getDislikeCount());
@@ -300,13 +311,13 @@ public class VideoService {
         likeDetails.setIsUserDisliked(Boolean.FALSE);
         videoFullInfoDTO.setLikeDetails(likeDetails);
 
-        videoFullInfoDTO.setLikeDetails(likeDetails);
-
         videoFullInfoDTO.setViewCount(video.getViewCount());
         videoFullInfoDTO.setSharedCount(video.getSharedCount());
         videoFullInfoDTO.setStatus(video.getStatus());
         videoFullInfoDTO.setCreatedDate(video.getCreatedDate());
         videoFullInfoDTO.setPublishedDate(video.getPublishedDate());
+
+        log.debug("Completed converting video entity to DTO for video ID: {}", video.getId());
         return videoFullInfoDTO;
     }
 
