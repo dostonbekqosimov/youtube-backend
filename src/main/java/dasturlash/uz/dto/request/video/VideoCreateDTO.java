@@ -18,6 +18,10 @@ public class VideoCreateDTO {
     private String description;
     @NotNull
     private Long categoryId;
+
+    // playlist can be null
+    private String playlistId;
+
     @NotBlank
     private String attachId;
     @NotBlank

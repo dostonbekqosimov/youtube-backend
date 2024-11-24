@@ -29,6 +29,14 @@ public class Video {
     @Column(name = "title")
     private String title;
 
+    @Column(name = "playlist_id")
+    private String playlistId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playlist_id", updatable = false, insertable = false)
+    private Playlist playlist;
+
+
     @Column(name = "category_id")
     private Long categoryId;
 
