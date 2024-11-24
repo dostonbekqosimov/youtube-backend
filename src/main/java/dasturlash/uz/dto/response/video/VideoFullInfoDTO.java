@@ -1,5 +1,6 @@
 package dasturlash.uz.dto.response.video;
 
+import dasturlash.uz.dto.response.channel.MediaUrlDTO;
 import dasturlash.uz.enums.ContentStatus;
 import lombok.Data;
 
@@ -10,8 +11,8 @@ public class VideoFullInfoDTO {
     private String id;
     private String title;
     private String description;
-    private String previewUrl;
-    private String videoUrl;
+    private MediaUrlDTO previewAttach;
+    private MediaUrlDTO videoAttach;
     private Integer viewCount;
     private Integer likeCount;
     private Integer dislikeCount;
@@ -19,4 +20,5 @@ public class VideoFullInfoDTO {
     private ContentStatus status;
     private LocalDateTime createdDate;
     private LocalDateTime publishedDate;
+    private LocalDateTime scheduledDate;
 }

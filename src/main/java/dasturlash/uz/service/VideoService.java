@@ -1,6 +1,7 @@
 package dasturlash.uz.service;
 
 import dasturlash.uz.dto.request.video.*;
+import dasturlash.uz.dto.response.channel.MediaUrlDTO;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
 import dasturlash.uz.entity.Channel;
@@ -33,6 +34,7 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final ChannelService channelService;
+    private final AttachService attachService;
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
         log.info("Entering createVideo with request: {}", dto);
@@ -48,8 +50,16 @@ public class VideoService {
         video.setChannelId(dto.getChannelId());
         video.setCreatedDate(LocalDateTime.now());
 
+
         // set status and scheduled date
-        setScheduledDate(video, dto.getStatus(), dto.getScheduledDate());
+        updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
+
+        // Set other default values
+        video.setVisible(true);
+        video.setViewCount(0);
+        video.setLikeCount(0);
+        video.setDislikeCount(0);
+        video.setSharedCount(0);
 
         video = videoRepository.save(video);
         log.info("Video created with ID: {}", video.getId());
@@ -64,6 +74,8 @@ public class VideoService {
                 response.setPublic(true);
                 response.setMessage("Video published");
                 response.setAllowedSharePlatforms(List.of("Telegram", "WhatsApp", "Facebook", "X", "Email", "KakaoTalk", "Reddit"));
+                response.setScheduledDate(null);
+                response.setPublishedDate(video.getPublishedDate());
             }
             case PRIVATE -> {
                 response.setPublic(false);
@@ -133,7 +145,7 @@ public class VideoService {
             video.setStatus(dto.getStatus());
 
             // If video is scheduled, set scheduled date
-            setScheduledDate(video, dto.getStatus(), dto.getScheduledDate());
+            updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
         }
 
 
@@ -143,7 +155,7 @@ public class VideoService {
         return updatedVideo;
     }
 
-    private void setScheduledDate(Video video, ContentStatus status, LocalDateTime scheduledDate) {
+    private void updateVideoStatusAndDates(Video video, ContentStatus status, LocalDateTime scheduledDate) {
 
         if (status == ContentStatus.SCHEDULED) {
             validateScheduledVideo(scheduledDate);
@@ -153,10 +165,21 @@ public class VideoService {
             video.setStatus(status);
             if (status == ContentStatus.PUBLIC) {
                 video.setPublishedDate(LocalDateTime.now());
+            } else if (status == ContentStatus.PRIVATE) {
+                video.setStatus(ContentStatus.PRIVATE);
+                video.setPublishedDate(null); // Avoid setting a published date for private videos
+                video.setScheduledDate(null);
+            } else if (status == ContentStatus.DRAFT) {
+                video.setStatus(ContentStatus.DRAFT);
+                video.setPublishedDate(null); // Drafts are not published
+                video.setScheduledDate(null);
+            } else {
+                video.setStatus(ContentStatus.PRIVATE);
+                video.setPublishedDate(null); // Fallback to private, with no published date
+                video.setScheduledDate(null);
             }
-        } else {
-            video.setStatus(ContentStatus.PRIVATE);
         }
+
     }
 
     private void validateScheduledVideo(LocalDateTime scheduledDate) {
@@ -164,10 +187,6 @@ public class VideoService {
         if (scheduledDate == null) {
             log.error("Scheduled date is missing for scheduled video");
             throw new AppBadRequestException("Scheduled date is required for scheduled videos");
-        }
-        if (scheduledDate.isBefore(LocalDateTime.now())) {
-            log.error("Scheduled date is in the past for scheduled video");
-            throw new AppBadRequestException("Scheduled date must be in the future");
         }
     }
 
@@ -177,7 +196,7 @@ public class VideoService {
         Video video = getVideoAndCheckOwnership(videoId);
 
         // set scheduled date using method
-        setScheduledDate(video, dto.getStatus(), dto.getScheduledDate());
+        updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
 
         video.setUpdatedDate(LocalDateTime.now());
         VideoFullInfoDTO updatedVideo = toDTO(videoRepository.save(video));
@@ -238,8 +257,19 @@ public class VideoService {
         videoFullInfoDTO.setId(video.getId());
         videoFullInfoDTO.setTitle(video.getTitle());
         videoFullInfoDTO.setDescription(video.getDescription());
-        videoFullInfoDTO.setPreviewUrl(domain + "/api/attach/open/" + video.getPreviewAttachId());
-        videoFullInfoDTO.setVideoUrl(domain + "/api/attach/open/" + video.getAttachId());
+
+        // get media urls
+        MediaUrlDTO previewAttach = attachService.getUrlOfMedia(video.getPreviewAttachId());
+
+        // setting duration null because preview attach doesn't need duration for now!
+        previewAttach.setDuration(null);
+
+        MediaUrlDTO videoAttach = attachService.getUrlOfMedia(video.getAttachId());
+
+        // set media urls
+        videoFullInfoDTO.setPreviewAttach(previewAttach);
+        videoFullInfoDTO.setVideoAttach(videoAttach);
+
         videoFullInfoDTO.setViewCount(video.getViewCount());
         videoFullInfoDTO.setLikeCount(video.getLikeCount());
         videoFullInfoDTO.setDislikeCount(video.getDislikeCount());

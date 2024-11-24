@@ -324,10 +324,18 @@ public class AttachService {
         if (attachId == null) {
             return null;
         }
+
         MediaUrlDTO mediaUrlDTO = new MediaUrlDTO();
         mediaUrlDTO.setId(attachId);
         mediaUrlDTO.setUrl(openURL(attachId));
+        mediaUrlDTO.setDuration(getDurationFromEntity(attachId));
+
         return mediaUrlDTO;
+    }
+
+    private String getDurationFromEntity(String attachId) {
+        return attachRepository.findAttachDurationById(attachId);
+
     }
 
     public AttachDTO updateProfileAttach(MultipartFile file) {
