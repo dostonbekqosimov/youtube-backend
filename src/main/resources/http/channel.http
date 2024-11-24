@@ -62,7 +62,7 @@ GET http://localhost:8090/api/channels/name?name=<channel_name>
 Accept: application/json
 
 ### Get channel by handle or handle characters
-GET http://localhost:8090/api/channels/handle?handle=<channel_handle>
+GET http://localhost:8090/api/channels/handle/@<channel_handle>
 Accept: application/json
 
 ### Get all channels with pagination (Admin)
@@ -74,3 +74,7 @@ Authorization: Bearer token
 GET http://localhost:8090/api/channels/my-channels
 Accept: application/json
 Authorization: Bearer token
+
+### Get share link
+GET http://localhost:8090/api/channels/share-link?channelId=<channel_id>
+Accept: application/json

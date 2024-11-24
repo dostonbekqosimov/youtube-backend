@@ -76,10 +76,10 @@ public class ChannelController {
     @PatchMapping("/edit-status")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Void> updateChannelStatus(
-                                                    @RequestBody @Valid UpdateChannelStatusRequest request,
-                                                    @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
+            @RequestBody @Valid UpdateChannelStatusRequest request,
+            @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        channelService.updateChannelStatus( request, lang);
+        channelService.updateChannelStatus(request, lang);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -96,8 +96,8 @@ public class ChannelController {
     }
 
     // Get Channels by Handle
-    @GetMapping("/handle")
-    public ResponseEntity<List<ChannelResponseDTO>> getChannelListByHandle(@RequestParam("handle") String channelHandle) {
+    @GetMapping("/handle/{handle}")
+    public ResponseEntity<ChannelResponseDTO> getChannelListByHandle(@PathVariable("handle") String channelHandle) {
         return ResponseEntity.ok().body(channelService.getChannelByHandle(channelHandle));
     }
 
@@ -112,7 +112,12 @@ public class ChannelController {
     @GetMapping("/my-channels")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<PageImpl<ChannelResponseDTO>> getUserChannelList(@RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                                        @RequestParam(value = "size", defaultValue = "25") Integer size) {
+                                                                           @RequestParam(value = "size", defaultValue = "25") Integer size) {
         return ResponseEntity.ok().body(channelService.getUserChannelList(page - 1, size));
+    }
+
+    @GetMapping("/share-link")
+    public ResponseEntity<String> shareChannel(@RequestParam("channelId") String channelId) {
+        return ResponseEntity.ok().body(channelService.shareChannel(channelId));
     }
 }
