@@ -62,7 +62,6 @@ public class ChannelService {
         }
 
 
-
     }
 
     public String updateChannelInfo(String channelId, ChannelCreateRequest updateRequest, LanguageEnum lang) {

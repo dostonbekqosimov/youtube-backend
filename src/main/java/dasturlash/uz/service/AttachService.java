@@ -47,11 +47,14 @@ public class AttachService {
 
     @Value("${attach.upload.folder}")
     private String folderName;
+
     @Value("${attach.url}")
     private String attachUrl;
 
+
     public AttachDTO upload(MultipartFile file) {
         log.info("Starting file upload process for file: {}", file.getOriginalFilename());
+
         String pathFolder = generateDateBasedFolder();
         String key = UUID.randomUUID().toString();
         String extension = getExtension(file.getOriginalFilename());
@@ -65,12 +68,14 @@ public class AttachService {
 
         Attach entity = createAttachEntity(file, key, extension, pathFolder, duration);
         log.info("File upload completed successfully. Generated ID: {}", entity.getId());
+
         return toDTO(entity);
     }
 
+
     public String openURL(String fileName) {
         if (fileName == null) {
-            log.warn("Attempt to open URL with null fileName"); // Clear warning for null input
+            log.warn("Attempt to open URL with null fileName");
             return null;
         }
 
@@ -82,12 +87,14 @@ public class AttachService {
             return url;
         }
 
-        log.warn("File not found: {}", fileName); // Changed from debug to warn since this is an error condition
+        log.warn("File not found: {}", fileName);
         return null;
     }
 
+
     public ResponseEntity<Resource> open(String attachId) {
         log.info("Opening file with ID: {}", attachId);
+
         if (attachId == null) {
             log.error("Null attachId provided 1");
             throw new AppBadRequestException("The given id must not be null");
@@ -113,23 +120,29 @@ public class AttachService {
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
                     .body(resource);
+
         } catch (IOException e) {
             log.error("Error opening file: {}", attachId, e);
             throw new AppBadRequestException("Could not read file: " + attachId);
         }
     }
 
+
     public PageImpl<AttachDTO> getAll(int page, int size) {
         log.info("Retrieving all attachments for page: {}, size: {}", page, size);
+
         Pageable pageable = PageRequest.of(page, size);
         Page<Attach> entityPages = attachRepository.findAll(pageable);
         List<AttachDTO> response = entityPages.stream().map(this::toDTO).toList();
+
         log.debug("Retrieved {} attachments", response.size());
         return new PageImpl<>(response, pageable, entityPages.getTotalElements());
     }
 
+
     public Boolean delete(String id) {
         log.info("Attempting to delete file with ID: {}", id);
+
         if (id == null) {
             log.error("Null id provided for deletion");
             throw new AppBadRequestException("The given id must not be null");
@@ -139,17 +152,21 @@ public class AttachService {
         attachRepository.changeVisible(id, Boolean.FALSE);
         File file = new File(getPath(entity));
         boolean isDeleted = false;
+
         if (file.exists()) {
             isDeleted = file.delete();
             log.info("File deletion result: {}", isDeleted);
         } else {
             log.warn("File not found on disk: {}", id);
         }
+
         return isDeleted;
     }
 
+
     public Attach getById(String id) {
         log.debug("Retrieving attach by ID: {}", id);
+
         if (id == null) {
             log.error("Null id provided for retrieval");
             throw new AppBadRequestException("The given id must not be null");
@@ -162,8 +179,10 @@ public class AttachService {
                 });
     }
 
+
     public ResponseEntity<Resource> download(String id) {
         log.info("Starting download for file ID: {}", id);
+
         if (id == null) {
             log.error("Null id provided for download");
             throw new AppBadRequestException("The given id must not be null");
@@ -182,14 +201,17 @@ public class AttachService {
                 log.error("Could not read file: {}", id);
                 throw new RuntimeException("Could not read the file!");
             }
+
         } catch (MalformedURLException e) {
             log.error("Error downloading file: {}", id, e);
             throw new RuntimeException("Could not read the file!");
         }
     }
 
+
     public MediaUrlDTO getUrlOfMedia(String attachId) {
         log.debug("Getting media URL for ID: {}", attachId);
+
         if (attachId == null) {
             log.warn("Null attachId provided 2");
             return null;
@@ -198,12 +220,15 @@ public class AttachService {
         MediaUrlDTO mediaUrlDTO = new MediaUrlDTO();
         mediaUrlDTO.setId(attachId);
         mediaUrlDTO.setUrl(openURL(attachId));
+
         log.debug("Media URL generated successfully for ID: {}", attachId);
         return mediaUrlDTO;
     }
 
+
     public VideoMediaDTO getUrlOfVideo(String attachId) {
         log.debug("Getting video URL for ID: {}", attachId);
+
         if (attachId == null) {
             log.warn("Null attachId provided 3");
             return null;
@@ -213,13 +238,16 @@ public class AttachService {
         videoMediaDTO.setVideoId(attachId);
         videoMediaDTO.setUrl(openURL(attachId));
         videoMediaDTO.setDuration(getDurationFromEntity(attachId));
+
         log.debug("Video URL generated successfully for ID: {}", attachId);
         return videoMediaDTO;
     }
 
+
     // Private methods below
     private boolean isVideoFile(String extension) {
         log.debug("Checking if file is video. Extension: {}", extension);
+
         if (extension == null) {
             return false;
         }
@@ -233,12 +261,15 @@ public class AttachService {
         String lowercaseExt = extension.toLowerCase();
         boolean isVideo = primaryFormats.contains(lowercaseExt) ||
                 secondaryFormats.contains(lowercaseExt);
+
         log.debug("Is video file: {}", isVideo);
         return isVideo;
     }
 
+
     private String saveAttach(MultipartFile file, String pathFolder, String key, String extension) {
         log.debug("Saving attachment: {}, key: {}", file.getOriginalFilename(), key);
+
         Path uploadDir = Path.of(folderName);
         try {
             if (!Files.exists(uploadDir)) {
@@ -252,15 +283,18 @@ public class AttachService {
 
             log.debug("File saved successfully at: {}", fullPath);
             return fullPath.toString();
+
         } catch (IOException e) {
             log.error("Failed to save file", e);
             throw new RuntimeException("Failed to save video file", e);
         }
     }
 
+
     private Attach createAttachEntity(MultipartFile file, String key,
                                       String extension, String pathFolder, String duration) {
         log.debug("Creating attach entity for file: {}", file.getOriginalFilename());
+
         Attach entity = new Attach();
         entity.setId(key + "." + extension);
         entity.setPath(pathFolder);
@@ -277,18 +311,23 @@ public class AttachService {
         return saved;
     }
 
+
     private String generateDateBasedFolder() {
         log.debug("Generating date-based folder");
+
         Calendar cal = Calendar.getInstance();
         String folder = cal.get(Calendar.YEAR) + "/" +
                 (cal.get(Calendar.MONTH) + 1) + "/" +
                 cal.get(Calendar.DATE);
+
         log.debug("Generated folder: {}", folder);
         return folder;
     }
 
+
     private String extractVideoMetadata(String videoFilePath) {
         log.debug("Extracting video metadata from: {}", videoFilePath);
+
         String ffmpegPath = "ffmpeg";
         String command = ffmpegPath + " -i " + videoFilePath;
 
@@ -304,8 +343,10 @@ public class AttachService {
         return getDuration(process);
     }
 
+
     private static String getDuration(Process process) {
         log.debug("Getting duration from FFmpeg process");
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         String duration = null;
 
@@ -330,16 +371,21 @@ public class AttachService {
         return duration;
     }
 
+
     private String getExtension(String fileName) {
         log.debug("Getting extension for filename: {}", fileName);
+
         int lastIndex = fileName.lastIndexOf(".");
         String extension = fileName.substring(lastIndex + 1);
+
         log.debug("Extension extracted: {}", extension);
         return extension;
     }
 
+
     private AttachDTO toDTO(Attach entity) {
         log.debug("Converting Attach entity to DTO: {}", entity.getId());
+
         AttachDTO attachDTO = new AttachDTO();
         attachDTO.setId(entity.getId());
         attachDTO.setOriginName(entity.getOriginName());
@@ -349,29 +395,39 @@ public class AttachService {
         attachDTO.setExtension(entity.getExtension());
         attachDTO.setCreatedData(entity.getCreatedDate());
         attachDTO.setUrl(openURL(entity.getId()));
+
         return attachDTO;
     }
 
+
     private String getPath(Attach entity) {
         log.debug("Getting full path for entity: {}", entity.getId());
+
         String path = folderName + "/" + entity.getPath() + "/" + entity.getId();
+
         log.debug("Full path: {}", path);
         return path;
     }
 
+
     private String getDurationFromEntity(String attachId) {
         log.debug("Getting duration for attach ID: {}", attachId);
+
         String duration = attachRepository.findAttachDurationById(attachId);
+
         log.debug("Duration found: {}", duration);
         return duration;
     }
 
+
     private Boolean isExist(String attachId) {
         log.debug("Checking if attach exists: {}", attachId);
+
         if (attachId == null) {
             log.warn("Null attachId provided 4");
             return false;
         }
+
         boolean exists = attachRepository.existsById(attachId);
         log.debug("Attach exists: {}", exists);
         return exists;

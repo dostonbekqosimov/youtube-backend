@@ -11,6 +11,7 @@ import dasturlash.uz.dto.response.video.VideoMediaDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
+import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
+import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
 
 @Service
 @RequiredArgsConstructor
@@ -55,8 +57,7 @@ public class VideoService {
         video.setChannelId(dto.getChannelId());
         video.setCreatedDate(LocalDateTime.now());
 
-
-        // set status and scheduled date
+        // Set status and scheduled date
         updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
 
         // Set other default values
@@ -105,54 +106,77 @@ public class VideoService {
         return response;
     }
 
-
     public VideoFullInfoDTO getVideoById(String videoId) {
-
+        // Fetch the video entity
         Video video = getVideoEntityById(videoId);
 
-        if (!video.getVisible() || video.getStatus() == ContentStatus.PRIVATE) {
-            log.warn("Video with ID: {} is not accessible", videoId);
-            throw new ForbiddenException("Video is not accessible");
+        // If the video is visible or has PRIVATE status
+        if (video.getVisible() || video.getStatus() == ContentStatus.PRIVATE) {
+
+            // Check if the video is PRIVATE and ensure access is limited to owner or admin
+            if (video.getStatus() == ContentStatus.PRIVATE) {
+                // get only profile id here no need for whole channel [...]
+                Channel channel = channelService.getById(video.getChannelId());
+                Long currentUserId = getCurrentUserId();
+
+                // Allow only if the current user is the owner or an admin
+                if (!currentUserId.equals(channel.getProfileId()) && !isAdmin()) {
+                    throw new ForbiddenException("Access to this video is restricted.");
+                }
+            }
+
+            // Increment view count and save changes
+            video.setViewCount(video.getViewCount() + 1);
+            videoRepository.save(video);
+
+            // Convert and return the video details
+            VideoFullInfoDTO videoFullInfoDTO = toVideoFullInfoDTO(video);
+            log.info("Returning video details for ID: {}", videoId);
+            return videoFullInfoDTO;
+
+        } else {
+            throw new DataNotFoundException("Video not available or accessible.");
         }
+    }
 
-        video.setViewCount(video.getViewCount() + 1);
-        videoRepository.save(video);
-
-        VideoFullInfoDTO videoFullInfoDTO = toVideoFullInfoDTO(video);
-        log.info("Returning video details for ID: {}", videoId);
-        return videoFullInfoDTO;
+    private boolean isAdmin() {
+        // Logic to determine if the user is an admin
+        return getCurrentUserRole() == ProfileRole.ROLE_ADMIN;
     }
 
     @Transactional
     public VideoUpdateDTO updateVideo(String videoId, VideoUpdateDTO dto) {
         log.info("Updating video with ID: {} and request: {}", videoId, dto);
+
         Video video = getVideoAndCheckOwnership(videoId);
 
-            video.setTitle(dto.getTitle());
-
-            video.setDescription(dto.getDescription());
+        video.setTitle(dto.getTitle());
+        video.setDescription(dto.getDescription());
 
         if (dto.getCategoryId() != null) {
             video.setCategoryId(dto.getCategoryId());
         }
+
         if (dto.getPlaylistId() != null) {
             video.setPlaylistId(dto.getPlaylistId());
         }
+
         if (dto.getPreviewAttachId() != null) {
             video.setPreviewAttachId(dto.getPreviewAttachId());
         }
+
         if (dto.getType() != null) {
             video.setType(dto.getType());
         }
-        if (dto.getStatus() != null) {
-            video.setStatus(dto.getStatus());
 
+        if (dto.getStatus() != null) {
             // If video is scheduled, set scheduled date
+            log.info("Updating status and dates for video ID: {} with request: {}", videoId, dto);
             updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
         }
 
-
         video.setUpdatedDate(LocalDateTime.now());
+
         VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
         log.info("Video updated with response: {}", updatedVideo);
         return updatedVideo;
@@ -164,29 +188,34 @@ public class VideoService {
             validateScheduledVideo(scheduledDate);
             video.setStatus(ContentStatus.SCHEDULED);
             video.setScheduledDate(scheduledDate);
+
         } else if (status != null) {
             video.setStatus(status);
+
             if (status == ContentStatus.PUBLIC) {
                 video.setPublishedDate(LocalDateTime.now());
+
             } else if (status == ContentStatus.PRIVATE) {
                 video.setStatus(ContentStatus.PRIVATE);
-                video.setPublishedDate(null); // Avoid setting a published date for private videos
+                video.setPublishedDate(null);
                 video.setScheduledDate(null);
+
             } else if (status == ContentStatus.DRAFT) {
                 video.setStatus(ContentStatus.DRAFT);
-                video.setPublishedDate(null); // Drafts are not published
+                video.setPublishedDate(null);
                 video.setScheduledDate(null);
+
             } else {
                 video.setStatus(ContentStatus.PRIVATE);
-                video.setPublishedDate(null); // Fallback to private, with no published date
+                video.setPublishedDate(null);
                 video.setScheduledDate(null);
             }
         }
-
     }
 
     private void validateScheduledVideo(LocalDateTime scheduledDate) {
         log.info("Validating scheduled video with scheduled date: {}", scheduledDate);
+
         if (scheduledDate == null) {
             log.error("Scheduled date is missing for scheduled video");
             throw new AppBadRequestException("Scheduled date is required for scheduled videos");
@@ -196,12 +225,14 @@ public class VideoService {
     @Transactional
     public VideoUpdateDTO updateStatus(String videoId, VideoStatusDTO dto) {
         log.info("Updating status for video ID: {} with request: {}", videoId, dto);
+
         Video video = getVideoAndCheckOwnership(videoId);
 
-        // set scheduled date using method
+        // Set scheduled date using method
         updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
 
         video.setUpdatedDate(LocalDateTime.now());
+
         VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
         log.info("Status updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
@@ -210,9 +241,12 @@ public class VideoService {
     @Transactional
     public VideoUpdateDTO updatePlaylist(String videoId, VideoPlaylistDTO dto) {
         log.info("Updating playlist for video ID: {} with request: {}", videoId, dto);
+
         Video video = getVideoAndCheckOwnership(videoId);
+
         video.setPlaylistId(dto.getPlaylistId());
         video.setUpdatedDate(LocalDateTime.now());
+
         VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
         log.info("Playlist updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
@@ -221,9 +255,12 @@ public class VideoService {
     @Transactional
     public VideoUpdateDTO updateCategory(String videoId, VideoCategoryDTO dto) {
         log.info("Updating category for video ID: {} with request: {}", videoId, dto);
+
         Video video = getVideoAndCheckOwnership(videoId);
+
         video.setCategoryId(dto.getCategoryId());
         video.setUpdatedDate(LocalDateTime.now());
+
         VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
         log.info("Category updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
@@ -232,9 +269,12 @@ public class VideoService {
     @Transactional
     public VideoUpdateDTO updatePreview(String videoId, VideoPreviewDTO dto) {
         log.info("Updating preview for video ID: {} with request: {}", videoId, dto);
+
         Video video = getVideoAndCheckOwnership(videoId);
+
         video.setPreviewAttachId(dto.getPreviewAttachId());
         video.setUpdatedDate(LocalDateTime.now());
+
         VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
         log.info("Preview updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
@@ -242,6 +282,7 @@ public class VideoService {
 
     private Video getVideoAndCheckOwnership(String videoId) {
         log.info("Checking ownership for video ID: {}", videoId);
+
         Video video = getVideoEntityById(videoId);
 
         Channel channel = channelService.getById(video.getChannelId());
@@ -256,55 +297,51 @@ public class VideoService {
 
     private VideoFullInfoDTO toVideoFullInfoDTO(Video video) {
         log.debug("Converting video entity to DTO for video ID: {}", video.getId());
+
         VideoFullInfoDTO videoFullInfoDTO = new VideoFullInfoDTO();
         videoFullInfoDTO.setId(video.getId());
         videoFullInfoDTO.setTitle(video.getTitle());
         videoFullInfoDTO.setDescription(video.getDescription());
 
-        // get media urls
+        // Get media URLs
         log.debug("Fetching media URLs for video ID: {}", video.getId());
-        MediaUrlDTO previewAttach = attachService.getUrlOfMedia(video.getPreviewAttachId());
-        log.debug("Retrieved preview attachment for video ID: {}, preview ID: {}",
-                video.getId(), video.getPreviewAttachId());
-        VideoMediaDTO videoAttach = attachService.getUrlOfVideo(video.getAttachId());
-        log.debug("Retrieved video attachment for video ID: {}, attachment ID: {}",
-                video.getId(), video.getAttachId());
 
-        // set media urls
+        MediaUrlDTO previewAttach = attachService.getUrlOfMedia(video.getPreviewAttachId());
+        log.debug("Retrieved preview attachment for video ID: {}, preview ID: {}", video.getId(), video.getPreviewAttachId());
+
+        VideoMediaDTO videoAttach = attachService.getUrlOfVideo(video.getAttachId());
+        log.debug("Retrieved video attachment for video ID: {}, attachment ID: {}", video.getId(), video.getAttachId());
+
+        // Set media URLs
         videoFullInfoDTO.setPreviewAttach(previewAttach);
         videoFullInfoDTO.setVideoAttach(videoAttach);
 
-        // get category short info by using category id
-        log.debug("Fetching category info for video ID: {}, category ID: {}",
-                video.getId(), video.getCategoryId());
+        // Get category short info by using category id
+        log.debug("Fetching category info for video ID: {}, category ID: {}", video.getId(), video.getCategoryId());
         CategoryResponseDTO category = categoryService.getCategoryShortInfoById(video.getCategoryId());
 
-        // set category short info
+        // Set category short info
         videoFullInfoDTO.setCategory(category);
 
-        // get tags by using tag ids
-//        List<TagResponseDTO> tags = tagService.getTagsByTagIds(video.getTagIds());
-
-        // set tags
+        // Set tags
         log.debug("Setting empty tag list for video ID: {}", video.getId());
         videoFullInfoDTO.setTags(List.of());
 
-        // get channel by using channel id
-        log.debug("Fetching channel info for video ID: {}, channel ID: {}",
-                video.getId(), video.getChannelId());
+        // Get channel by using channel id
+        log.debug("Fetching channel info for video ID: {}, channel ID: {}", video.getId(), video.getChannelId());
         VideoChannelDTO channel = channelService.getVideoShortInfo(video.getChannelId());
 
-        // set channel
+        // Set channel
         videoFullInfoDTO.setChannel(channel);
 
-        // setting like details
-        log.debug("Setting like details for video ID: {}, likes: {}, dislikes: {}",
-                video.getId(), video.getLikeCount(), video.getDislikeCount());
+        // Setting like details
+        log.debug("Setting like details for video ID: {}, likes: {}, dislikes: {}", video.getId(), video.getLikeCount(), video.getDislikeCount());
+
         VideoLikeDTO likeDetails = new VideoLikeDTO();
         likeDetails.setLikeCount(video.getLikeCount());
         likeDetails.setDislikeCount(video.getDislikeCount());
 
-        // bularni keyinroq o'zgartiramiz
+        // Set like details
         likeDetails.setIsUserLiked(Boolean.FALSE);
         likeDetails.setIsUserDisliked(Boolean.FALSE);
         videoFullInfoDTO.setLikeDetails(likeDetails);
@@ -321,6 +358,7 @@ public class VideoService {
 
     private VideoUpdateDTO toVideoUpdateDTO(Video video) {
         VideoUpdateDTO videoUpdateDTO = new VideoUpdateDTO();
+
         videoUpdateDTO.setTitle(video.getTitle());
         videoUpdateDTO.setDescription(video.getDescription());
         videoUpdateDTO.setCategoryId(video.getCategoryId());
@@ -330,18 +368,20 @@ public class VideoService {
         videoUpdateDTO.setStatus(video.getStatus());
         videoUpdateDTO.setScheduledDate(video.getScheduledDate());
         videoUpdateDTO.setUpdatedDate(video.getUpdatedDate());
+
         return videoUpdateDTO;
     }
 
     private Video getVideoEntityById(String videoId) {
         log.info("Fetching video with ID: {}", videoId);
+
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(() -> {
                     log.error("Video not found with ID: {}", videoId);
                     return new DataNotFoundException("Video not found");
                 });
+
         log.info("Successfully fetched video: {}", video);
         return video;
     }
-
 }
