@@ -1,6 +1,7 @@
 package dasturlash.uz.repository;
 
 import dasturlash.uz.entity.Channel;
+import dasturlash.uz.mapper.ChannelShortInfoMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,7 @@ public interface ChannelRepository extends CrudRepository<Channel, String> {
     Page<Channel> findAllByProfileIdAndVisibleTrue(Long currentUserId, Pageable pageRequest);
 
     Channel findByHandle(String handle);
+
+    @Query("select c.id as id, c.name as name, c.photoId as photoId from Channel c where c.id = ?1")
+    ChannelShortInfoMapper getShortInfo(String videoId);
 }
