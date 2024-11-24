@@ -17,3 +17,54 @@ Authorization: Bearer token
 GET http://localhost:8090/api/videos/watch?v=<video id>
 Accept: application/json
 Authorization: Bearer token
+
+### Update video details
+PUT http://localhost:8090/api/videos/<video id>
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "title": "<Updated title>",
+  "description": "<Updated description>",
+  "categoryId": 2,
+  "playlistId": "<playlist id>",
+  "previewAttachId": "<updated preview id>",
+  "type": "<updated type>",
+  "status": "<updated status>"
+}
+
+### Update video visibility status
+PATCH http://localhost:8090/api/videos/<video id>/status
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "status": "PUBLIC"
+}
+
+### Update video playlist
+PATCH http://localhost:8090/api/videos/<video id>/playlist
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "playlistId": "<new playlist id>"
+}
+
+### Update video category
+PATCH http://localhost:8090/api/videos/<video id>/category
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "categoryId": 3
+}
+
+### Update video thumbnail
+PATCH http://localhost:8090/api/videos/<video id>/preview
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "previewAttachId": "<new preview attach id>"
+}
