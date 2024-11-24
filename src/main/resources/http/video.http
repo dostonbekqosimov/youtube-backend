@@ -1,0 +1,19 @@
+### Create new video
+POST http://localhost:8090/api/videos
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "title": "<Video title>",
+  "description": "<Video description>",
+  "categoryId": 1,
+  "attachId": "<new uploaded attach video id>",
+  "previewAttachId": "<new uploaded preview id>",
+  "type": "<type>",
+  "status": "<status>"
+}
+
+### Watch video by id
+GET http://localhost:8090/api/videos/watch?v=<video id>
+Accept: application/json
+Authorization: Bearer token
