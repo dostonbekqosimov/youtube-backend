@@ -9,14 +9,12 @@ import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
-import dasturlash.uz.exceptions.UnauthorizedException;
 import dasturlash.uz.repository.ChannelRepository;
 import dasturlash.uz.repository.VideoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,24 +22,22 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
-import static dasturlash.uz.enums.ContentStatus.PUBLIC;
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VideoService {
 
     @Value("${app.domain}")
     private String domain;
 
     private final VideoRepository videoRepository;
-
     private final ChannelService channelService;
 
-
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
+        log.info("Entering createVideo with request: {}", dto);
 
-        // Create new video entity
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setCategoryId(dto.getCategoryId());
@@ -53,15 +49,10 @@ public class VideoService {
         video.setChannelId(dto.getChannelId());
         video.setCreatedDate(LocalDateTime.now());
 
-
-        // handle status and published date
         if (dto.getStatus() == ContentStatus.SCHEDULED) {
-
-            // First validate scheduled video if applicable
             validateScheduledVideo(dto);
-
             video.setStatus(ContentStatus.SCHEDULED);
-            video.setPublishedDate(dto.getPublishedDate());  // Safe because validation ensures it's not null
+            video.setPublishedDate(dto.getPublishedDate());
         } else if (dto.getStatus() != null) {
             video.setStatus(dto.getStatus());
             if (dto.getStatus() == ContentStatus.PUBLIC) {
@@ -71,33 +62,19 @@ public class VideoService {
             video.setStatus(ContentStatus.PRIVATE);
         }
 
-        // Set default values
-        video.setStatus(dto.getStatus() != null ? dto.getStatus() : ContentStatus.PRIVATE);
-        video.setCreatedDate(LocalDateTime.now());
-        video.setVisible(true);
-        video.setViewCount(0);
-        video.setLikeCount(0);
-        video.setDislikeCount(0);
-        video.setSharedCount(0);
-
-        // Save the video
         video = videoRepository.save(video);
+        log.info("Video created with ID: {}", video.getId());
 
         VideoCreateResponseDTO response = new VideoCreateResponseDTO();
         response.setId(video.getId());
         response.setTitle(video.getTitle());
         response.setVideoLink(domain + "/api/videos/watch?v=" + video.getId());
 
-        // Configure response based on status
         switch (video.getStatus()) {
             case PUBLIC -> {
                 response.setPublic(true);
                 response.setMessage("Video published");
-                response.setAllowedSharePlatforms(List.of(
-                        "Telegran",
-                        "WhatsApp", "Facebook", "X", "Email",
-                        "KakaoTalk", "Reddit"
-                ));
+                response.setAllowedSharePlatforms(List.of("Telegram", "WhatsApp", "Facebook", "X", "Email", "KakaoTalk", "Reddit"));
             }
             case PRIVATE -> {
                 response.setPublic(false);
@@ -112,49 +89,50 @@ public class VideoService {
             case SCHEDULED -> {
                 response.setPublic(false);
                 response.setMessage("Video scheduled for " +
-                        video.getPublishedDate().format(
-                                DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm a")
-                        ));
+                        video.getPublishedDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm a")));
                 response.setScheduledDate(video.getPublishedDate());
                 response.setAllowedSharePlatforms(Collections.emptyList());
             }
         }
 
+        log.info("Exiting createVideo with response: {}", response);
         return response;
     }
 
     private void validateScheduledVideo(VideoCreateDTO dto) {
-        if (dto.getStatus() == ContentStatus.SCHEDULED) {
-            if (dto.getPublishedDate() == null) {
-                throw new AppBadRequestException("Published date is required for scheduled videos");
-            }
-            if (dto.getPublishedDate().isBefore(LocalDateTime.now())) {
-                throw new AppBadRequestException("Published date must be in the future");
-            }
+        log.info("Validating scheduled video with published date: {}", dto.getPublishedDate());
+        if (dto.getPublishedDate() == null) {
+            log.error("Published date is missing for scheduled video");
+            throw new AppBadRequestException("Published date is required for scheduled videos");
+        }
+        if (dto.getPublishedDate().isBefore(LocalDateTime.now())) {
+            log.error("Published date is in the past for scheduled video");
+            throw new AppBadRequestException("Published date must be in the future");
         }
     }
 
     public VideoDTO getVideoById(String videoId) {
-        Video video = videoRepository.findById(videoId)
-                .orElseThrow(() -> new DataNotFoundException("Video not found"));
 
-        // Check visibility and permissions
+        Video video = getVideoEntityById(videoId);
+
         if (!video.getVisible() || video.getStatus() == ContentStatus.PRIVATE) {
+            log.warn("Video with ID: {} is not accessible", videoId);
             throw new ForbiddenException("Video is not accessible");
         }
 
-        // Increment view count
         video.setViewCount(video.getViewCount() + 1);
         videoRepository.save(video);
 
-        return toDTO(video);
+        VideoDTO videoDTO = toDTO(video);
+        log.info("Returning video details for ID: {}", videoId);
+        return videoDTO;
     }
 
     @Transactional
     public VideoDTO updateVideo(String videoId, VideoUpdateDTO dto) {
+        log.info("Updating video with ID: {} and request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
 
-        // Update only non-null fields
         if (dto.getTitle() != null) {
             video.setTitle(dto.getTitle());
         }
@@ -178,55 +156,71 @@ public class VideoService {
         }
 
         video.setUpdatedDate(LocalDateTime.now());
-        return toDTO(videoRepository.save(video));
+        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        log.info("Video updated with response: {}", updatedVideo);
+        return updatedVideo;
     }
 
     @Transactional
-    public VideoDTO updateVisibility(String videoId, VideoStatusDTO dto) {
+    public VideoDTO updateStatus(String videoId, VideoStatusDTO dto) {
+        log.info("Updating status for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
         video.setStatus(dto.getStatus());
         video.setUpdatedDate(LocalDateTime.now());
-        return toDTO(videoRepository.save(video));
+        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        log.info("Status updated for video ID: {} with response: {}", videoId, updatedVideo);
+        return updatedVideo;
     }
 
     @Transactional
     public VideoDTO updatePlaylist(String videoId, VideoPlaylistDTO dto) {
+        log.info("Updating playlist for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
         video.setPlaylistId(dto.getPlaylistId());
         video.setUpdatedDate(LocalDateTime.now());
-        return toDTO(videoRepository.save(video));
+        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        log.info("Playlist updated for video ID: {} with response: {}", videoId, updatedVideo);
+        return updatedVideo;
     }
 
     @Transactional
     public VideoDTO updateCategory(String videoId, VideoCategoryDTO dto) {
+        log.info("Updating category for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
         video.setCategoryId(dto.getCategoryId());
         video.setUpdatedDate(LocalDateTime.now());
-        return toDTO(videoRepository.save(video));
+        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        log.info("Category updated for video ID: {} with response: {}", videoId, updatedVideo);
+        return updatedVideo;
     }
 
     @Transactional
-    public VideoDTO updateThumbnail(String videoId, VideoPreviewDTO dto) {
+    public VideoDTO updatePreview(String videoId, VideoPreviewDTO dto) {
+        log.info("Updating preview for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
         video.setPreviewAttachId(dto.getPreviewAttachId());
         video.setUpdatedDate(LocalDateTime.now());
-        return toDTO(videoRepository.save(video));
+        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        log.info("Preview updated for video ID: {} with response: {}", videoId, updatedVideo);
+        return updatedVideo;
     }
 
     private Video getVideoAndCheckOwnership(String videoId) {
-        Video video = videoRepository.findById(videoId)
-                .orElseThrow(() -> new DataNotFoundException("Video not found"));
+        log.info("Checking ownership for video ID: {}", videoId);
+        Video video = getVideoEntityById(videoId);
 
         Channel channel = channelService.getById(video.getChannelId());
-
         if (!channel.getProfileId().equals(getCurrentUserId())) {
+            log.error("User does not have permission to update video ID: {}", videoId);
             throw new AppBadRequestException("You don't have permission to update this video");
         }
 
+        log.info("Ownership verified for video ID: {}", videoId);
         return video;
     }
 
     private VideoDTO toDTO(Video video) {
+        log.debug("Converting video entity to DTO for video ID: {}", video.getId());
         VideoDTO videoDTO = new VideoDTO();
         videoDTO.setId(video.getId());
         videoDTO.setTitle(video.getTitle());
@@ -243,5 +237,15 @@ public class VideoService {
         return videoDTO;
     }
 
+    private Video getVideoEntityById(String videoId) {
+        log.info("Fetching video with ID: {}", videoId);
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> {
+                    log.error("Video not found with ID: {}", videoId);
+                    return new DataNotFoundException("Video not found");
+                });
+        log.info("Successfully fetched video: {}", video);
+        return video;
+    }
 
 }
