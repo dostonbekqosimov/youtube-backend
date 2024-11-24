@@ -238,7 +238,7 @@ public class ChannelService {
         }
     }
 
-    private Channel getById(String id) {
+    public Channel getById(String id) {
         return channelRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Channel not found"));
     }
 

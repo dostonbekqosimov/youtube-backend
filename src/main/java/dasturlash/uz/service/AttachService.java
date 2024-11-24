@@ -61,7 +61,7 @@ public class AttachService {
         String extension = getExtension(file.getOriginalFilename());
 
         // Save the file and get the full path
-        String fullFilePath = saveVideoFile(file, pathFolder, key, extension);
+        String fullFilePath = saveAttach(file, pathFolder, key, extension);
 
         String duration = null;
         if (isVideoFile(extension)) {
@@ -108,7 +108,7 @@ public class AttachService {
 
     // All video upload related methods
 
-    private String saveVideoFile(MultipartFile file, String pathFolder, String key, String extension) {
+    private String saveAttach(MultipartFile file, String pathFolder, String key, String extension) {
 
         // Ensure upload directory exists
         Path uploadDir = Path.of(folderName);
@@ -334,7 +334,7 @@ public class AttachService {
         String pathFolder = generateDateBasedFolder();
         String key = UUID.randomUUID().toString();
         String extension = getExtension(file.getOriginalFilename());
-        String fullPath = saveVideoFile(file, pathFolder, key, extension);
+        String fullPath = saveAttach(file, pathFolder, key, extension);
 
         Attach entity = new Attach();
         entity.setId(key + "." + extension);

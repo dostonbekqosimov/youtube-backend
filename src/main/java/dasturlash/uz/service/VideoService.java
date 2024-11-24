@@ -1,15 +1,18 @@
 package dasturlash.uz.service;
 
-import dasturlash.uz.dto.request.video.VideoCreateDTO;
+import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoDTO;
+import dasturlash.uz.entity.Channel;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.exceptions.UnauthorizedException;
+import dasturlash.uz.repository.ChannelRepository;
 import dasturlash.uz.repository.VideoRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static dasturlash.uz.enums.ContentStatus.PUBLIC;
+import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,8 @@ public class VideoService {
     private String domain;
 
     private final VideoRepository videoRepository;
+
+    private final ChannelService channelService;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -142,6 +148,82 @@ public class VideoService {
         videoRepository.save(video);
 
         return toDTO(video);
+    }
+
+    @Transactional
+    public VideoDTO updateVideo(String videoId, VideoUpdateDTO dto) {
+        Video video = getVideoAndCheckOwnership(videoId);
+
+        // Update only non-null fields
+        if (dto.getTitle() != null) {
+            video.setTitle(dto.getTitle());
+        }
+        if (dto.getDescription() != null) {
+            video.setDescription(dto.getDescription());
+        }
+        if (dto.getCategoryId() != null) {
+            video.setCategoryId(dto.getCategoryId());
+        }
+        if (dto.getPlaylistId() != null) {
+            video.setPlaylistId(dto.getPlaylistId());
+        }
+        if (dto.getPreviewAttachId() != null) {
+            video.setPreviewAttachId(dto.getPreviewAttachId());
+        }
+        if (dto.getType() != null) {
+            video.setType(dto.getType());
+        }
+        if (dto.getStatus() != null) {
+            video.setStatus(dto.getStatus());
+        }
+
+        video.setUpdatedDate(LocalDateTime.now());
+        return toDTO(videoRepository.save(video));
+    }
+
+    @Transactional
+    public VideoDTO updateVisibility(String videoId, VideoStatusDTO dto) {
+        Video video = getVideoAndCheckOwnership(videoId);
+        video.setStatus(dto.getStatus());
+        video.setUpdatedDate(LocalDateTime.now());
+        return toDTO(videoRepository.save(video));
+    }
+
+    @Transactional
+    public VideoDTO updatePlaylist(String videoId, VideoPlaylistDTO dto) {
+        Video video = getVideoAndCheckOwnership(videoId);
+        video.setPlaylistId(dto.getPlaylistId());
+        video.setUpdatedDate(LocalDateTime.now());
+        return toDTO(videoRepository.save(video));
+    }
+
+    @Transactional
+    public VideoDTO updateCategory(String videoId, VideoCategoryDTO dto) {
+        Video video = getVideoAndCheckOwnership(videoId);
+        video.setCategoryId(dto.getCategoryId());
+        video.setUpdatedDate(LocalDateTime.now());
+        return toDTO(videoRepository.save(video));
+    }
+
+    @Transactional
+    public VideoDTO updateThumbnail(String videoId, VideoPreviewDTO dto) {
+        Video video = getVideoAndCheckOwnership(videoId);
+        video.setPreviewAttachId(dto.getPreviewAttachId());
+        video.setUpdatedDate(LocalDateTime.now());
+        return toDTO(videoRepository.save(video));
+    }
+
+    private Video getVideoAndCheckOwnership(String videoId) {
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new DataNotFoundException("Video not found"));
+
+        Channel channel = channelService.getById(video.getChannelId());
+
+        if (!channel.getProfileId().equals(getCurrentUserId())) {
+            throw new AppBadRequestException("You don't have permission to update this video");
+        }
+
+        return video;
     }
 
     private VideoDTO toDTO(Video video) {
