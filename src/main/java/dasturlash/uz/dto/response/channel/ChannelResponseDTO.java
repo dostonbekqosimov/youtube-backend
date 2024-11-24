@@ -15,11 +15,11 @@ public class ChannelResponseDTO {
 
     private String description;
 
-    private ChannelMediaDTO photo;
+    private MediaUrlDTO photo;
 
     private Long profileId;
 
-    private ChannelMediaDTO banner;
+    private MediaUrlDTO banner;
 
     private ChannelStatus status;
 
