@@ -41,7 +41,7 @@ public class ChannelService {
     @Value("${app.domain}")
     private String domain;
 
-    public void create(ChannelCreateRequest request, LanguageEnum lang) {
+    public String create(ChannelCreateRequest request, LanguageEnum lang) {
 
         // check if channel with handle exists
         existByHandle(request.getHandle());
@@ -56,14 +56,16 @@ public class ChannelService {
             newChannel.setVisible(Boolean.TRUE);
 
             channelRepository.save(newChannel);
+            return newChannel.getId();
         } catch (Exception e) {
             throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
         }
 
 
+
     }
 
-    public void updateChannelInfo(String channelId, ChannelCreateRequest updateRequest, LanguageEnum lang) {
+    public String updateChannelInfo(String channelId, ChannelCreateRequest updateRequest, LanguageEnum lang) {
 
 
         Channel channel = getById(channelId);
@@ -81,6 +83,7 @@ public class ChannelService {
                 }
                 channel.setUpdatedDate(LocalDateTime.now());
                 channelRepository.save(channel);
+                return channel.getId();
             } catch (Exception e) {
                 throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
             }
@@ -90,7 +93,7 @@ public class ChannelService {
 
     }
 
-    public void updateChannelPhoto(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
+    public String updateChannelPhoto(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
         Channel channel = getById(channelId);
         if (getCurrentUserId().equals(channel.getProfileId())) {
             try {
@@ -99,6 +102,7 @@ public class ChannelService {
                     channel.setPhotoId(updateRequest.getPhotoId());
                     channel.setUpdatedDate(LocalDateTime.now());
                     channelRepository.save(channel);
+
                 }
             } catch (Exception e) {
                 throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
@@ -106,9 +110,10 @@ public class ChannelService {
         } else {
             throw new AppBadRequestException("You can't change this channel photo");
         }
+        return channel.getId();
     }
 
-    public void updateChannelBanner(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
+    public String updateChannelBanner(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
         Channel channel = getById(channelId);
         if (getCurrentUserId().equals(channel.getProfileId())) {
             try {
@@ -124,9 +129,11 @@ public class ChannelService {
         } else {
             throw new AppBadRequestException("You can't change this channel banner");
         }
+        return channel.getId();
+
     }
 
-    public void updateChannelStatus(UpdateChannelStatusRequest request, LanguageEnum lang) {
+    public String updateChannelStatus(UpdateChannelStatusRequest request, LanguageEnum lang) {
         Channel channel = getById(request.getChannelId()); // Fetch channel by ID
 
         ProfileRole userRole = getCurrentUserRole(); // Fetch current user's role
@@ -135,7 +142,7 @@ public class ChannelService {
         // Handle based on roles
         if (userRole == ProfileRole.ROLE_ADMIN) {
             // Admins can update any channel status
-            performStatusUpdate(request, channel);
+            changeChannelStatus(request, channel);
         } else if (userRole == ProfileRole.ROLE_USER) {
             // Owners can only update their own channels
             if (!currentUserId.equals(channel.getProfileId())) {
@@ -143,16 +150,18 @@ public class ChannelService {
                         resourceBundleService.getMessage("error.not.owner.of.channel", lang)
                 );
             }
-            performStatusUpdate(request, channel);
+            changeChannelStatus(request, channel);
         } else {
             // Other roles (if any) are unauthorized
             throw new AppBadRequestException(
                     resourceBundleService.getMessage("something.went.wrong", lang)
             );
         }
+        return channel.getId();
+
     }
 
-    private void performStatusUpdate(UpdateChannelStatusRequest request, Channel channel) {
+    private void changeChannelStatus(UpdateChannelStatusRequest request, Channel channel) {
         if (!request.getStatus().equals(channel.getStatus())) {
             channel.setStatus(request.getStatus());
             channel.setUpdatedDate(LocalDateTime.now());

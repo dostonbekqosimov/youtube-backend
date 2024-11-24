@@ -24,63 +24,59 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    // version 0.0.1 of creating channel. Now I only create channels with name, description and handle(unique name for channel)
-    // in the future I will include adding photo.
+    // version 0.0.1 of creating channel. Now I only create channels with name, description, and handle(unique name for channel)
+    // in the future, I will include adding photo.
     @PostMapping({"", "/"})
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<Void> create(@RequestBody @Valid ChannelCreateRequest request,
-                                       @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
+    public ResponseEntity<String> create(@RequestBody @Valid ChannelCreateRequest request,
+                                         @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-
-        channelService.create(request, lang);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        String result = channelService.create(request, lang);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     // Update channel info(name, description, handle) (User and Owner)
     @PatchMapping("/edit-info")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> updateChannelInfo(@RequestParam("id") String channelId,
-                                                  @RequestBody ChannelCreateRequest updateRequest,
-                                                  @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
-
+    public ResponseEntity<String> updateChannelInfo(@RequestParam("id") String channelId,
+                                                    @RequestBody ChannelCreateRequest updateRequest,
+                                                    @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        channelService.updateChannelInfo(channelId, updateRequest, lang);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        String result = channelService.updateChannelInfo(channelId, updateRequest, lang);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     // Update channel photo
     @PatchMapping("/edit-photo")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> updateChannelPhoto(@RequestParam("id") String channelId,
-                                                   @RequestBody ChannelMediaUpdateRequest updateRequest,
-                                                   @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
-
+    public ResponseEntity<String> updateChannelPhoto(@RequestParam("id") String channelId,
+                                                     @RequestBody ChannelMediaUpdateRequest updateRequest,
+                                                     @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        channelService.updateChannelPhoto(channelId, updateRequest, lang);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        String result = channelService.updateChannelPhoto(channelId, updateRequest, lang);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     // Update channel banner
     @PatchMapping("/edit-banner")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> updateChannelBanner(@RequestParam("id") String channelId,
-                                                    @RequestBody ChannelMediaUpdateRequest updateRequest,
-                                                    @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
-
+    public ResponseEntity<String> updateChannelBanner(@RequestParam("id") String channelId,
+                                                      @RequestBody ChannelMediaUpdateRequest updateRequest,
+                                                      @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        channelService.updateChannelBanner(channelId, updateRequest, lang);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        String result = channelService.updateChannelBanner(channelId, updateRequest, lang);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     // Change channel status(Admin, Owner)
     @PatchMapping("/edit-status")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<Void> updateChannelStatus(
+    public ResponseEntity<String> updateChannelStatus(
             @RequestBody @Valid UpdateChannelStatusRequest request,
             @RequestHeader(value = "Accept-Language", defaultValue = "uz") String languageHeader) {
         LanguageEnum lang = LanguageUtil.getLanguageFromHeader(languageHeader);
-        channelService.updateChannelStatus(request, lang);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        String result = channelService.updateChannelStatus(request, lang);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     // Get Channel by ID
