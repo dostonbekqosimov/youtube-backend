@@ -2,7 +2,7 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
-import dasturlash.uz.dto.response.video.VideoDTO;
+import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
 import dasturlash.uz.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,59 +27,59 @@ public class VideoController {
     }
 
     @PutMapping("/{videoId}")
-    public ResponseEntity<VideoDTO> updateVideo(
+    public ResponseEntity<VideoFullInfoDTO> updateVideo(
             @PathVariable String videoId,
             @Valid @RequestBody VideoUpdateDTO dto) {
         log.info("Entering updateVideo with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoDTO> response = ResponseEntity.ok(videoService.updateVideo(videoId, dto));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updateVideo(videoId, dto));
         log.info("Exiting updateVideo with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/status")
-    public ResponseEntity<VideoDTO> updateStatus(
+    public ResponseEntity<VideoFullInfoDTO> updateStatus(
             @PathVariable String videoId,
             @Valid @RequestBody VideoStatusDTO dto) {
         log.info("Entering updateStatus with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoDTO> response = ResponseEntity.ok(videoService.updateStatus(videoId, dto));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updateStatus(videoId, dto));
         log.info("Exiting updateStatus with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/playlist")
-    public ResponseEntity<VideoDTO> updatePlaylist(
+    public ResponseEntity<VideoFullInfoDTO> updatePlaylist(
             @PathVariable String videoId,
             @Valid @RequestBody VideoPlaylistDTO dto) {
         log.info("Entering updatePlaylist with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoDTO> response = ResponseEntity.ok(videoService.updatePlaylist(videoId, dto));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updatePlaylist(videoId, dto));
         log.info("Exiting updatePlaylist with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/category")
-    public ResponseEntity<VideoDTO> updateCategory(
+    public ResponseEntity<VideoFullInfoDTO> updateCategory(
             @PathVariable String videoId,
             @Valid @RequestBody VideoCategoryDTO dto) {
         log.info("Entering updateCategory with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoDTO> response = ResponseEntity.ok(videoService.updateCategory(videoId, dto));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updateCategory(videoId, dto));
         log.info("Exiting updateCategory with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/preview")
-    public ResponseEntity<VideoDTO> updatePreview(
+    public ResponseEntity<VideoFullInfoDTO> updatePreview(
             @PathVariable String videoId,
             @Valid @RequestBody VideoPreviewDTO dto) {
         log.info("Entering updatePreview with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoDTO> response = ResponseEntity.ok(videoService.updatePreview(videoId, dto));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updatePreview(videoId, dto));
         log.info("Exiting updatePreview with response: {}", response);
         return response;
     }
 
     @GetMapping("/watch")
-    public ResponseEntity<VideoDTO> watchVideo(@RequestParam("v") String videoId) {
+    public ResponseEntity<VideoFullInfoDTO> watchVideo(@RequestParam("v") String videoId) {
         log.info("Entering watchVideo with videoId: {}", videoId);
-        ResponseEntity<VideoDTO> response = ResponseEntity.ok(videoService.getVideoById(videoId));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.getVideoById(videoId));
         log.info("Exiting watchVideo with response: {}", response);
         return response;
     }

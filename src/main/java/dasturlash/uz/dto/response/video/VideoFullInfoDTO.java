@@ -1,13 +1,12 @@
 package dasturlash.uz.dto.response.video;
 
 import dasturlash.uz.enums.ContentStatus;
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class VideoDTO {
+public class VideoFullInfoDTO {
     private String id;
     private String title;
     private String description;

@@ -2,7 +2,7 @@ package dasturlash.uz.service;
 
 import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
-import dasturlash.uz.dto.response.video.VideoDTO;
+import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
@@ -89,7 +89,7 @@ public class VideoService {
     }
 
 
-    public VideoDTO getVideoById(String videoId) {
+    public VideoFullInfoDTO getVideoById(String videoId) {
 
         Video video = getVideoEntityById(videoId);
 
@@ -101,13 +101,13 @@ public class VideoService {
         video.setViewCount(video.getViewCount() + 1);
         videoRepository.save(video);
 
-        VideoDTO videoDTO = toDTO(video);
+        VideoFullInfoDTO videoFullInfoDTO = toDTO(video);
         log.info("Returning video details for ID: {}", videoId);
-        return videoDTO;
+        return videoFullInfoDTO;
     }
 
     @Transactional
-    public VideoDTO updateVideo(String videoId, VideoUpdateDTO dto) {
+    public VideoFullInfoDTO updateVideo(String videoId, VideoUpdateDTO dto) {
         log.info("Updating video with ID: {} and request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
 
@@ -138,7 +138,7 @@ public class VideoService {
 
 
         video.setUpdatedDate(LocalDateTime.now());
-        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        VideoFullInfoDTO updatedVideo = toDTO(videoRepository.save(video));
         log.info("Video updated with response: {}", updatedVideo);
         return updatedVideo;
     }
@@ -172,7 +172,7 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoDTO updateStatus(String videoId, VideoStatusDTO dto) {
+    public VideoFullInfoDTO updateStatus(String videoId, VideoStatusDTO dto) {
         log.info("Updating status for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
 
@@ -180,40 +180,40 @@ public class VideoService {
         setScheduledDate(video, dto.getStatus(), dto.getScheduledDate());
 
         video.setUpdatedDate(LocalDateTime.now());
-        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        VideoFullInfoDTO updatedVideo = toDTO(videoRepository.save(video));
         log.info("Status updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
     }
 
     @Transactional
-    public VideoDTO updatePlaylist(String videoId, VideoPlaylistDTO dto) {
+    public VideoFullInfoDTO updatePlaylist(String videoId, VideoPlaylistDTO dto) {
         log.info("Updating playlist for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
         video.setPlaylistId(dto.getPlaylistId());
         video.setUpdatedDate(LocalDateTime.now());
-        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        VideoFullInfoDTO updatedVideo = toDTO(videoRepository.save(video));
         log.info("Playlist updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
     }
 
     @Transactional
-    public VideoDTO updateCategory(String videoId, VideoCategoryDTO dto) {
+    public VideoFullInfoDTO updateCategory(String videoId, VideoCategoryDTO dto) {
         log.info("Updating category for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
         video.setCategoryId(dto.getCategoryId());
         video.setUpdatedDate(LocalDateTime.now());
-        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        VideoFullInfoDTO updatedVideo = toDTO(videoRepository.save(video));
         log.info("Category updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
     }
 
     @Transactional
-    public VideoDTO updatePreview(String videoId, VideoPreviewDTO dto) {
+    public VideoFullInfoDTO updatePreview(String videoId, VideoPreviewDTO dto) {
         log.info("Updating preview for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
         video.setPreviewAttachId(dto.getPreviewAttachId());
         video.setUpdatedDate(LocalDateTime.now());
-        VideoDTO updatedVideo = toDTO(videoRepository.save(video));
+        VideoFullInfoDTO updatedVideo = toDTO(videoRepository.save(video));
         log.info("Preview updated for video ID: {} with response: {}", videoId, updatedVideo);
         return updatedVideo;
     }
@@ -232,22 +232,22 @@ public class VideoService {
         return video;
     }
 
-    private VideoDTO toDTO(Video video) {
+    private VideoFullInfoDTO toDTO(Video video) {
         log.debug("Converting video entity to DTO for video ID: {}", video.getId());
-        VideoDTO videoDTO = new VideoDTO();
-        videoDTO.setId(video.getId());
-        videoDTO.setTitle(video.getTitle());
-        videoDTO.setDescription(video.getDescription());
-        videoDTO.setPreviewUrl(domain + "/api/attach/open/" + video.getPreviewAttachId());
-        videoDTO.setVideoUrl(domain + "/api/attach/open/" + video.getAttachId());
-        videoDTO.setViewCount(video.getViewCount());
-        videoDTO.setLikeCount(video.getLikeCount());
-        videoDTO.setDislikeCount(video.getDislikeCount());
-        videoDTO.setSharedCount(video.getSharedCount());
-        videoDTO.setStatus(video.getStatus());
-        videoDTO.setCreatedDate(video.getCreatedDate());
-        videoDTO.setPublishedDate(video.getPublishedDate());
-        return videoDTO;
+        VideoFullInfoDTO videoFullInfoDTO = new VideoFullInfoDTO();
+        videoFullInfoDTO.setId(video.getId());
+        videoFullInfoDTO.setTitle(video.getTitle());
+        videoFullInfoDTO.setDescription(video.getDescription());
+        videoFullInfoDTO.setPreviewUrl(domain + "/api/attach/open/" + video.getPreviewAttachId());
+        videoFullInfoDTO.setVideoUrl(domain + "/api/attach/open/" + video.getAttachId());
+        videoFullInfoDTO.setViewCount(video.getViewCount());
+        videoFullInfoDTO.setLikeCount(video.getLikeCount());
+        videoFullInfoDTO.setDislikeCount(video.getDislikeCount());
+        videoFullInfoDTO.setSharedCount(video.getSharedCount());
+        videoFullInfoDTO.setStatus(video.getStatus());
+        videoFullInfoDTO.setCreatedDate(video.getCreatedDate());
+        videoFullInfoDTO.setPublishedDate(video.getPublishedDate());
+        return videoFullInfoDTO;
     }
 
     private Video getVideoEntityById(String videoId) {
