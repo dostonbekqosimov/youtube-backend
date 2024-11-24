@@ -36,5 +36,5 @@ public class VideoCreateDTO {
     @NotNull(message = "Status is required")
     private ContentStatus status;
 
-    private LocalDateTime publishedDate;
+    private LocalDateTime scheduledDate;
 }

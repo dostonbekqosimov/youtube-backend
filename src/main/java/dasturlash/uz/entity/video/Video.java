@@ -75,6 +75,9 @@ public class Video {
     @Column(name = "published_date")
     private LocalDateTime publishedDate;
 
+    @Column(name = "scheduled_date")
+    private LocalDateTime scheduledDate;
+
     @Column(name = "shared_count")
     private Integer sharedCount;
 

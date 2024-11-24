@@ -9,7 +9,6 @@ import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
-import dasturlash.uz.repository.ChannelRepository;
 import dasturlash.uz.repository.VideoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -49,18 +48,8 @@ public class VideoService {
         video.setChannelId(dto.getChannelId());
         video.setCreatedDate(LocalDateTime.now());
 
-        if (dto.getStatus() == ContentStatus.SCHEDULED) {
-            validateScheduledVideo(dto);
-            video.setStatus(ContentStatus.SCHEDULED);
-            video.setPublishedDate(dto.getPublishedDate());
-        } else if (dto.getStatus() != null) {
-            video.setStatus(dto.getStatus());
-            if (dto.getStatus() == ContentStatus.PUBLIC) {
-                video.setPublishedDate(LocalDateTime.now());
-            }
-        } else {
-            video.setStatus(ContentStatus.PRIVATE);
-        }
+        // set status and scheduled date
+        setScheduledDate(video, dto.getStatus(), dto.getScheduledDate());
 
         video = videoRepository.save(video);
         log.info("Video created with ID: {}", video.getId());
@@ -89,8 +78,8 @@ public class VideoService {
             case SCHEDULED -> {
                 response.setPublic(false);
                 response.setMessage("Video scheduled for " +
-                        video.getPublishedDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm a")));
-                response.setScheduledDate(video.getPublishedDate());
+                        video.getScheduledDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm a")));
+                response.setScheduledDate(video.getScheduledDate());
                 response.setAllowedSharePlatforms(Collections.emptyList());
             }
         }
@@ -99,17 +88,6 @@ public class VideoService {
         return response;
     }
 
-    private void validateScheduledVideo(VideoCreateDTO dto) {
-        log.info("Validating scheduled video with published date: {}", dto.getPublishedDate());
-        if (dto.getPublishedDate() == null) {
-            log.error("Published date is missing for scheduled video");
-            throw new AppBadRequestException("Published date is required for scheduled videos");
-        }
-        if (dto.getPublishedDate().isBefore(LocalDateTime.now())) {
-            log.error("Published date is in the past for scheduled video");
-            throw new AppBadRequestException("Published date must be in the future");
-        }
-    }
 
     public VideoDTO getVideoById(String videoId) {
 
@@ -153,7 +131,11 @@ public class VideoService {
         }
         if (dto.getStatus() != null) {
             video.setStatus(dto.getStatus());
+
+            // If video is scheduled, set scheduled date
+            setScheduledDate(video, dto.getStatus(), dto.getScheduledDate());
         }
+
 
         video.setUpdatedDate(LocalDateTime.now());
         VideoDTO updatedVideo = toDTO(videoRepository.save(video));
@@ -161,11 +143,42 @@ public class VideoService {
         return updatedVideo;
     }
 
+    private void setScheduledDate(Video video, ContentStatus status, LocalDateTime scheduledDate) {
+
+        if (status == ContentStatus.SCHEDULED) {
+            validateScheduledVideo(scheduledDate);
+            video.setStatus(ContentStatus.SCHEDULED);
+            video.setScheduledDate(scheduledDate);
+        } else if (status != null) {
+            video.setStatus(status);
+            if (status == ContentStatus.PUBLIC) {
+                video.setPublishedDate(LocalDateTime.now());
+            }
+        } else {
+            video.setStatus(ContentStatus.PRIVATE);
+        }
+    }
+
+    private void validateScheduledVideo(LocalDateTime scheduledDate) {
+        log.info("Validating scheduled video with scheduled date: {}", scheduledDate);
+        if (scheduledDate == null) {
+            log.error("Scheduled date is missing for scheduled video");
+            throw new AppBadRequestException("Scheduled date is required for scheduled videos");
+        }
+        if (scheduledDate.isBefore(LocalDateTime.now())) {
+            log.error("Scheduled date is in the past for scheduled video");
+            throw new AppBadRequestException("Scheduled date must be in the future");
+        }
+    }
+
     @Transactional
     public VideoDTO updateStatus(String videoId, VideoStatusDTO dto) {
         log.info("Updating status for video ID: {} with request: {}", videoId, dto);
         Video video = getVideoAndCheckOwnership(videoId);
-        video.setStatus(dto.getStatus());
+
+        // set scheduled date using method
+        setScheduledDate(video, dto.getStatus(), dto.getScheduledDate());
+
         video.setUpdatedDate(LocalDateTime.now());
         VideoDTO updatedVideo = toDTO(videoRepository.save(video));
         log.info("Status updated for video ID: {} with response: {}", videoId, updatedVideo);

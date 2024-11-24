@@ -26,6 +26,7 @@ public class VideoUpdateDTO {
     private ContentStatus status;
 
     private LocalDateTime updatedDate;
+    private LocalDateTime scheduledDate;
 }
 
 

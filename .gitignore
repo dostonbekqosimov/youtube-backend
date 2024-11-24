@@ -39,3 +39,4 @@ build/
 /uploads/
 /attaches/
 /src/main/resources/http/local/
+/logs/
