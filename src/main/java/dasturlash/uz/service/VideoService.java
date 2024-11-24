@@ -39,6 +39,7 @@ public class VideoService {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setCategoryId(dto.getCategoryId());
+        video.setPlaylistId(dto.getPlaylistId());
         video.setAttachId(dto.getAttachId());
         video.setPreviewAttachId(dto.getPreviewAttachId());
         video.setDescription(dto.getDescription());
