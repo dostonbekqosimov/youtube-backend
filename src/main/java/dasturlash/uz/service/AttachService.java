@@ -368,6 +368,10 @@ public class AttachService {
 
     private Boolean isExist(String attachId) {
         log.debug("Checking if attach exists: {}", attachId);
+        if (attachId == null) {
+            log.warn("Null attachId provided 4");
+            return false;
+        }
         boolean exists = attachRepository.existsById(attachId);
         log.debug("Attach exists: {}", exists);
         return exists;
