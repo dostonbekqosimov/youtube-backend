@@ -32,6 +32,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -49,7 +50,7 @@ public class AttachService {
     private String attachUrl;
 
 
-    public AttachDTO videoUpload(MultipartFile file) {
+    public AttachDTO upload(MultipartFile file) {
         // Generate a unique path based on current date
         String pathFolder = generateDateBasedFolder();
 
@@ -62,14 +63,47 @@ public class AttachService {
         // Save the file and get the full path
         String fullFilePath = saveVideoFile(file, pathFolder, key, extension);
 
-        // Extract video metadata (duration)
-        String duration = extractVideoMetadata(fullFilePath);
+        String duration = null;
+        if (isVideoFile(extension)) {
+            duration = extractVideoMetadata(fullFilePath);
+        }
 
         // Create and save Attach entity
         Attach entity = createAttachEntity(file, key, extension, pathFolder, duration);
 
         // Convert to DTO and return
         return toDTO(entity);
+    }
+
+    private boolean isVideoFile(String extension) {
+        if (extension == null) {
+            return false;
+        }
+
+        // Primary formats (most common and recommended)
+        Set<String> primaryFormats = Set.of(
+                "mp4",    // Most universal format, widely supported
+                "webm",   // Open format, great for web streaming
+                "mov"     // Common format from iOS devices
+        );
+
+        // Secondary formats (supported but might need transcoding)
+        Set<String> secondaryFormats = Set.of(
+                "avi",    // Older but still common format
+                "mkv",    // Popular container format
+                "m4v",    // MPEG-4 video
+                "3gp",    // Mobile device videos
+                "wmv",    // Windows Media Video
+                "flv",    // Legacy Flash format
+                "mpeg",   // Older standard format
+                "mpg",    // Older standard format
+                "mts",    // HD camera format
+                "ts"      // Transport stream
+        );
+
+        String lowercaseExt = extension.toLowerCase();
+        return primaryFormats.contains(lowercaseExt) ||
+                secondaryFormats.contains(lowercaseExt);
     }
 
     // All video upload related methods
@@ -198,7 +232,7 @@ public class AttachService {
         return attachDTO;
     }
 
-    public ResponseEntity<Resource> openVideo(String attachId) {
+    public ResponseEntity<Resource> open(String attachId) {
         // Retrieve the file entity from the database using the given filename
         Attach entity = getById(attachId);
 
@@ -261,7 +295,7 @@ public class AttachService {
                 .orElseThrow(() -> new DataNotFoundException("File not found with id: " + id));
     }
 
-    public ResponseEntity<Resource> downloadVideo(String id) {
+    public ResponseEntity<Resource> download(String id) {
 
         try {
             Attach entity = getById(id);
