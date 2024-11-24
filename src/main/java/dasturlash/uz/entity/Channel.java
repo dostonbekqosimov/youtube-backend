@@ -60,4 +60,13 @@ public class Channel {
     // Adding new field for handle
     @Column(name = "handle", nullable = false, unique = true)
     private String handle;
+
+    private Integer subscriberCount = 0;
+
+    private Integer videoCount = 0;
+
+    private Integer viewsCount = 0;
+
+    private String country;
+
 }
