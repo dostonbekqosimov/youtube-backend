@@ -1,7 +1,9 @@
 package dasturlash.uz.dto.request.video;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.enums.VideoType;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,6 +12,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VideoUpdateDTO {
 
 
@@ -26,6 +29,7 @@ public class VideoUpdateDTO {
     private ContentStatus status;
 
     private LocalDateTime updatedDate;
+    @Future
     private LocalDateTime scheduledDate;
 }
 

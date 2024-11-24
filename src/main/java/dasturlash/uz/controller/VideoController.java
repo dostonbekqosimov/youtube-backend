@@ -27,51 +27,51 @@ public class VideoController {
     }
 
     @PutMapping("/{videoId}")
-    public ResponseEntity<VideoFullInfoDTO> updateVideo(
+    public ResponseEntity<VideoUpdateDTO> updateVideo(
             @PathVariable String videoId,
             @Valid @RequestBody VideoUpdateDTO dto) {
         log.info("Entering updateVideo with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updateVideo(videoId, dto));
+        ResponseEntity<VideoUpdateDTO> response = ResponseEntity.ok(videoService.updateVideo(videoId, dto));
         log.info("Exiting updateVideo with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/status")
-    public ResponseEntity<VideoFullInfoDTO> updateStatus(
+    public ResponseEntity<VideoUpdateDTO> updateStatus(
             @PathVariable String videoId,
             @Valid @RequestBody VideoStatusDTO dto) {
         log.info("Entering updateStatus with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updateStatus(videoId, dto));
+        ResponseEntity<VideoUpdateDTO> response = ResponseEntity.ok(videoService.updateStatus(videoId, dto));
         log.info("Exiting updateStatus with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/playlist")
-    public ResponseEntity<VideoFullInfoDTO> updatePlaylist(
+    public ResponseEntity<VideoUpdateDTO> updatePlaylist(
             @PathVariable String videoId,
             @Valid @RequestBody VideoPlaylistDTO dto) {
         log.info("Entering updatePlaylist with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updatePlaylist(videoId, dto));
+        ResponseEntity<VideoUpdateDTO> response = ResponseEntity.ok(videoService.updatePlaylist(videoId, dto));
         log.info("Exiting updatePlaylist with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/category")
-    public ResponseEntity<VideoFullInfoDTO> updateCategory(
+    public ResponseEntity<VideoUpdateDTO> updateCategory(
             @PathVariable String videoId,
             @Valid @RequestBody VideoCategoryDTO dto) {
         log.info("Entering updateCategory with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updateCategory(videoId, dto));
+        ResponseEntity<VideoUpdateDTO> response = ResponseEntity.ok(videoService.updateCategory(videoId, dto));
         log.info("Exiting updateCategory with response: {}", response);
         return response;
     }
 
     @PatchMapping("/{videoId}/preview")
-    public ResponseEntity<VideoFullInfoDTO> updatePreview(
+    public ResponseEntity<VideoUpdateDTO> updatePreview(
             @PathVariable String videoId,
             @Valid @RequestBody VideoPreviewDTO dto) {
         log.info("Entering updatePreview with videoId: {} and request: {}", videoId, dto);
-        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.updatePreview(videoId, dto));
+        ResponseEntity<VideoUpdateDTO> response = ResponseEntity.ok(videoService.updatePreview(videoId, dto));
         log.info("Exiting updatePreview with response: {}", response);
         return response;
     }
