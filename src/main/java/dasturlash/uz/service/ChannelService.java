@@ -1,9 +1,9 @@
 package dasturlash.uz.service;
 
-import dasturlash.uz.dto.request.ChannelMediaUpdateRequest;
-import dasturlash.uz.dto.request.ChannelCreateRequest;
+import dasturlash.uz.dto.request.channel.ChannelMediaUpdateRequest;
+import dasturlash.uz.dto.request.channel.ChannelCreateRequest;
 import dasturlash.uz.dto.request.UpdateChannelStatusRequest;
-import dasturlash.uz.dto.response.ChannelResponseDTO;
+import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ChannelStatus;
 import dasturlash.uz.enums.LanguageEnum;

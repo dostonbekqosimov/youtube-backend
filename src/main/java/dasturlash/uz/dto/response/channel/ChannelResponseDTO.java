@@ -1,12 +1,7 @@
-package dasturlash.uz.dto.response;
+package dasturlash.uz.dto.response.channel;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import dasturlash.uz.entity.Attach;
-import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.ChannelStatus;
-import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 

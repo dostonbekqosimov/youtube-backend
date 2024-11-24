@@ -1,7 +1,7 @@
 package dasturlash.uz.service;
 
 import dasturlash.uz.dto.AttachDTO;
-import dasturlash.uz.dto.response.ChannelMediaDTO;
+import dasturlash.uz.dto.response.channel.ChannelMediaDTO;
 import dasturlash.uz.entity.Attach;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
