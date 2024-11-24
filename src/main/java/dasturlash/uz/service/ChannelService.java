@@ -5,6 +5,7 @@ import dasturlash.uz.dto.request.channel.ChannelCreateRequest;
 import dasturlash.uz.dto.request.UpdateChannelStatusRequest;
 import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
+import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ChannelStatus;
 import dasturlash.uz.enums.LanguageEnum;
@@ -13,6 +14,7 @@ import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.ChannelExistsException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
+import dasturlash.uz.mapper.ChannelShortInfoMapper;
 import dasturlash.uz.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -277,6 +279,16 @@ public class ChannelService {
 
         return makeShareLink(channel.getHandle());
     }
+
+    public VideoChannelDTO getVideoShortInfo(String videoId) {
+        ChannelShortInfoMapper video = channelRepository.getShortInfo(videoId);
+        VideoChannelDTO videoChannelDTO = new VideoChannelDTO();
+        videoChannelDTO.setId(video.getId());
+        videoChannelDTO.setName(video.getName());
+        videoChannelDTO.setPhotoUrl(attachService.openURL(video.getPhotoId()));
+        return videoChannelDTO;
+    }
+
 
     private String makeShareLink(String handle) {
         return domain + "/api/channels/handle/" + handle;

@@ -1,9 +1,12 @@
 package dasturlash.uz.service;
 
 import dasturlash.uz.dto.request.video.*;
+import dasturlash.uz.dto.response.CategoryResponseDTO;
 import dasturlash.uz.dto.response.MediaUrlDTO;
+import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
+import dasturlash.uz.dto.response.video.VideoLikeDTO;
 import dasturlash.uz.dto.response.video.VideoMediaDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.entity.video.Video;
@@ -36,6 +39,7 @@ public class VideoService {
     private final VideoRepository videoRepository;
     private final ChannelService channelService;
     private final AttachService attachService;
+    private final CategoryService categoryService;
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
         log.info("Entering createVideo with request: {}", dto);
@@ -267,9 +271,38 @@ public class VideoService {
         videoFullInfoDTO.setPreviewAttach(previewAttach);
         videoFullInfoDTO.setVideoAttach(videoAttach);
 
+        // get category short info by using category id
+        CategoryResponseDTO category = categoryService.getCategoryShortInfoById(video.getCategoryId());
+
+        // set category short info
+        videoFullInfoDTO.setCategory(category);
+
+
+        // get tags by using tag ids
+//        List<TagResponseDTO> tags = tagService.getTagsByTagIds(video.getTagIds());
+
+        // set tags
+        videoFullInfoDTO.setTags(List.of());
+
+        // get channel by using channel id
+        VideoChannelDTO channel = channelService.getVideoShortInfo(video.getChannelId());
+
+        // set channel
+        videoFullInfoDTO.setChannel(channel);
+
+        // setting like details
+        VideoLikeDTO likeDetails = new VideoLikeDTO();
+        likeDetails.setLikeCount(video.getLikeCount());
+        likeDetails.setDislikeCount(video.getDislikeCount());
+
+        // bularni keyinroq o'zgartiramiz
+        likeDetails.setIsUserLiked(Boolean.FALSE);
+        likeDetails.setIsUserDisliked(Boolean.FALSE);
+        videoFullInfoDTO.setLikeDetails(likeDetails);
+
+        videoFullInfoDTO.setLikeDetails(likeDetails);
+
         videoFullInfoDTO.setViewCount(video.getViewCount());
-        videoFullInfoDTO.setLikeCount(video.getLikeCount());
-        videoFullInfoDTO.setDislikeCount(video.getDislikeCount());
         videoFullInfoDTO.setSharedCount(video.getSharedCount());
         videoFullInfoDTO.setStatus(video.getStatus());
         videoFullInfoDTO.setCreatedDate(video.getCreatedDate());

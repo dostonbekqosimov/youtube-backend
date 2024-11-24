@@ -22,8 +22,6 @@ public class VideoFullInfoDTO {
     private VideoChannelDTO channel;
     private VideoLikeDTO likeDetails;
     private Integer viewCount;
-    private Integer likeCount;
-    private Integer dislikeCount;
     private Integer sharedCount;
     private ContentStatus status;
     private LocalDateTime createdDate;

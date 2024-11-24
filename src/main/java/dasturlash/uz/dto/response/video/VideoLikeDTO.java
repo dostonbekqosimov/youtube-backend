@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class VideoLikeDTO {
-    private Long likeCount;
-    private Long dislikeCount;
+    private Integer likeCount;
+    private Integer dislikeCount;
     private Boolean isUserLiked;
     private Boolean isUserDisliked;
 }
