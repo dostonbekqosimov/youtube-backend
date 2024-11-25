@@ -43,21 +43,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String token = header.substring(7).trim();
             JwtDTO dto = JwtUtil.decode(token);
 
-            // load user depending on email
             String login = dto.getLogin();
-
             UserDetails userDetails = userDetailsService.loadUserByUsername(login);
 
-            System.out.println("JWT Role: " + dto.getRole());
-            System.out.println("User Details Authorities: " + userDetails.getAuthorities());
-
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
         } catch (JwtException | UsernameNotFoundException e) {
-            filterChain.doFilter(request, response); // Continue the filter chain
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
             return;
         }
     }
