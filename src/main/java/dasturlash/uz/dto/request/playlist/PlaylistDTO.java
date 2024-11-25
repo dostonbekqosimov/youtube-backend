@@ -1,4 +1,4 @@
-package dasturlash.uz.dto.request;
+package dasturlash.uz.dto.request.playlist;
 
 import dasturlash.uz.enums.ContentStatus;
 import lombok.Data;
