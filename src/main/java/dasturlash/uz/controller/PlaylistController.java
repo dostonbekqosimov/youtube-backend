@@ -49,7 +49,7 @@ public class PlaylistController {
     }
 
     @PutMapping("/change-status")
-    public ResponseEntity<String> changePlaylistStatus(@RequestBody ChangeStatusDTO status) {
+    public ResponseEntity<PlaylistDTO> changePlaylistStatus(@RequestBody ChangeStatusDTO status) {
         log.info("Changing playlist status");
         log.debug("status: {}", status);
 
