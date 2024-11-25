@@ -1,7 +1,8 @@
 package dasturlash.uz.controller;
 
-import dasturlash.uz.dto.request.PlaylistDTO;
-import dasturlash.uz.entity.video.Playlist;
+import dasturlash.uz.dto.request.playlist.ChangeStatusDTO;
+import dasturlash.uz.dto.request.playlist.PlaylistDTO;
+import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.service.PlaylistService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -43,6 +44,20 @@ public class PlaylistController {
             return ResponseEntity.ok(update);
         }catch (Exception e){
             log.error("Error during updating playlist", e);
+            throw e;
+        }
+    }
+
+    @PutMapping("/change-status")
+    public ResponseEntity<String> changePlaylistStatus(@RequestBody ChangeStatusDTO status) {
+        log.info("Changing playlist status");
+        log.debug("status: {}", status);
+
+        try {
+            log.info("Playlist change status success with name");
+            return ResponseEntity.ok(service.changeStatus(status));
+        }catch (Exception e){
+            log.error("Error during changing playlist status", e);
             throw e;
         }
     }
