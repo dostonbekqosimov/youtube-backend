@@ -53,6 +53,7 @@ public class PlaylistService {
         return dto;
     }
 
+
     public PlaylistDTO update(PlaylistDTO dto, String playlistId) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
@@ -80,6 +81,7 @@ public class PlaylistService {
         return dto;
     }
 
+
     public String changeStatus(ChangeStatusDTO status) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Optional<Playlist> optionalPlaylist = playlistRepository.findById(status.getPlaylistId());
@@ -101,6 +103,5 @@ public class PlaylistService {
         playlistRepository.save(playlist);
         log.info("Playlist updated with name: {}", playlist.getName());
         return "Changed status to " + status.getStatus();
-
     }
 }
