@@ -2,7 +2,7 @@ package dasturlash.uz.service;
 
 import dasturlash.uz.dto.request.playlist.ChangeStatusDTO;
 import dasturlash.uz.dto.request.playlist.PlaylistDTO;
-import dasturlash.uz.dto.response.ChannelResponseDTO;
+import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
 import dasturlash.uz.entity.video.Playlist;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.repository.PlaylistRepository;

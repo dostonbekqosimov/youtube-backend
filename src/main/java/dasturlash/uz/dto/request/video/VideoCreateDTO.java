@@ -2,6 +2,7 @@ package dasturlash.uz.dto.request.video;
 
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.enums.VideoType;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -36,5 +37,6 @@ public class VideoCreateDTO {
     @NotNull(message = "Status is required")
     private ContentStatus status;
 
-    private LocalDateTime publishedDate;
+    @Future(message = "Scheduled date must be in the future")
+    private LocalDateTime scheduledDate;
 }
