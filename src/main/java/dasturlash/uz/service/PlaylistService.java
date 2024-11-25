@@ -80,12 +80,12 @@ public class PlaylistService {
         return dto;
     }
 
-    public PlaylistDTO changeStatus(ChangeStatusDTO status) {
+    public String changeStatus(ChangeStatusDTO status) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Optional<Playlist> optionalPlaylist = playlistRepository.findById(status.getPlaylistId());
 
 
-        /*Long channelOwner = playlistRepository.checkOwner(status.getPlaylistId());
+        Long channelOwner = playlistRepository.checkOwner(status.getPlaylistId());
         if (!Objects.equals(currentUserId, channelOwner)) {
             log.error("User {} does not have permission to change playlist status: {}", currentUserId, status.getPlaylistId());
             throw new AppBadRequestException("You do not have permission to change playlist status");
@@ -100,9 +100,7 @@ public class PlaylistService {
         playlist.setStatus(status.getStatus());
         playlistRepository.save(playlist);
         log.info("Playlist updated with name: {}", playlist.getName());
-        return "Changed status to " + status.getStatus();*/
-        PlaylistDTO payload = new PlaylistDTO();
-        payload.setName("haromi");
-        return payload;
+        return "Changed status to " + status.getStatus();
+
     }
 }
