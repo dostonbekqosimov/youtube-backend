@@ -1,6 +1,7 @@
 package dasturlash.uz.service;
 
-import dasturlash.uz.dto.request.PlaylistDTO;
+import dasturlash.uz.dto.request.playlist.ChangeStatusDTO;
+import dasturlash.uz.dto.request.playlist.PlaylistDTO;
 import dasturlash.uz.dto.response.ChannelResponseDTO;
 import dasturlash.uz.entity.video.Playlist;
 import dasturlash.uz.exceptions.AppBadRequestException;
@@ -77,5 +78,28 @@ public class PlaylistService {
         log.info("Playlist updated with name: {}", playlist.getName());
         dto.setChannelId(playlist.getChannelId());
         return dto;
+    }
+
+    public String changeStatus(ChangeStatusDTO status) {
+        Long currentUserId = SpringSecurityUtil.getCurrentUserId();
+        Optional<Playlist> optionalPlaylist = playlistRepository.findById(status.getPlaylistId());
+
+
+        Long channelOwner = playlistRepository.checkOwner(status.getPlaylistId());
+        if (!Objects.equals(currentUserId, channelOwner)) {
+            log.error("User {} does not have permission to change playlist status: {}", currentUserId, status.getPlaylistId());
+            throw new AppBadRequestException("You do not have permission to change playlist status");
+        }
+
+        if (!optionalPlaylist.isPresent()) {
+            log.error("Playlist not found for playlistId: {}", status.getPlaylistId());
+            throw new AppBadRequestException("Playlist not found");
+        }
+
+        Playlist playlist = optionalPlaylist.get();
+        playlist.setStatus(status.getStatus());
+        playlistRepository.save(playlist);
+        log.info("Playlist updated with name: {}", playlist.getName());
+        return "Changed status to " + status.getStatus();
     }
 }
