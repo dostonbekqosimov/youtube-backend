@@ -34,6 +34,7 @@ import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
 @RequiredArgsConstructor
 public class ChannelService {
 
+
     private final ResourceBundleService resourceBundleService;
     private final ChannelRepository channelRepository;
     private final AttachService attachService;
