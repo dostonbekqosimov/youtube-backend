@@ -33,7 +33,7 @@ Authorization: Bearer token
   "status": "<updated status>"
 }
 
-### Update video visibility status
+### Update video status
 PATCH http://localhost:8090/api/videos/<video id>/status
 Content-Type: application/json
 Authorization: Bearer token
@@ -60,7 +60,7 @@ Authorization: Bearer token
   "categoryId": 3
 }
 
-### Update video thumbnail
+### Update video preview
 PATCH http://localhost:8090/api/videos/<video id>/preview
 Content-Type: application/json
 Authorization: Bearer token

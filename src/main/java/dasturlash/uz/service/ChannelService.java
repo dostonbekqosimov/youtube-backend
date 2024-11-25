@@ -1,9 +1,11 @@
 package dasturlash.uz.service;
 
-import dasturlash.uz.dto.request.ChannelMediaUpdateRequest;
-import dasturlash.uz.dto.request.ChannelCreateRequest;
+import dasturlash.uz.dto.request.channel.ChannelMediaUpdateRequest;
+import dasturlash.uz.dto.request.channel.ChannelCreateRequest;
 import dasturlash.uz.dto.request.UpdateChannelStatusRequest;
-import dasturlash.uz.dto.response.ChannelResponseDTO;
+import dasturlash.uz.dto.response.MediaUrlDTO;
+import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
+import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ChannelStatus;
 import dasturlash.uz.enums.LanguageEnum;
@@ -12,6 +14,7 @@ import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.ChannelExistsException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
+import dasturlash.uz.mapper.ChannelShortInfoMapper;
 import dasturlash.uz.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +41,7 @@ public class ChannelService {
     @Value("${app.domain}")
     private String domain;
 
-    public void create(ChannelCreateRequest request, LanguageEnum lang) {
+    public String create(ChannelCreateRequest request, LanguageEnum lang) {
 
         // check if channel with handle exists
         existByHandle(request.getHandle());
@@ -53,6 +56,7 @@ public class ChannelService {
             newChannel.setVisible(Boolean.TRUE);
 
             channelRepository.save(newChannel);
+            return newChannel.getId();
         } catch (Exception e) {
             throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
         }
@@ -60,7 +64,7 @@ public class ChannelService {
 
     }
 
-    public void updateChannelInfo(String channelId, ChannelCreateRequest updateRequest, LanguageEnum lang) {
+    public String updateChannelInfo(String channelId, ChannelCreateRequest updateRequest, LanguageEnum lang) {
 
 
         Channel channel = getById(channelId);
@@ -78,6 +82,7 @@ public class ChannelService {
                 }
                 channel.setUpdatedDate(LocalDateTime.now());
                 channelRepository.save(channel);
+                return channel.getId();
             } catch (Exception e) {
                 throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
             }
@@ -87,7 +92,7 @@ public class ChannelService {
 
     }
 
-    public void updateChannelPhoto(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
+    public String updateChannelPhoto(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
         Channel channel = getById(channelId);
         if (getCurrentUserId().equals(channel.getProfileId())) {
             try {
@@ -96,6 +101,7 @@ public class ChannelService {
                     channel.setPhotoId(updateRequest.getPhotoId());
                     channel.setUpdatedDate(LocalDateTime.now());
                     channelRepository.save(channel);
+
                 }
             } catch (Exception e) {
                 throw new SomethingWentWrongException(resourceBundleService.getMessage("something.went.wrong", lang));
@@ -103,9 +109,10 @@ public class ChannelService {
         } else {
             throw new AppBadRequestException("You can't change this channel photo");
         }
+        return channel.getId();
     }
 
-    public void updateChannelBanner(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
+    public String updateChannelBanner(String channelId, ChannelMediaUpdateRequest updateRequest, LanguageEnum lang) {
         Channel channel = getById(channelId);
         if (getCurrentUserId().equals(channel.getProfileId())) {
             try {
@@ -121,9 +128,11 @@ public class ChannelService {
         } else {
             throw new AppBadRequestException("You can't change this channel banner");
         }
+        return channel.getId();
+
     }
 
-    public void updateChannelStatus(UpdateChannelStatusRequest request, LanguageEnum lang) {
+    public String updateChannelStatus(UpdateChannelStatusRequest request, LanguageEnum lang) {
         Channel channel = getById(request.getChannelId()); // Fetch channel by ID
 
         ProfileRole userRole = getCurrentUserRole(); // Fetch current user's role
@@ -132,7 +141,7 @@ public class ChannelService {
         // Handle based on roles
         if (userRole == ProfileRole.ROLE_ADMIN) {
             // Admins can update any channel status
-            performStatusUpdate(request, channel);
+            changeChannelStatus(request, channel);
         } else if (userRole == ProfileRole.ROLE_USER) {
             // Owners can only update their own channels
             if (!currentUserId.equals(channel.getProfileId())) {
@@ -140,16 +149,18 @@ public class ChannelService {
                         resourceBundleService.getMessage("error.not.owner.of.channel", lang)
                 );
             }
-            performStatusUpdate(request, channel);
+            changeChannelStatus(request, channel);
         } else {
             // Other roles (if any) are unauthorized
             throw new AppBadRequestException(
                     resourceBundleService.getMessage("something.went.wrong", lang)
             );
         }
+        return channel.getId();
+
     }
 
-    private void performStatusUpdate(UpdateChannelStatusRequest request, Channel channel) {
+    private void changeChannelStatus(UpdateChannelStatusRequest request, Channel channel) {
         if (!request.getStatus().equals(channel.getStatus())) {
             channel.setStatus(request.getStatus());
             channel.setUpdatedDate(LocalDateTime.now());
@@ -253,8 +264,16 @@ public class ChannelService {
         channelResponseDTO.setCreatedDate(channel.getCreatedDate());
         channelResponseDTO.setUpdatedDate(channel.getUpdatedDate());
         channelResponseDTO.setVisible(channel.getVisible());
-        channelResponseDTO.setBanner(attachService.getUrlOfMedia(channel.getBannerId()));
-        channelResponseDTO.setPhoto(attachService.getUrlOfMedia(channel.getPhotoId()));
+
+        // get media urls
+        MediaUrlDTO banner = attachService.getUrlOfMedia(channel.getPhotoId());
+        MediaUrlDTO photo = attachService.getUrlOfMedia(channel.getBannerId());
+
+
+        // set media urls
+        channelResponseDTO.setBanner(banner);
+        channelResponseDTO.setPhoto(photo);
+
 
         return channelResponseDTO;
     }
@@ -268,6 +287,16 @@ public class ChannelService {
 
         return makeShareLink(channel.getHandle());
     }
+
+    public VideoChannelDTO getVideoShortInfo(String channelId) {
+        ChannelShortInfoMapper result = channelRepository.getShortInfo(channelId);
+        VideoChannelDTO videoChannelDTO = new VideoChannelDTO();
+        videoChannelDTO.setId(result.getId());
+        videoChannelDTO.setName(result.getName());
+        videoChannelDTO.setPhotoUrl(attachService.openURL(result.getPhotoId()));
+        return videoChannelDTO;
+    }
+
 
     private String makeShareLink(String handle) {
         return domain + "/api/channels/handle/" + handle;

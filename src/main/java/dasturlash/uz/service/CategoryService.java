@@ -5,6 +5,7 @@ import dasturlash.uz.dto.response.CategoryResponseDTO;
 import dasturlash.uz.entity.Category;
 import dasturlash.uz.exceptions.DataExistsException;
 import dasturlash.uz.exceptions.DataNotFoundException;
+import dasturlash.uz.mapper.CategoryShortInfoMapper;
 import dasturlash.uz.repository.CategoryRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -109,13 +110,19 @@ public class CategoryService {
         return dto;
     }
 
+    public CategoryResponseDTO getCategoryShortInfoById(Long id) {
+        CategoryShortInfoMapper mapper = categoryRepository.toShortInfoMapper(id);
+        CategoryResponseDTO dto = new CategoryResponseDTO();
+        dto.setId(mapper.getId());
+        dto.setName(mapper.getName());
+        return dto;
+    }
+
 
     public Category getById(Long id) {
         return categoryRepository.findByIdAndVisibleTrue(id)
                 .orElseThrow(() -> new DataNotFoundException("Category with id: " + id + " not found"));
     }
-
-
 
 
 }

@@ -1,4 +1,4 @@
-package dasturlash.uz.dto.request;
+package dasturlash.uz.dto.request.channel;
 
 import lombok.Data;
 
