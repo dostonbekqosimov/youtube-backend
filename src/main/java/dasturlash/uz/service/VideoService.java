@@ -4,10 +4,7 @@ import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.CategoryResponseDTO;
 import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
-import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
-import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
-import dasturlash.uz.dto.response.video.VideoLikeDTO;
-import dasturlash.uz.dto.response.video.VideoMediaDTO;
+import dasturlash.uz.dto.response.video.*;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
@@ -20,6 +17,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -187,6 +188,7 @@ public class VideoService {
         if (status == ContentStatus.SCHEDULED) {
             validateScheduledVideo(scheduledDate);
             video.setStatus(ContentStatus.SCHEDULED);
+            video.setPublishedDate(null);
             video.setScheduledDate(scheduledDate);
 
         } else if (status != null) {
@@ -194,6 +196,7 @@ public class VideoService {
 
             if (status == ContentStatus.PUBLIC) {
                 video.setPublishedDate(LocalDateTime.now());
+                video.setScheduledDate(null);
 
             } else if (status == ContentStatus.PRIVATE) {
                 video.setStatus(ContentStatus.PRIVATE);
@@ -349,8 +352,13 @@ public class VideoService {
         videoFullInfoDTO.setViewCount(video.getViewCount());
         videoFullInfoDTO.setSharedCount(video.getSharedCount());
         videoFullInfoDTO.setStatus(video.getStatus());
+
+
+        videoFullInfoDTO.setUpdatedDate(video.getUpdatedDate());
+        videoFullInfoDTO.setScheduledDate(video.getScheduledDate());
         videoFullInfoDTO.setCreatedDate(video.getCreatedDate());
         videoFullInfoDTO.setPublishedDate(video.getPublishedDate());
+
 
         log.debug("Completed converting video entity to DTO for video ID: {}", video.getId());
         return videoFullInfoDTO;
@@ -383,5 +391,18 @@ public class VideoService {
 
         log.info("Successfully fetched video: {}", video);
         return video;
+    }
+
+    public PageImpl<VideShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate"));
+
+        PageImpl<Video> result = videoRepository.findAllByCategoryIdAndVisibleTrueAndStatus(categoryId, ContentStatus.PUBLIC, pageRequest);
+
+
+
+
+        return new PageImpl<>(List.of(), pageRequest, result.getTotalElements());
+
+
     }
 }
