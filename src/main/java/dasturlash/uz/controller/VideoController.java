@@ -1,7 +1,8 @@
 package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.video.*;
-import dasturlash.uz.dto.response.VideShortInfoDTO;
+
+import dasturlash.uz.dto.response.video.VideShortInfoDTO;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
 import dasturlash.uz.service.VideoService;
@@ -85,7 +86,7 @@ public class VideoController {
         log.info("Exiting watchVideo with response: {}", response);
         return response;
     }
-
+//
 //    @GetMapping
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    public ResponseEntity<VideShortInfoDTO>
