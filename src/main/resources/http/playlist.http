@@ -1,0 +1,34 @@
+### Create Playlist
+POST http://localhost:8090/playlist/create
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "channelId": "<channel_id>",
+  "name": "<name>",
+  "description": "<description>",
+  "status": "<status>",
+  "orderNumber": 0
+}
+
+### Update Playlist
+PUT http://localhost:8090/playlist/update/<playlist_id>
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "name": "<name>",
+  "description": "<description>",
+  "status": "<status>",
+  "orderNumber": 0
+}
+
+### Change Status
+PUT http://localhost:8090/playlist/change-status
+Content-Type: application/json
+Authorization: token
+
+{
+  "playlistId": "",
+  "status": "PRIVATE"
+}
