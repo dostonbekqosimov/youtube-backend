@@ -8,6 +8,7 @@ import dasturlash.uz.dto.response.playlist.PlayListShortInfoUser;
 import dasturlash.uz.entity.video.Playlist;
 import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
+import dasturlash.uz.repository.ChannelRepository;
 import dasturlash.uz.repository.PlaylistRepository;
 import dasturlash.uz.security.SpringSecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final ChannelService channelService;
     private static final Logger log = LoggerFactory.getLogger(PlaylistService.class);
+    private final ChannelRepository channelRepository;
 
     public PlaylistDTO create(PlaylistDTO dto) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
@@ -159,15 +161,20 @@ public class PlaylistService {
     }
 
     public Page<PlayListShortInfoUser> getPaginationUser(int page, int size) {
+        Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Pageable pageable = PageRequest.of(page, size);
         List<PlayListShortInfoUser> listPlaylist = new ArrayList<>();
 
-        for (Playlist playlist : playlistRepository.findAll(pageable)) {
+        String channelId = channelRepository.findChannelIdByProfileId(currentUserId);
+
+        for (Playlist playlist : playlistRepository.findAllPlaylistOwner(channelId)) {
             PlayListShortInfoUser shortInfoUser = toShortInfoUser(playlist);
             listPlaylist.add(shortInfoUser);
         }
+
         return new PageImpl<>(listPlaylist, pageable, listPlaylist.size());
     }
+
 
     private PlayListShortInfoUser toShortInfoUser(Playlist playlist) {
         PlayListShortInfoUser shortInfo = new PlayListShortInfoUser();
