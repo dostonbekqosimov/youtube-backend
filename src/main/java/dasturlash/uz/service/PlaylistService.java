@@ -4,6 +4,7 @@ import dasturlash.uz.dto.request.playlist.ChangeStatusDTO;
 import dasturlash.uz.dto.request.playlist.PlaylistDTO;
 import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
 import dasturlash.uz.entity.video.Playlist;
+import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.repository.PlaylistRepository;
 import dasturlash.uz.security.SpringSecurityUtil;
@@ -53,6 +54,7 @@ public class PlaylistService {
         return dto;
     }
 
+
     public PlaylistDTO update(PlaylistDTO dto, String playlistId) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
@@ -80,6 +82,7 @@ public class PlaylistService {
         return dto;
     }
 
+
     public String changeStatus(ChangeStatusDTO status) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Optional<Playlist> optionalPlaylist = playlistRepository.findById(status.getPlaylistId());
@@ -101,6 +104,21 @@ public class PlaylistService {
         playlistRepository.save(playlist);
         log.info("Playlist updated with name: {}", playlist.getName());
         return "Changed status to " + status.getStatus();
+    }
 
+    public String delete(String playlistId) {
+        Long ownerPlaylist = playlistRepository.checkOwner(playlistId);
+        if (!Objects.equals(ownerPlaylist, SpringSecurityUtil.getCurrentUserId())) {
+            log.error("User {} does not have permission to delete playlist: {}", ownerPlaylist, playlistId);
+            throw new AppBadRequestException("You do not have permission to delete playlist");
+        }
+
+        if (!SpringSecurityUtil.getCurrentUserRole().equals(ProfileRole.ROLE_ADMIN)){
+            log.error("User {} does not have permission to delete playlist: {}", SpringSecurityUtil.getCurrentUserId(), playlistId);
+            throw new AppBadRequestException("You do not have permission to delete playlist");
+        }
+        playlistRepository.setVisibleFalse(playlistId);
+        log.info("Playlist deleted with name: {}", playlistId);
+        return "Deleted playlist";
     }
 }
