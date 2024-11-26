@@ -27,4 +27,17 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "WHERE v.categoryId = :categoryId AND v.status = :status AND v.visible = true")
     Page<VideoShortInfoProjection> findShortVideoInfoByCategoryId(@Param("categoryId") Long categoryId, @Param("status") ContentStatus status, Pageable pageable);
 
+    @Query("SELECT v.id AS id, v.title AS title, " +
+            "p.id AS previewAttachId, " +
+            "c.id AS channelId, " +
+            "v.viewCount AS viewCount, a.duration AS duration " +
+            "FROM Video v " +
+            "LEFT JOIN v.preview p " +
+            "LEFT JOIN v.channel c " +
+            "LEFT JOIN c.photo cp " +
+            "LEFT JOIN v.video a " +
+            "WHERE lower(v.title) like lower(concat('%', :title, '%')) AND v.status = :status AND v.visible = true")
+    Page<VideoShortInfoProjection> findShortVideoInfoByTitle(@Param("title") String title, @Param("status") ContentStatus status, Pageable pageable);
+
+
 }
