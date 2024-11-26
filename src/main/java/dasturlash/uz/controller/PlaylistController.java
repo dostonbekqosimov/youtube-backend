@@ -2,18 +2,22 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.playlist.ChangeStatusDTO;
 import dasturlash.uz.dto.request.playlist.PlaylistDTO;
-import dasturlash.uz.enums.ContentStatus;
+import dasturlash.uz.dto.response.playlist.PlayListShortInfoAdmin;
+import dasturlash.uz.dto.response.playlist.PlayListShortInfoUser;
+import dasturlash.uz.repository.PlaylistRepository;
 import dasturlash.uz.service.PlaylistService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/playlist")
 @RequiredArgsConstructor
-public class PlaylistController {
+public class   PlaylistController {
     private static final Logger log = LoggerFactory.getLogger(PlaylistController.class);
     private final PlaylistService service;
 
@@ -72,6 +76,37 @@ public class PlaylistController {
             return ResponseEntity.ok(service.delete(playlistId));
         }catch (Exception e){
             log.error("Error during deleting playlist", e);
+            throw e;
+        }
+    }
+
+    @GetMapping("/get-pagination-admin")
+    public ResponseEntity<Page<PlayListShortInfoAdmin>> getPlaylistsPagination(@RequestParam(defaultValue = "0")int page,
+                                                                               @RequestParam(defaultValue = "10") int size) {
+        log.info("Getting playlists pagination");
+        log.debug("page: {}", page);
+        try {
+            log.info("Playlists pagination success with name: {}", page);
+            Page<PlayListShortInfoAdmin> playlist = service.getPagination(page, size);
+            return ResponseEntity.ok(playlist);
+        }catch (Exception e){
+            log.error("Error during getting playlists", e);
+            throw e;
+        }
+
+    }
+
+    @GetMapping("/get-pagenation-user")
+    public ResponseEntity<Page<PlayListShortInfoUser>> getPlaylistPaginationUser(@RequestParam(defaultValue = "0") int page,
+                                                                                 @RequestParam(defaultValue = "10") int size) {
+        log.info("Getting playlists pagination user");
+        log.debug("page: {}", page);
+        try {
+            log.info("Playlists pagination user success with name: {}", page);
+            Page<PlayListShortInfoUser> pagePlaylist = service.getPaginationUser(page, size);
+            return ResponseEntity.ok(pagePlaylist);
+        }catch (Exception e){
+            log.error("Error during getting playlists", e);
             throw e;
         }
     }
