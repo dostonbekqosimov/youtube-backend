@@ -29,6 +29,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
+    public static final String[] AUTH_WHITELIST = {
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/swagger-ui.html"
+    };
+
+
     private final UserDetailsService userDetailsService;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -69,6 +83,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("api/videos/title").permitAll()
                             .requestMatchers("api/videos/watch").permitAll()
                             .requestMatchers("api/videos/channel/**").permitAll()
+                            .requestMatchers(AUTH_WHITELIST).permitAll()
 
                             //Authentication APIs - open to authenticated users
                             .requestMatchers("profile/updateEmail").authenticated()
