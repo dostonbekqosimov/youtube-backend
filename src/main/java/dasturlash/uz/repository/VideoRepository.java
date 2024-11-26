@@ -26,7 +26,8 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "LEFT JOIN v.channel c " +
             "LEFT JOIN c.photo cp " +
             "LEFT JOIN v.video a " +
-            "WHERE v.categoryId = :categoryId AND v.status = 'PUBLIC' AND v.visible = true")
+            "WHERE v.categoryId = :categoryId AND v.status = 'PUBLIC' AND v.visible = true " +
+            "order by v.publishedDate desc")
     Page<VideoShortInfoProjection> findPublicVideosByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 
     @Query("SELECT v.id AS id, v.title AS title, " +
@@ -39,7 +40,8 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "LEFT JOIN v.channel c " +
             "LEFT JOIN c.photo cp " +
             "LEFT JOIN v.video a " +
-            "WHERE lower(v.title) like lower(concat('%', :title, '%')) AND v.status = 'PUBLIC' AND v.visible = true")
+            "WHERE lower(v.title) like lower(concat('%', :title, '%')) AND v.status = 'PUBLIC' AND v.visible = true " +
+            "order by v.publishedDate desc")
     Page<VideoShortInfoProjection> findPublicVideosByTitle(@Param("title") String title, Pageable pageable);
 
     @Query("SELECT v.id AS id, v.title AS title, " +
@@ -51,7 +53,8 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "LEFT JOIN v.channel c " +
             "LEFT JOIN c.photo cp " +
             "LEFT JOIN v.video a " +
-            "WHERE v.channelId = :channelId AND v.status = 'PUBLIC' AND v.visible = true")
+            "WHERE v.channelId = :channelId AND v.status = 'PUBLIC' AND v.visible = true " +
+            "order by v.publishedDate desc")
     Page<VideoShortInfoProjection> findPublicChannelVideosListByChannelId(@Param("channelId") String channelId, Pageable pageable);
 
     @Query("SELECT v.id AS id, v.title AS title, " +
@@ -67,7 +70,7 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "LEFT JOIN c.profile o " + // Assuming `Channel` has a relationship with the `Owner`
             "LEFT JOIN v.playlist pl " + // Assuming videos can have a playlist
             "LEFT JOIN v.video a " +
-            "WHERE v.visible = true")
+            "WHERE v.visible = true" )
     Page<AdminVideoProjection> findAdminVideoInfo(Pageable pageable);
 
 

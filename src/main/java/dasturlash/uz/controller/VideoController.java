@@ -134,7 +134,7 @@ public class VideoController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "20") int size
     ) {
-        Page<AdminVideoInfoDTO> videoList = videoService.getAdminVideoList(page, size);
+        Page<AdminVideoInfoDTO> videoList = videoService.getAdminVideoList(page - 1, size);
         return ResponseEntity.ok(videoList);
     }
 

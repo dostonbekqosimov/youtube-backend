@@ -16,6 +16,9 @@ public class VideoChannelDTO {
     }
 
     public VideoChannelDTO(VideoChannelDTO dto) {
+        if (dto == null) {
+            return;
+        }
         this.id = dto.getId();
         this.photoUrl = dto.getPhotoUrl();
         this.name = dto.getName();
