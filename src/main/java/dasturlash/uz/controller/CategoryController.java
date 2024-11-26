@@ -29,7 +29,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CategoryResponseDTO> updateById(@PathVariable("id") Long id,
-                                        @RequestBody @Valid CategoryRequestDTO requestDTO) {
+                                                          @RequestBody @Valid CategoryRequestDTO requestDTO) {
 
         return ResponseEntity.ok().body(categoryService.updateById(id, requestDTO));
     }
@@ -44,8 +44,9 @@ public class CategoryController {
 
     // Get the list of Categories with pagination
     @GetMapping({"", "/"})
-    public ResponseEntity<PageImpl<CategoryResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                                @RequestParam(value = "size", defaultValue = "5") Integer size) {
+    public ResponseEntity<PageImpl<CategoryResponseDTO>> getAll(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size) {
 
         return ResponseEntity.ok().body(categoryService.getCategoriesList(page - 1, size));
     }

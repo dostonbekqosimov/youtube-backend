@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Table(name = "videos")
 @Data
 public class Video {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
