@@ -11,14 +11,14 @@ public class VideoChannelDTO {
     private String name;
     private String photoUrl;
 
-    // hali qo'shilmaganlar:
-    private Integer subscriberCount;
-    private Boolean isSubscribed;
 
     public VideoChannelDTO() {
     }
 
     public VideoChannelDTO(VideoChannelDTO dto) {
+        if (dto == null) {
+            return;
+        }
         this.id = dto.getId();
         this.photoUrl = dto.getPhotoUrl();
         this.name = dto.getName();

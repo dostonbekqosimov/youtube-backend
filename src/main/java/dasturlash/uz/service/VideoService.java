@@ -12,9 +12,10 @@ import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
+import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
-import dasturlash.uz.util.VideoShortInfoMapper;
+import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
@@ -43,7 +43,7 @@ public class VideoService {
     private final ChannelService channelService;
     private final AttachService attachService;
     private final CategoryService categoryService;
-    private final VideoShortInfoMapper videoShortInfoMapper;
+    private final VideoInfoMapper videoInfoMapper;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -396,45 +396,84 @@ public class VideoService {
     }
 
     public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(int page, int size, Long categoryId) {
+        log.info("Fetching video list by category ID: {}, page: {}, size: {}", categoryId, page, size);
+
+        Pageable pageRequest = PageRequest.of(page, size);
+
+        // Fetch projections from the database
+        Page<VideoShortInfoProjection> projections = videoRepository.findPublicVideosByCategoryId(categoryId, pageRequest);
+        log.debug("Fetched {} videos for category ID: {}", projections.getContent().size(), categoryId);
+
+        // Map projections to DTOs
+        List<VideoShortInfoDTO> response = projections.stream()
+                .map(videoInfoMapper::toVideShortInfoDTO)
+                .toList();
+
+        log.info("Mapped {} videos to VideoShortInfoDTO for category ID: {}", response.size(), categoryId);
+        return new PageImpl<>(response, pageRequest, projections.getTotalElements());
+    }
+
+    public PageImpl<VideoShortInfoDTO> getVideoListByTitle(int page, int size, String title) {
+        log.info("Fetching video list by title: '{}', page: {}, size: {}", title, page, size);
+
+        Pageable pageRequest = PageRequest.of(page, size);
+
+        // Fetch projections from the database
+        Page<VideoShortInfoProjection> projections = videoRepository.findPublicVideosByTitle(title, pageRequest);
+        log.debug("Fetched {} videos matching title: '{}'", projections.getContent().size(), title);
+
+        // Map projections to DTOs
+        List<VideoShortInfoDTO> response = projections.stream()
+                .map(videoInfoMapper::toVideShortInfoDTO)
+                .toList();
+
+        log.info("Mapped {} videos to VideoShortInfoDTO for title: '{}'", response.size(), title);
+        return new PageImpl<>(response, pageRequest, projections.getTotalElements());
+    }
+
+    public PageImpl<VideoShortInfoDTO> getVideoListByTagId(int page, int size, String tag) {
+        log.info("Fetching video list by tag: '{}', page: {}, size: {}", tag, page, size);
+
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
+
+        // No implementation yet; returning placeholder response
+        log.warn("Tag-based video fetching is not yet implemented. Returning placeholder data.");
+        return new PageImpl<>(List.of(), pageRequest, 14);
+    }
+
+    public PageImpl<VideoPlayListInfoDTO> getChannelVideoListByChannelId(int page, int size, String channelId) {
+        log.info("Fetching channel video list for channel ID: {}, page: {}, size: {}", channelId, page, size);
 
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
 
         // Fetch projections from the database
-        Page<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByCategoryId(categoryId, ContentStatus.PUBLIC, pageRequest);
+        Page<VideoShortInfoProjection> videos = videoRepository.findPublicChannelVideosListByChannelId(channelId, pageRequest);
+        log.debug("Fetched {} videos for channel ID: {}", videos.getContent().size(), channelId);
 
         // Map projections to DTOs
-        List<VideoShortInfoDTO> response = projections.stream()
-                .map(videoShortInfoMapper::toVideShortInfoDTO)
+        List<VideoPlayListInfoDTO> response = videos.stream()
+                .map(videoInfoMapper::videoPlayListInfoDTODTO)
                 .toList();
-        return new PageImpl<>(response, pageRequest, projections.getTotalElements());
 
+        log.info("Mapped {} videos to VideoPlayListInfoDTO for channel ID: {}", response.size(), channelId);
+        return new PageImpl<>(response, pageRequest, videos.getTotalElements());
     }
 
-    public PageImpl<VideoShortInfoDTO> getVideoListByTitle(int page, int size, String title) {
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
+    public Page<AdminVideoInfoDTO> getAdminVideoList(int page, int size) {
+        log.info("Fetching admin video list, page: {}, size: {}", page, size);
 
-        Page<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByTitle(title, ContentStatus.PUBLIC, pageRequest);
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
 
-        List<VideoShortInfoDTO> response = projections.stream()
-                .map(videoShortInfoMapper::toVideShortInfoDTO)
+        // Fetch projections from the database
+        Page<AdminVideoProjection> videos = videoRepository.findAdminVideoInfo(pageRequest);
+        log.debug("Fetched {} videos for admin list.", videos.getContent().size());
+
+        // Map projections to DTOs
+        List<AdminVideoInfoDTO> response = videos.stream()
+                .map(videoInfoMapper::toAdminVideoInfoDTO)
                 .toList();
-        return new PageImpl<>(response, pageRequest, projections.getTotalElements());
-    }
 
-//    public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
-//
-//        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate"));
-//
-//        PageImpl<VideoShortInfoProjection> result = videoRepository.findShortVideoInfoByCategoryId(categoryId, pageRequest);
-//
-//
-//
-//
-//
-//
-//
-//        return new PageImpl<>(List.of(), pageRequest, result.getTotalElements());
-//
-//
-//    }
+        log.info("Mapped {} videos to AdminVideoInfoDTO.", response.size());
+        return new PageImpl<>(response, pageRequest, videos.getTotalElements());
+    }
 }
