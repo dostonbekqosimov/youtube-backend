@@ -1,4 +1,4 @@
-package dasturlash.uz.service;
+package dasturlash.uz.service.video;
 
 import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.CategoryResponseDTO;
@@ -15,6 +15,9 @@ import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
+import dasturlash.uz.service.AttachService;
+import dasturlash.uz.service.CategoryService;
+import dasturlash.uz.service.ChannelService;
 import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

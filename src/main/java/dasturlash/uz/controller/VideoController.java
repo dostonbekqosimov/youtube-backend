@@ -3,7 +3,7 @@ package dasturlash.uz.controller;
 import dasturlash.uz.dto.request.video.*;
 
 import dasturlash.uz.dto.response.video.*;
-import dasturlash.uz.service.VideoService;
+import dasturlash.uz.service.video.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
