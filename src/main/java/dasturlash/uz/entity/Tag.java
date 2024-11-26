@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,5 +22,8 @@ public class Tag {
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+    private List<VideoTag> videoTags = new ArrayList<>();
 
 }
