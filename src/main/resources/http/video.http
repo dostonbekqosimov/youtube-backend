@@ -18,6 +18,15 @@ GET http://localhost:8090/api/videos/watch?v=<video id>
 Accept: application/json
 Authorization: Bearer token
 
+
+### Get videos by categoryId (pagination)
+GET http://localhost:8090/api/videos/category?categoryId=<categoryId>
+Accept: application/json
+
+### Get videos by title (pagination)
+GET http://localhost:8090/api/videos/title?title=<title(no need for to be full)>
+Accept: application/json
+
 ### Update video details
 PUT http://localhost:8090/api/videos/<video id>
 Content-Type: application/json
