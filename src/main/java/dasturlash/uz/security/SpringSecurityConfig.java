@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -67,6 +68,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("api/videos/category").permitAll()
                             .requestMatchers("api/videos/title").permitAll()
                             .requestMatchers("api/videos/watch").permitAll()
+                            .requestMatchers("api/videos/channel/**").permitAll()
 
                             //Authentication APIs - open to authenticated users
                             .requestMatchers("profile/updateEmail").authenticated()
@@ -93,9 +95,9 @@ public class SpringSecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(httpSecurityCorsConfigurer -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+                    configuration.setAllowedOriginPatterns(List.of("*"));
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    configuration.setAllowedHeaders(Arrays.asList("*"));
+                    configuration.setAllowedHeaders(List.of("*"));
                     configuration.setAllowCredentials(true); // Add this line
 
                     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
