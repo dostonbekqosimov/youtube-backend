@@ -289,7 +289,7 @@ public class ChannelService {
         return makeShareLink(channel.getHandle());
     }
 
-    public VideoChannelDTO getVideoShortInfo(String channelId) {
+    public VideoChannelDTO getVideoChannelShortInfo(String channelId) {
         ChannelShortInfoMapper result = channelRepository.getShortInfo(channelId);
         VideoChannelDTO videoChannelDTO = new VideoChannelDTO();
         videoChannelDTO.setId(result.getId());

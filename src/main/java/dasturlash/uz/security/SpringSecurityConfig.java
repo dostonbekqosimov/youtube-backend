@@ -64,6 +64,8 @@ public class SpringSecurityConfig {
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/attach/**").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/channels/**").permitAll()
+                            .requestMatchers("api/videos/category").permitAll()
+                            .requestMatchers("api/videos/watch").permitAll()
                             //Authentication APIs - open to authenticated users
                             .requestMatchers("profile/updateEmail").authenticated()
                             .requestMatchers("/profile/changePassword").authenticated()
