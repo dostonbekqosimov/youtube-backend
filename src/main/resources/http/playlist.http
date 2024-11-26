@@ -32,3 +32,8 @@ Authorization: token
   "playlistId": "",
   "status": "PRIVATE"
 }
+
+### Delete Playlist
+DELETE http://localhost:8090/profile/delete/<playlist-id>
+Content-Type: application/json
+Authorization: Bearer token
