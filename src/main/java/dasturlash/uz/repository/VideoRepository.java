@@ -18,26 +18,39 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
     @Query("SELECT v.id AS id, v.title AS title, " +
             "p.id AS previewAttachId, " +
             "c.id AS channelId, " +
-            "v.viewCount AS viewCount, a.duration AS duration " +
+            "v.viewCount AS viewCount, a.duration AS duration, " +
+            "v.publishedDate AS publishedDate " +
             "FROM Video v " +
             "LEFT JOIN v.preview p " +
             "LEFT JOIN v.channel c " +
             "LEFT JOIN c.photo cp " +
             "LEFT JOIN v.video a " +
-            "WHERE v.categoryId = :categoryId AND v.status = :status AND v.visible = true")
-    Page<VideoShortInfoProjection> findShortVideoInfoByCategoryId(@Param("categoryId") Long categoryId, @Param("status") ContentStatus status, Pageable pageable);
+            "WHERE v.categoryId = :categoryId AND v.status = 'PUBLIC' AND v.visible = true")
+    Page<VideoShortInfoProjection> findPublicVideosByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 
     @Query("SELECT v.id AS id, v.title AS title, " +
             "p.id AS previewAttachId, " +
             "c.id AS channelId, " +
-            "v.viewCount AS viewCount, a.duration AS duration " +
+            "v.viewCount AS viewCount, a.duration AS duration, " +
+            "v.publishedDate AS publishedDate " +
             "FROM Video v " +
             "LEFT JOIN v.preview p " +
             "LEFT JOIN v.channel c " +
             "LEFT JOIN c.photo cp " +
             "LEFT JOIN v.video a " +
-            "WHERE lower(v.title) like lower(concat('%', :title, '%')) AND v.status = :status AND v.visible = true")
-    Page<VideoShortInfoProjection> findShortVideoInfoByTitle(@Param("title") String title, @Param("status") ContentStatus status, Pageable pageable);
+            "WHERE lower(v.title) like lower(concat('%', :title, '%')) AND v.status = 'PUBLIC' AND v.visible = true")
+    Page<VideoShortInfoProjection> findPublicVideosByTitle(@Param("title") String title, Pageable pageable);
 
+    @Query("SELECT v.id AS id, v.title AS title, " +
+            "p.id AS previewAttachId, " +
+            "v.viewCount AS viewCount, a.duration AS duration, " +
+            "v.publishedDate AS publishedDate " +
+            "FROM Video v " +
+            "LEFT JOIN v.preview p " +
+            "LEFT JOIN v.channel c " +
+            "LEFT JOIN c.photo cp " +
+            "LEFT JOIN v.video a " +
+            "WHERE v.channelId = :channelId AND v.status = 'PUBLIC' AND v.visible = true")
+    Page<VideoShortInfoProjection> findPublicChannelVideosListByChannelId(@Param("channelId") String channelId, Pageable pageable);
 
 }

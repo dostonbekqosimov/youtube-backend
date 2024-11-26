@@ -2,6 +2,7 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.video.*;
 
+import dasturlash.uz.dto.response.video.VideoPlayListInfoDTO;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
@@ -119,7 +120,14 @@ public class VideoController {
         return ResponseEntity.ok().body(videoService.getVideoListByTagId(page - 1, size, tag));
     }
 
-
+    @GetMapping("/channel/{channelId}")
+    public ResponseEntity<PageImpl<VideoPlayListInfoDTO>> getVideoListByChannelId(
+            @PathVariable("channelId") String channelId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size) {
+        log.info("Entering getVideoListByChannelId with channelId: {}", channelId);
+        return ResponseEntity.ok().body(videoService.getChannelVideoListByChannelId(page - 1, size, channelId));
+    }
 
 
 }

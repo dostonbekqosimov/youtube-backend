@@ -14,7 +14,7 @@ import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
-import dasturlash.uz.util.VideoShortInfoMapper;
+import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
@@ -43,7 +42,7 @@ public class VideoService {
     private final ChannelService channelService;
     private final AttachService attachService;
     private final CategoryService categoryService;
-    private final VideoShortInfoMapper videoShortInfoMapper;
+    private final VideoInfoMapper videoInfoMapper;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -400,11 +399,11 @@ public class VideoService {
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
 
         // Fetch projections from the database
-        Page<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByCategoryId(categoryId, ContentStatus.PUBLIC, pageRequest);
+        Page<VideoShortInfoProjection> projections = videoRepository.findPublicVideosByCategoryId(categoryId, pageRequest);
 
         // Map projections to DTOs
         List<VideoShortInfoDTO> response = projections.stream()
-                .map(videoShortInfoMapper::toVideShortInfoDTO)
+                .map(videoInfoMapper::toVideShortInfoDTO)
                 .toList();
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
 
@@ -413,10 +412,10 @@ public class VideoService {
     public PageImpl<VideoShortInfoDTO> getVideoListByTitle(int page, int size, String title) {
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
 
-        Page<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByTitle(title, ContentStatus.PUBLIC, pageRequest);
+        Page<VideoShortInfoProjection> projections = videoRepository.findPublicVideosByTitle(title, pageRequest);
 
         List<VideoShortInfoDTO> response = projections.stream()
-                .map(videoShortInfoMapper::toVideShortInfoDTO)
+                .map(videoInfoMapper::toVideShortInfoDTO)
                 .toList();
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
     }
@@ -428,20 +427,16 @@ public class VideoService {
         return new PageImpl<>(List.of(), pageRequest, 14);
     }
 
-//    public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
-//
-//        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate"));
-//
-//        PageImpl<VideoShortInfoProjection> result = videoRepository.findShortVideoInfoByCategoryId(categoryId, pageRequest);
-//
-//
-//
-//
-//
-//
-//
-//        return new PageImpl<>(List.of(), pageRequest, result.getTotalElements());
-//
-//
-//    }
+    public PageImpl<VideoPlayListInfoDTO> getChannelVideoListByChannelId(int page, int size, String channelId) {
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
+
+        Page<VideoShortInfoProjection> videos = videoRepository.findPublicChannelVideosListByChannelId(channelId, pageRequest);
+
+        List<VideoPlayListInfoDTO> response = videos.stream()
+                .map(videoInfoMapper::videoPlayListInfoDTODTO)
+                .toList();
+
+
+        return new PageImpl<>(response, pageRequest, videos.getTotalElements());
+    }
 }

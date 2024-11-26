@@ -27,6 +27,11 @@ Accept: application/json
 GET http://localhost:8090/api/videos/title?title=<title(no need for to be full)>
 Accept: application/json
 
+### Get videos by channelId (pagination)
+GET http://localhost:8090/api/videos/channel/<channelId>?page=2&size=4
+Accept: application/json
+
+
 ### Update video details
 PUT http://localhost:8090/api/videos/<video id>
 Content-Type: application/json
