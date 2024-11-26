@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
-
 public class FlywayStarterConfig implements CommandLineRunner {
 
     @Autowired
