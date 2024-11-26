@@ -85,7 +85,7 @@ public class VideoController {
     public ResponseEntity<VideoFullInfoDTO> watchVideo(@RequestParam("v") String videoId) {
         log.info("Entering watchVideo with videoId: {}", videoId);
         ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.getVideoById(videoId));
-        log.info("Exiting watchVideo with response: {}", response);
+        log.info("Exiting watchVideo with response: {}", "ok");
         return response;
     }
 
@@ -93,9 +93,19 @@ public class VideoController {
     public ResponseEntity<PageImpl<VideoShortInfoDTO>> getVideoListByCategoryId(
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "5") int size) {
-
+            @RequestParam(value = "size", defaultValue = "20") int size) {
+        log.info("Entering getVideoListByCategoryId with categoryId: {}", categoryId);
         return ResponseEntity.ok().body(videoService.getVideoListByCategoryId(page - 1, size, categoryId));
+
+    }
+
+    @GetMapping("/title")
+    public ResponseEntity<PageImpl<VideoShortInfoDTO>> getVideoListByTitle(
+            @RequestParam("title") String title,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size) {
+        log.info("Entering getVideoListByCategoryId with title: {}", title);
+        return ResponseEntity.ok().body(videoService.getVideoListByTitle(page - 1, size, title));
 
     }
 

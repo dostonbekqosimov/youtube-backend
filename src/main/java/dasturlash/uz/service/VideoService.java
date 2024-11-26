@@ -410,6 +410,17 @@ public class VideoService {
 
     }
 
+    public PageImpl<VideoShortInfoDTO> getVideoListByTitle(int page, int size, String title) {
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
+
+        Page<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByTitle(title, ContentStatus.PUBLIC, pageRequest);
+
+        List<VideoShortInfoDTO> response = projections.stream()
+                .map(videoShortInfoMapper::toVideShortInfoDTO)
+                .toList();
+        return new PageImpl<>(response, pageRequest, projections.getTotalElements());
+    }
+
 //    public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
 //
 //        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate"));
