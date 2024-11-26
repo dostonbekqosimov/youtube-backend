@@ -12,21 +12,20 @@ import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
+import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
+import dasturlash.uz.util.VideoShortInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
@@ -43,6 +42,8 @@ public class VideoService {
     private final ChannelService channelService;
     private final AttachService attachService;
     private final CategoryService categoryService;
+    private final VideoShortInfoMapper videoShortInfoMapper;
+
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
         log.info("Entering createVideo with request: {}", dto);
@@ -332,7 +333,7 @@ public class VideoService {
 
         // Get channel by using channel id
         log.debug("Fetching channel info for video ID: {}, channel ID: {}", video.getId(), video.getChannelId());
-        VideoChannelDTO channel = channelService.getVideoShortInfo(video.getChannelId());
+        VideoChannelDTO channel = channelService.getVideoChannelShortInfo(video.getChannelId());
 
         // Set channel
         videoFullInfoDTO.setChannel(channel);
@@ -393,16 +394,30 @@ public class VideoService {
         return video;
     }
 
-    public PageImpl<VideShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate"));
+    public List<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId) {
+        // Fetch projections from the database
+        List<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByCategoryId(categoryId);
 
-        PageImpl<Video> result = videoRepository.findAllByCategoryIdAndVisibleTrueAndStatus(categoryId, ContentStatus.PUBLIC, pageRequest);
-
-
-
-
-        return new PageImpl<>(List.of(), pageRequest, result.getTotalElements());
-
-
+        // Map projections to DTOs
+        return projections.stream()
+                .map(videoShortInfoMapper::toVideShortInfoDTO)
+                .collect(Collectors.toList());
     }
+
+//    public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
+//
+//        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate"));
+//
+//        PageImpl<VideoShortInfoProjection> result = videoRepository.findShortVideoInfoByCategoryId(categoryId, pageRequest);
+//
+//
+//
+//
+//
+//
+//
+//        return new PageImpl<>(List.of(), pageRequest, result.getTotalElements());
+//
+//
+//    }
 }

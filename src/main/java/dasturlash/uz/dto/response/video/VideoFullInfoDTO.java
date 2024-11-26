@@ -28,6 +28,8 @@ public class VideoFullInfoDTO {
     private LocalDateTime createdDate;
     private LocalDateTime publishedDate;
     private LocalDateTime scheduledDate;
+    private LocalDateTime updatedDate;
+
 
     // hali ishlatilinmaganlar
     private Integer commentCount;

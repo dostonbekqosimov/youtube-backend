@@ -2,16 +2,18 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.video.*;
 
-import dasturlash.uz.dto.response.video.VideShortInfoDTO;
+import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
 import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
 import dasturlash.uz.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -86,10 +88,16 @@ public class VideoController {
         log.info("Exiting watchVideo with response: {}", response);
         return response;
     }
-//
-//    @GetMapping
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    public ResponseEntity<VideShortInfoDTO>
+
+    @GetMapping("/category")
+    public ResponseEntity<List<VideoShortInfoDTO>> getVideoListByCategoryId(
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size) {
+
+        return ResponseEntity.ok().body(videoService.getVideoListByCategoryId(categoryId));
+
+    }
 
 
 }
