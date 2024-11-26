@@ -90,12 +90,12 @@ public class VideoController {
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<VideoShortInfoDTO>> getVideoListByCategoryId(
+    public ResponseEntity<PageImpl<VideoShortInfoDTO>> getVideoListByCategoryId(
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "5") int size) {
 
-        return ResponseEntity.ok().body(videoService.getVideoListByCategoryId(categoryId));
+        return ResponseEntity.ok().body(videoService.getVideoListByCategoryId(page - 1, size, categoryId));
 
     }
 

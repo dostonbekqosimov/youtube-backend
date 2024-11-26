@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -394,14 +395,19 @@ public class VideoService {
         return video;
     }
 
-    public List<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId) {
+    public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(int page, int size, Long categoryId) {
+
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
+
         // Fetch projections from the database
-        List<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByCategoryId(categoryId);
+        Page<VideoShortInfoProjection> projections = videoRepository.findShortVideoInfoByCategoryId(categoryId, ContentStatus.PUBLIC, pageRequest);
 
         // Map projections to DTOs
-        return projections.stream()
+        List<VideoShortInfoDTO> response = projections.stream()
                 .map(videoShortInfoMapper::toVideShortInfoDTO)
-                .collect(Collectors.toList());
+                .toList();
+        return new PageImpl<>(response, pageRequest, projections.getTotalElements());
+
     }
 
 //    public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
