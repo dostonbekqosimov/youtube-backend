@@ -11,9 +11,6 @@ public class VideoChannelDTO {
     private String name;
     private String photoUrl;
 
-    // hali qo'shilmaganlar:
-    private Integer subscriberCount;
-    private Boolean isSubscribed;
 
     public VideoChannelDTO() {
     }

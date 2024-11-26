@@ -2,9 +2,13 @@ package dasturlash.uz.util;
 
 
 import dasturlash.uz.dto.response.MediaUrlDTO;
+import dasturlash.uz.dto.response.OwnerInfoDTO;
+import dasturlash.uz.dto.response.PlaylistInfoDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
+import dasturlash.uz.dto.response.video.AdminVideoInfoDTO;
 import dasturlash.uz.dto.response.video.VideoPlayListInfoDTO;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
+import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.service.AttachService;
 import dasturlash.uz.service.ChannelService;
@@ -55,5 +59,36 @@ public class VideoInfoMapper {
                 projection.getDuration(),
                 projection.getPublishedDate()
         );
+    }
+
+    public AdminVideoInfoDTO toAdminVideoInfoDTO(AdminVideoProjection projection) {
+        if (projection == null) return null;
+
+        // Map VideoShortInfoDTO
+        VideoShortInfoDTO videoShortInfoDTO = new VideoShortInfoDTO(
+                projection.getId(),
+                projection.getTitle(),
+                new MediaUrlDTO(attachService.getUrlOfMedia(projection.getPreviewAttachId())),
+                new VideoChannelDTO(channelService.getVideoChannelShortInfo(projection.getChannelId())),
+                projection.getViewCount(),
+                projection.getDuration(),
+                projection.getPublishedDate()
+        );
+
+        // Map OwnerInfoDTO
+        OwnerInfoDTO ownerInfoDTO = new OwnerInfoDTO(
+                projection.getOwnerId(),
+                projection.getOwnerName(),
+                projection.getOwnerSurname()
+        );
+
+        // Map PlaylistInfoDTO
+        PlaylistInfoDTO playlistInfoDTO = new PlaylistInfoDTO(
+                projection.getPlaylistId(),
+                projection.getPlaylistName()
+        );
+
+        // Combine all into AdminVideoInfoDTO
+        return new AdminVideoInfoDTO(videoShortInfoDTO, ownerInfoDTO, playlistInfoDTO);
     }
 }

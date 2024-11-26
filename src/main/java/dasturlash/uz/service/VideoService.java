@@ -12,6 +12,7 @@ import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
+import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.util.VideoInfoMapper;
@@ -438,5 +439,20 @@ public class VideoService {
 
 
         return new PageImpl<>(response, pageRequest, videos.getTotalElements());
+    }
+
+    public Page<AdminVideoInfoDTO> getAdminVideoList(int page, int size) {
+
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
+
+        Page<AdminVideoProjection> videos = videoRepository.findAdminVideoInfo(pageRequest);
+
+        // Map projections to DTOs
+        List<AdminVideoInfoDTO> response = videos.stream()
+                .map(videoInfoMapper::toAdminVideoInfoDTO)
+                .toList();
+
+        return new PageImpl<>(response, pageRequest, videos.getTotalElements());
+
     }
 }

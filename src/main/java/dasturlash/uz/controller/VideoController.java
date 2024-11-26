@@ -2,16 +2,15 @@ package dasturlash.uz.controller;
 
 import dasturlash.uz.dto.request.video.*;
 
-import dasturlash.uz.dto.response.video.VideoPlayListInfoDTO;
-import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
-import dasturlash.uz.dto.response.video.VideoCreateResponseDTO;
-import dasturlash.uz.dto.response.video.VideoFullInfoDTO;
+import dasturlash.uz.dto.response.video.*;
 import dasturlash.uz.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -127,6 +126,16 @@ public class VideoController {
             @RequestParam(value = "size", defaultValue = "20") int size) {
         log.info("Entering getVideoListByChannelId with channelId: {}", channelId);
         return ResponseEntity.ok().body(videoService.getChannelVideoListByChannelId(page - 1, size, channelId));
+    }
+
+    @GetMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Page<AdminVideoInfoDTO>> getVideosByCategory(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size
+    ) {
+        Page<AdminVideoInfoDTO> videoList = videoService.getAdminVideoList(page, size);
+        return ResponseEntity.ok(videoList);
     }
 
 
