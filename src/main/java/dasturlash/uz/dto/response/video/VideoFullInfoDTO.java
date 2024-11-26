@@ -33,5 +33,4 @@ public class VideoFullInfoDTO {
 
     // hali ishlatilinmaganlar
     private Integer commentCount;
-    private VideoPlaylistDTO playlistDTO;
 }

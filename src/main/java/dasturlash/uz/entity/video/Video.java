@@ -1,14 +1,14 @@
 package dasturlash.uz.entity.video;
 
-import dasturlash.uz.entity.Attach;
-import dasturlash.uz.entity.Category;
-import dasturlash.uz.entity.Channel;
+import dasturlash.uz.entity.*;
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.enums.VideoType;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "videos")
@@ -95,6 +95,9 @@ public class Video {
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
+    private List<VideoTag> videoTags = new ArrayList<>();
 
 
 }

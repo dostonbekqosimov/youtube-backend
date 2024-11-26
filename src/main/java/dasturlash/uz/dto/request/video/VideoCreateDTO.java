@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class VideoCreateDTO {
@@ -39,4 +40,6 @@ public class VideoCreateDTO {
 
     @Future(message = "Scheduled date must be in the future")
     private LocalDateTime scheduledDate;
+
+    private List<String> tags;
 }
