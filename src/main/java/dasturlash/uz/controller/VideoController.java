@@ -109,5 +109,17 @@ public class VideoController {
 
     }
 
+    // after tag implemented, we will finish this [...]
+    @GetMapping("/tag")
+    public ResponseEntity<PageImpl<VideoShortInfoDTO>> getVideoListByTagId(
+            @RequestParam("tagId") String tag,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size) {
+        log.info("Entering getVideoListByTagId with tagId: {}", tag);
+        return ResponseEntity.ok().body(videoService.getVideoListByTagId(page - 1, size, tag));
+    }
+
+
+
 
 }

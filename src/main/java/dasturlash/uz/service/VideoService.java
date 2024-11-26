@@ -421,6 +421,13 @@ public class VideoService {
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
     }
 
+    // after tag implemented, we will finish this [...]
+    public PageImpl<VideoShortInfoDTO> getVideoListByTagId(int page, int size, String tag) {
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
+
+        return new PageImpl<>(List.of(), pageRequest, 14);
+    }
+
 //    public PageImpl<VideoShortInfoDTO> getVideoListByCategoryId(Long categoryId, int page, int size) {
 //
 //        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate"));
