@@ -61,4 +61,18 @@ public class PlaylistController {
             throw e;
         }
     }
+
+    @DeleteMapping("/delete/{playlistId}")
+    public ResponseEntity<String> deletePlaylist(@PathVariable String playlistId) {
+        log.info("Deleting playlist");
+        log.debug("playlist: {}", playlistId);
+
+        try {
+            log.info("Playlist delete success with name");
+            return ResponseEntity.ok(service.delete(playlistId));
+        }catch (Exception e){
+            log.error("Error during deleting playlist", e);
+            throw e;
+        }
+    }
 }
