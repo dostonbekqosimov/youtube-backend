@@ -3,6 +3,8 @@ package dasturlash.uz.service;
 import dasturlash.uz.dto.request.playlist.ChangeStatusDTO;
 import dasturlash.uz.dto.request.playlist.PlaylistDTO;
 import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
+import dasturlash.uz.dto.response.playlist.PlayListShortInfoAdmin;
+import dasturlash.uz.dto.response.playlist.PlayListShortInfoUser;
 import dasturlash.uz.entity.video.Playlist;
 import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
@@ -11,9 +13,15 @@ import dasturlash.uz.security.SpringSecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -120,5 +128,54 @@ public class PlaylistService {
         playlistRepository.setVisibleFalse(playlistId);
         log.info("Playlist deleted with name: {}", playlistId);
         return "Deleted playlist";
+    }
+
+    public Page<PlayListShortInfoAdmin> getPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<PlayListShortInfoAdmin> listPlaylist = new ArrayList<>();
+
+        for (Playlist playlist : playlistRepository.findAll(pageable)) {
+            PlayListShortInfoAdmin shortInfoAdmin = toShortInfoAdmin(playlist);
+            listPlaylist.add(shortInfoAdmin);
+        }
+        return new PageImpl<>(listPlaylist, pageable, listPlaylist.size());
+    }
+
+
+    private PlayListShortInfoAdmin toShortInfoAdmin(Playlist playlist) {
+        PlayListShortInfoAdmin shortInfo = new PlayListShortInfoAdmin();
+
+        shortInfo.setId(playlist.getId());
+        shortInfo.setName(playlist.getName());
+        shortInfo.setDescription(playlist.getDescription());
+        shortInfo.setStatus(playlist.getStatus());
+        shortInfo.setOrderNumber(playlist.getOrderNumber());
+        shortInfo.setChannelId(playlist.getChannelId());
+        shortInfo.setCreatedDate(playlist.getCreatedDate());
+        shortInfo.setUpdatedDate(playlist.getUpdatedDate());
+        shortInfo.setVisible(playlist.getVisible());
+
+        return shortInfo;
+    }
+
+    public Page<PlayListShortInfoUser> getPaginationUser(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<PlayListShortInfoUser> listPlaylist = new ArrayList<>();
+
+        for (Playlist playlist : playlistRepository.findAll(pageable)) {
+            PlayListShortInfoUser shortInfoUser = toShortInfoUser(playlist);
+            listPlaylist.add(shortInfoUser);
+        }
+        return new PageImpl<>(listPlaylist, pageable, listPlaylist.size());
+    }
+
+    private PlayListShortInfoUser toShortInfoUser(Playlist playlist) {
+        PlayListShortInfoUser shortInfo = new PlayListShortInfoUser();
+
+        shortInfo.setName(playlist.getName());
+        shortInfo.setDescription(playlist.getDescription());
+        shortInfo.setStatus(playlist.getStatus());
+        shortInfo.setCreatedDate(playlist.getCreatedDate());
+        return shortInfo;
     }
 }
