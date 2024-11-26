@@ -96,7 +96,7 @@ public class   PlaylistController {
 
     }
 
-    @GetMapping("/get-pagenation-user")
+    @GetMapping("/get-pagination-user")
     public ResponseEntity<Page<PlayListShortInfoUser>> getPlaylistPaginationUser(@RequestParam(defaultValue = "0") int page,
                                                                                  @RequestParam(defaultValue = "10") int size) {
         log.info("Getting playlists pagination user");
@@ -110,4 +110,7 @@ public class   PlaylistController {
             throw e;
         }
     }
+
+    /*@GetMapping("/get-channel-playlist/{channnelId}")
+    public ResponseEntity*/
 }
