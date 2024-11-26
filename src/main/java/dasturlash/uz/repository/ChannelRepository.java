@@ -27,4 +27,7 @@ public interface ChannelRepository extends CrudRepository<Channel, String> {
 
     @Query("select c.id as id, c.name as name, c.photoId as photoId from Channel c where c.id = ?1")
     ChannelShortInfoMapper getShortInfo(String channelId);
+
+    @Query("select c.id from Channel c where c.profileId = ?1")
+    String findChannelIdByProfileId(Long profileId);
 }
