@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -27,6 +28,7 @@ public class VideoUpdateDTO {
     private String previewAttachId;
     private VideoType type;
     private ContentStatus status;
+    private List<String> tags;
 
     private LocalDateTime updatedDate;
     @Future

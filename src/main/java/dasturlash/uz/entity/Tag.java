@@ -17,13 +17,20 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "name")
+    private String name; // Preserves original casing
+
+    @Column(name = "normalized_name")
+    private String normalizedName; // Lowercase for searching
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
 
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
+    private LocalDateTime updatedDate;
+
+    private Boolean visible;
+
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VideoTag> videoTags = new ArrayList<>();
 
 }
