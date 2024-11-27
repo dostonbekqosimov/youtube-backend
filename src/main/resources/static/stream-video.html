@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #09344b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .video-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .video-container video {
+            width: 100%;
+            max-width: 750px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            color: #333;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Video Streaming Player</h1>
+    <!-- Form for video selection -->
+    <label for="videoId">Video ID (with extension):</label>
+    <input type="text" id="videoId" placeholder="Enter video ID here (e.g., a803150b.mp4)" />
+
+    <!-- Button to load video -->
+    <button onclick="loadVideo()">Load Video</button>
+
+    <!-- Section for displaying video and message -->
+    <div class="video-container" id="videoContainer" style="display: none;">
+        <video id="videoPlayer" controls>
+            <!-- Video will be inserted here -->
+            Your browser does not support the video tag.
+        </video>
+        <div class="message" id="videoMessage"></div>
+    </div>
+</div>
+
+<script>
+    function loadVideo() {
+        // Get the video ID (with extension)
+        const videoId = document.getElementById('videoId').value.trim();
+
+        // Validate if videoId is provided
+        if (!videoId) {
+            alert("Please enter a valid Video ID.");
+            return;
+        }
+
+        // Construct the video URL based on the videoId (which includes the file type)
+        const videoUrl = `http://localhost:8090/api/attach/stream/${videoId}`;
+
+        // Get the video player and message container
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoContainer = document.getElementById('videoContainer');
+        const videoMessage = document.getElementById('videoMessage');
+
+        // Set the video source to the constructed URL
+        videoPlayer.src = videoUrl;
+
+        // Display the video player and a message
+        videoContainer.style.display = 'block';
+        videoMessage.textContent = `Streaming video with ID: ${videoId}`;
+
+        // Optional: Clear the input field after loading the video
+        document.getElementById('videoId').value = ''; // Clear video ID input after load
+    }
+</script>
+
+</body>
+</html>
