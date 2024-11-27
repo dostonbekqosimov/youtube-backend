@@ -8,18 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 
 @RestController
 @RequestMapping("/api/attach")
 @RequiredArgsConstructor
 @Slf4j
 public class AttachController {
-
 
     private final AttachService attachService;
 
@@ -32,19 +31,19 @@ public class AttachController {
         return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping("/open/{fileName}")
-    public ResponseEntity<Resource> open(@PathVariable("fileName") String fileName) {
-        log.info("Attempting to open file: {}", fileName);
-        ResponseEntity<Resource> response = attachService.open(fileName);
-        log.info("File {} opened successfully", fileName);
+    @GetMapping("/open/{attachId}")
+    public ResponseEntity<Resource> open(@PathVariable("attachId") String attachId) {
+        log.info("Attempting to open file: {}", attachId);
+        ResponseEntity<Resource> response = attachService.open(attachId);
+        log.info("File {} opened successfully", attachId);
         return response;
     }
 
-    @GetMapping("/download/{fileName}")
-    public ResponseEntity<Resource> download(@PathVariable("fileName") String fileName) {
-        log.info("Download request received for file: {}", fileName);
-        ResponseEntity<Resource> response = attachService.download(fileName);
-        log.info("File {} downloaded successfully", fileName);
+    @GetMapping("/download/{attachId}")
+    public ResponseEntity<Resource> download(@PathVariable("attachId") String attachId) {
+        log.info("Download request received for file: {}", attachId);
+        ResponseEntity<Resource> response = attachService.download(attachId);
+        log.info("File {} downloaded successfully", attachId);
         return response;
     }
 
@@ -58,17 +57,25 @@ public class AttachController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/{fileName}")
+    @DeleteMapping("/{attachId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Boolean> deleteVideo(@PathVariable("fileName") String id) {
-        log.info("Attempting to delete file with ID: {}", id);
-        Boolean result = attachService.delete(id);
+    public ResponseEntity<Boolean> deleteVideo(@PathVariable("attachId") String attachId) {
+        log.info("Attempting to delete file with ID: {}", attachId);
+        Boolean result = attachService.delete(attachId);
         if (result) {
-            log.info("File with ID {} successfully deleted", id);
+            log.info("File with ID {} successfully deleted", attachId);
         } else {
-            log.warn("Failed to delete file with ID {}", id);
+            log.warn("Failed to delete file with ID {}", attachId);
         }
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/stream/{attachId}")
+    public ResponseEntity<Resource> streamVideo(
+            @PathVariable String attachId,
+            @RequestHeader HttpHeaders headers
+    ) {
+        return attachService.streamVideo(attachId, headers);
     }
 
 }
