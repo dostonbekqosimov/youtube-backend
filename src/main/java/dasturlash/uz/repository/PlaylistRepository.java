@@ -21,5 +21,9 @@ public interface PlaylistRepository extends CrudRepository<Playlist, String>, Jp
     void setVisibleFalse(String playlistId);
 
     @Query("from Playlist p where p.channelId = ?1")
-    List<Playlist> findAllPlaylistOwner(String channelId);
+    List<Playlist> findAllByChannelId(String channelId);
+
+
+    @Query("from Playlist p where p.channelId = ?1 and p.status= dasturlash.uz.enums.ContentStatus.PUBLIC")
+    List<Playlist> findAllByChannelIdOnlyPublic(String channelId);
 }
