@@ -89,6 +89,8 @@ public class Video {
     @Column(name = "dislike_count")
     private Integer dislikeCount;
 
+    private Integer commentCount;
+
     // Buni shunchaki men qo'shdim (Doston)
     @Column(name = "visible")
     private Boolean visible;
@@ -97,7 +99,7 @@ public class Video {
     private LocalDateTime updatedDate;
 
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
-    private List<VideoTag> videoTags;
+    private List<VideoTag> videoTags = new ArrayList<>();
 
 
 }

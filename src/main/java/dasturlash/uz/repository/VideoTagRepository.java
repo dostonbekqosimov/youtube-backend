@@ -21,10 +21,6 @@ public interface VideoTagRepository extends JpaRepository<VideoTag, String> {
     @Query("UPDATE VideoTag vt SET vt.visible = FALSE WHERE vt.video = :video AND vt.tag IN :tags")
     void deleteByVideoAndTagIn(@Param("video") Video video, @Param("tags") List<Tag> tags);
 
-    // Retrieve active (visible) tags for a video
-    @Query("SELECT vt FROM VideoTag vt WHERE vt.video = :video ")
-    List<VideoTag> findTagsByVideo(@Param("video") Video video);
-
     // Soft delete: Mark all tags for a video as invisible instead of deleting rows
     @Modifying
     @Transactional
