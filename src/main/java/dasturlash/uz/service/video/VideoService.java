@@ -3,6 +3,7 @@ package dasturlash.uz.service.video;
 import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.CategoryResponseDTO;
 import dasturlash.uz.dto.response.MediaUrlDTO;
+import dasturlash.uz.dto.response.TagResponseDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.dto.response.video.*;
 import dasturlash.uz.entity.Channel;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -359,8 +361,16 @@ public class VideoService {
         videoFullInfoDTO.setCategory(category);
 
         // Set tags
-        log.debug("Setting empty tag list for video ID: {}", video.getId());
-        videoFullInfoDTO.setTags(List.of());
+        log.debug("Getting tag list for video ID: {}", video.getTitle());
+        List<TagResponseDTO> tagResponseDTOs = new ArrayList<>();
+        for (VideoTag videoTag : video.getVideoTags()) {
+            TagResponseDTO tagDTO = new TagResponseDTO();
+            tagDTO.setId(videoTag.getTag().getId());
+            tagDTO.setName(videoTag.getTag().getName());
+            tagResponseDTOs.add(tagDTO);
+        }
+        log.debug("Setting tag list for video ID: {}", video.getTitle());
+        videoFullInfoDTO.setTags(tagResponseDTOs);
 
         // Get channel by using channel id
         log.debug("Fetching channel info for video ID: {}, channel ID: {}", video.getId(), video.getChannelId());
