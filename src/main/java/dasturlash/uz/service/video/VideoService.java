@@ -30,9 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
@@ -209,17 +207,29 @@ public class VideoService {
             updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
         }
 
-        // Fix for tag handling
         if (dto.getTags() != null) {
-            if (dto.getTags().isEmpty()) {
-                // If tags is an empty list, remove all existing tags
-                videoTagService.updateVideoTags(video, Collections.emptyList());
+            // Fetch existing tags from the database
+            List<String> currentTags = videoTagService.getVisibleTagNamesForVideo(video);
+
+            // Convert both lists to sets for comparison
+            Set<String> existingTagSet = new HashSet<>(currentTags);
+            Set<String> incomingTagSet = new HashSet<>(dto.getTags());
+
+            // Check if tags have changed
+            if (!existingTagSet.equals(incomingTagSet)) {
+                if (dto.getTags().isEmpty()) {
+                    // If tags is an empty list, remove all existing tags
+                    videoTagService.updateVideoTags(video, Collections.emptyList());
+                } else {
+                    // If tags are provided, create or find tags and update
+                    List<Tag> tags = tagService.findOrCreateTags(dto.getTags());
+                    videoTagService.updateVideoTags(video, tags);
+                }
             } else {
-                // If tags are provided, create or find tags and update
-                List<Tag> tags = tagService.findOrCreateTags(dto.getTags());
-                videoTagService.updateVideoTags(video, tags);
+                log.info("Tags are unchanged; skipping tag update process.");
             }
         }
+
 
         video.setUpdatedDate(LocalDateTime.now());
 
@@ -540,5 +550,4 @@ public class VideoService {
 }
 
 
-// setting video tags
 
