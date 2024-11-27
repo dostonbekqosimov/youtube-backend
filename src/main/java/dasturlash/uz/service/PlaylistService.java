@@ -167,7 +167,7 @@ public class PlaylistService {
 
         String channelId = channelRepository.findChannelIdByProfileId(currentUserId);
 
-        for (Playlist playlist : playlistRepository.findAllPlaylistOwner(channelId)) {
+        for (Playlist playlist : playlistRepository.findAllByChannelId(channelId)) {
             PlayListShortInfoUser shortInfoUser = toShortInfoUser(playlist);
             listPlaylist.add(shortInfoUser);
         }
@@ -184,5 +184,17 @@ public class PlaylistService {
         shortInfo.setStatus(playlist.getStatus());
         shortInfo.setCreatedDate(playlist.getCreatedDate());
         return shortInfo;
+    }
+
+    public Page<PlayListShortInfoUser> getPlaylistByChannelId(String channelId, int size, int page) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<PlayListShortInfoUser> listPlaylist = new ArrayList<>();
+
+
+        for (Playlist playlist : playlistRepository.findAllByChannelIdOnlyPublic(channelId)) {
+            toShortInfoUser(playlist);
+            listPlaylist.add(toShortInfoUser(playlist));
+        }
+        return new PageImpl<>(listPlaylist, pageable, listPlaylist.size());
     }
 }

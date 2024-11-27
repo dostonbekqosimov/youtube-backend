@@ -101,6 +101,7 @@ public class   PlaylistController {
                                                                                  @RequestParam(defaultValue = "10") int size) {
         log.info("Getting playlists pagination user");
         log.debug("page: {}", page);
+
         try {
             log.info("Playlists pagination user success with name: {}", page);
             Page<PlayListShortInfoUser> pagePlaylist = service.getPaginationUser(page, size);
@@ -111,6 +112,11 @@ public class   PlaylistController {
         }
     }
 
-    /*@GetMapping("/get-channel-playlist/{channnelId}")
-    public ResponseEntity*/
+    @GetMapping("/get-channel-playlist/{channelId}")
+    public ResponseEntity<Page<PlayListShortInfoUser>> getPlaylistByChannelId(@PathVariable String channelId,
+                                                                              @RequestParam(defaultValue = "0") int page,
+                                                                              @RequestParam(defaultValue = "10")int size) {
+        log.info("Getting playlist by channel");
+        return ResponseEntity.ok(service.getPlaylistByChannelId(channelId, size, page));
+    }
 }
