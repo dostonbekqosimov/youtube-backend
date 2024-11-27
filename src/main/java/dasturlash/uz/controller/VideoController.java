@@ -29,6 +29,13 @@ public class VideoController {
         return response;
     }
 
+    @GetMapping("/edit")
+    public ResponseEntity<VideoUpdateDTO> getVideoUpdateInfo(
+            @RequestParam("v") String videoId) {
+        VideoUpdateDTO updateDTO = videoService.getUpdateInfo(videoId);
+        return ResponseEntity.ok().body(updateDTO);
+    }
+
     @PutMapping("/{videoId}")
     public ResponseEntity<VideoUpdateDTO> updateVideo(
             @PathVariable String videoId,
