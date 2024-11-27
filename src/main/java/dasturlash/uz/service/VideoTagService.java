@@ -18,8 +18,13 @@ public class VideoTagService {
     private final VideoTagRepository videoTagRepository;
 
     public void updateVideoTags(Video video, List<Tag> tags) {
+
+        if (tags == null || tags.isEmpty()) {
+            videoTagRepository.deleteByVideo(video);
+            return;
+        }
         // Retrieve all current VideoTag entries for the video
-        List<VideoTag> currentTags = videoTagRepository.findTagsByVideo(video);
+        List<VideoTag> currentTags = videoTagRepository.findAllVideoTagsByVideo(video);
 
         // Map current VideoTags for quick lookup
         Map<String, VideoTag> currentTagMap = currentTags.stream()
