@@ -29,6 +29,13 @@ public class VideoController {
         return response;
     }
 
+    @GetMapping("/edit")
+    public ResponseEntity<VideoUpdateDTO> getVideoUpdateInfo(
+            @RequestParam("v") String videoId) {
+        VideoUpdateDTO updateDTO = videoService.getUpdateInfo(videoId);
+        return ResponseEntity.ok().body(updateDTO);
+    }
+
     @PutMapping("/{videoId}")
     public ResponseEntity<VideoUpdateDTO> updateVideo(
             @PathVariable String videoId,
@@ -107,14 +114,14 @@ public class VideoController {
 
     }
 
-    // after tag implemented, we will finish this [...]
+    // after tag implemented, we will finish this [done]
     @GetMapping("/tag")
-    public ResponseEntity<PageImpl<VideoShortInfoDTO>> getVideoListByTagId(
-            @RequestParam("tagId") String tag,
+    public ResponseEntity<PageImpl<VideoShortInfoDTO>> getVideoListByTagName(
+            @RequestParam("tagName") String tagName,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "20") int size) {
-        log.info("Entering getVideoListByTagId with tagId: {}", tag);
-        return ResponseEntity.ok().body(videoService.getVideoListByTagId(page - 1, size, tag));
+        log.info("Entering getVideoListByTagName with tagName: {}", tagName);
+        return ResponseEntity.ok().body(videoService.getVideoListByTagName(tagName, page - 1, size));
     }
 
     @GetMapping("/channel/{channelId}")

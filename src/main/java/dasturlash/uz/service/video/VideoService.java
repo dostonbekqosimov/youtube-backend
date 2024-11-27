@@ -3,9 +3,12 @@ package dasturlash.uz.service.video;
 import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.CategoryResponseDTO;
 import dasturlash.uz.dto.response.MediaUrlDTO;
+import dasturlash.uz.dto.response.TagResponseDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.dto.response.video.*;
 import dasturlash.uz.entity.Channel;
+import dasturlash.uz.entity.Tag;
+import dasturlash.uz.entity.VideoTag;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.enums.ProfileRole;
@@ -15,9 +18,11 @@ import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
+import dasturlash.uz.repository.VideoTagRepository;
 import dasturlash.uz.service.AttachService;
 import dasturlash.uz.service.CategoryService;
 import dasturlash.uz.service.ChannelService;
+import dasturlash.uz.service.TagService;
 import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +33,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
@@ -47,6 +54,8 @@ public class VideoService {
     private final AttachService attachService;
     private final CategoryService categoryService;
     private final VideoInfoMapper videoInfoMapper;
+    private final TagService tagService;
+    private final VideoTagRepository videoTagRepository;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -75,7 +84,30 @@ public class VideoService {
 
         video = videoRepository.save(video);
         log.info("Video created with ID: {}", video.getId());
+        if (dto.getTags() != null && !dto.getTags().isEmpty()) {
+            List<Tag> tags = tagService.findOrCreateTags(dto.getTags());
+            List<VideoTag> videoTags = createVideoTags(video, tags);
+            videoTagRepository.saveAll(videoTags);
+        }
 
+        // Build and return response
+        VideoCreateResponseDTO response = buildVideoCreateResponse(video);
+        log.info("Exiting createVideo with response: {}", response);
+        return response;
+    }
+
+    private List<VideoTag> createVideoTags(Video video, List<Tag> tags) {
+        return tags.stream()
+                .map(tag -> {
+                    VideoTag videoTag = new VideoTag();
+                    videoTag.setVideo(video);
+                    videoTag.setTag(tag);
+                    return videoTag;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private VideoCreateResponseDTO buildVideoCreateResponse(Video video) {
         VideoCreateResponseDTO response = new VideoCreateResponseDTO();
         response.setId(video.getId());
         response.setTitle(video.getTitle());
@@ -108,7 +140,6 @@ public class VideoService {
             }
         }
 
-        log.info("Exiting createVideo with response: {}", response);
         return response;
     }
 
@@ -181,11 +212,44 @@ public class VideoService {
             updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
         }
 
+        if (dto.getTags() != null) {
+            updateVideoTags(video, dto.getTags());
+        }
+
         video.setUpdatedDate(LocalDateTime.now());
 
         VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
         log.info("Video updated with response: {}", updatedVideo);
         return updatedVideo;
+    }
+
+    private void updateVideoTags(Video video, List<String> newTagNames) {
+        // Validate tag count
+        final int MAX_TAGS = 10;
+        if (newTagNames.size() > MAX_TAGS) {
+            throw new AppBadRequestException("Too many tags. Maximum allowed: " + MAX_TAGS);
+        }
+
+        // Remove duplicates and normalize
+        List<String> uniqueTagNames = newTagNames.stream()
+                .map(String::trim)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // Clear existing tags
+        video.getVideoTags().clear();
+
+        // Find or create tags using TagService
+        List<Tag> tags = tagService.findOrCreateTags(uniqueTagNames);
+
+        // Create video tag relationships
+        for (Tag tag : tags) {
+            VideoTag videoTag = new VideoTag();
+            videoTag.setVideo(video);
+            videoTag.setTag(tag);
+
+            video.getVideoTags().add(videoTag);
+        }
     }
 
     private void updateVideoStatusAndDates(Video video, ContentStatus status, LocalDateTime scheduledDate) {
@@ -332,8 +396,16 @@ public class VideoService {
         videoFullInfoDTO.setCategory(category);
 
         // Set tags
-        log.debug("Setting empty tag list for video ID: {}", video.getId());
-        videoFullInfoDTO.setTags(List.of());
+        log.debug("Getting tag list for video ID: {}", video.getTitle());
+        List<TagResponseDTO> tagResponseDTOs = new ArrayList<>();
+        for (VideoTag videoTag : video.getVideoTags()) {
+            TagResponseDTO tagDTO = new TagResponseDTO();
+            tagDTO.setId(videoTag.getTag().getId());
+            tagDTO.setName(videoTag.getTag().getName());
+            tagResponseDTOs.add(tagDTO);
+        }
+        log.debug("Setting tag list for video ID: {}", video.getTitle());
+        videoFullInfoDTO.setTags(tagResponseDTOs);
 
         // Get channel by using channel id
         log.debug("Fetching channel info for video ID: {}, channel ID: {}", video.getId(), video.getChannelId());
@@ -379,6 +451,13 @@ public class VideoService {
         videoUpdateDTO.setPreviewAttachId(video.getPreviewAttachId());
         videoUpdateDTO.setType(video.getType());
         videoUpdateDTO.setStatus(video.getStatus());
+
+        // setting video tags
+        List<String> tagNames = video.getVideoTags().stream()
+                .map(videoTag -> videoTag.getTag().getName())
+                .collect(Collectors.toList());
+        videoUpdateDTO.setTags(tagNames);
+
         videoUpdateDTO.setScheduledDate(video.getScheduledDate());
         videoUpdateDTO.setUpdatedDate(video.getUpdatedDate());
 
@@ -434,14 +513,22 @@ public class VideoService {
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
     }
 
-    public PageImpl<VideoShortInfoDTO> getVideoListByTagId(int page, int size, String tag) {
-        log.info("Fetching video list by tag: '{}', page: {}, size: {}", tag, page, size);
+    public PageImpl<VideoShortInfoDTO> getVideoListByTagName(String tagName, int page, int size) {
+        // Create pageable request
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
 
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("publishedDate").descending());
+        // Fetch videos by tag name
+        log.info("Fetching video list by tag: '{}', page: {}, size: {}", tagName, page, size);
+        Page<VideoShortInfoProjection> videoPage = videoRepository.findVideosByTagName(tagName, pageable);
 
-        // No implementation yet; returning placeholder response
-        log.warn("Tag-based video fetching is not yet implemented. Returning placeholder data.");
-        return new PageImpl<>(List.of(), pageRequest, 14);
+        // Convert to DTO
+        List<VideoShortInfoDTO> videoDTOs = videoPage.getContent().stream()
+                .map(videoInfoMapper::toVideShortInfoDTO)
+                .collect(Collectors.toList());
+
+        // Return as PageImpl
+        log.warn("Returning videos based on tag: '{}'", tagName);
+        return new PageImpl<>(videoDTOs, pageable, videoPage.getTotalElements());
     }
 
     public PageImpl<VideoPlayListInfoDTO> getChannelVideoListByChannelId(int page, int size, String channelId) {
@@ -478,5 +565,13 @@ public class VideoService {
 
         log.info("Mapped {} videos to AdminVideoInfoDTO.", response.size());
         return new PageImpl<>(response, pageRequest, videos.getTotalElements());
+    }
+
+    // need to be optimized, use projection later
+    public VideoUpdateDTO getUpdateInfo(String videoId) {
+        Video video = getVideoAndCheckOwnership(videoId);
+
+        return toVideoUpdateDTO(video);
+
     }
 }

@@ -16,6 +16,24 @@ import java.util.List;
 
 
 public interface VideoRepository extends CrudRepository<Video, String>, PagingAndSortingRepository<Video, String> {
+
+    @Query("SELECT v.id AS id, v.title AS title, " +
+            "p.id AS previewAttachId, " +
+            "c.id AS channelId, " +
+            "v.viewCount AS viewCount, a.duration AS duration, " +
+            "v.publishedDate AS publishedDate " +
+            "FROM Video v " +
+            "LEFT JOIN v.preview p " +
+            "LEFT JOIN v.channel c " +
+            "LEFT JOIN c.photo cp " +
+            "LEFT JOIN v.video a " +
+            "JOIN v.videoTags vt " +
+            "JOIN vt.tag t " +
+            "WHERE t.name = :tagName AND t.visible = true " +
+            "ORDER BY v.publishedDate DESC")
+    Page<VideoShortInfoProjection> findVideosByTagName(@Param("tagName") String tagName, Pageable pageable);
+
+
     @Query("SELECT v.id AS id, v.title AS title, " +
             "p.id AS previewAttachId, " +
             "c.id AS channelId, " +

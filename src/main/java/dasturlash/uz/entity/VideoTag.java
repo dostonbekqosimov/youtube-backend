@@ -14,17 +14,12 @@ public class VideoTag {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "video_id")
-    private String videoId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "video_id", insertable = false, updatable = false)
+    @JoinColumn(name = "video_id")
     private Video video;
 
-    @Column(name = "tag_id")
-    private String tagId;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id", updatable = false, insertable = false)
+    @JoinColumn(name = "tag_id")
     private Tag tag;
 }
 

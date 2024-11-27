@@ -83,6 +83,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("api/videos/title").permitAll()
                             .requestMatchers("api/videos/watch").permitAll()
                             .requestMatchers("api/videos/channel/**").permitAll()
+                            .requestMatchers("api/videos/tag").permitAll()
                             .requestMatchers(AUTH_WHITELIST).permitAll()
 
 
