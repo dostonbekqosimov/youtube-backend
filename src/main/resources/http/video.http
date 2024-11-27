@@ -36,6 +36,10 @@ GET http://localhost:8090/api/videos?page=1&size=4
 Accept: application/json
 Authorization:  Bearer token(admin)
 
+### 10. Get partial video info by videoId
+GET http://localhost:8090/api/videos/edit?v=<videoId>
+Accept: application/json
+Authorization: Bearer token
 
 
 ### Update video details
@@ -44,13 +48,8 @@ Content-Type: application/json
 Authorization: Bearer token
 
 {
-  "title": "<Updated title>",
-  "description": "<Updated description>",
-  "categoryId": 2,
-  "playlistId": "<playlist id>",
-  "previewAttachId": "<updated preview id>",
-  "type": "<updated type>",
-  "status": "<updated status>"
+  "The result of '10. Get partial video info by videoId' should be put here": "run 10. with video id then delete updated date"
+
 }
 
 ### Update video status

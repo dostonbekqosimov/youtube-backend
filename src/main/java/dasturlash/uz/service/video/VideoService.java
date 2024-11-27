@@ -452,14 +452,13 @@ public class VideoService {
         videoUpdateDTO.setType(video.getType());
         videoUpdateDTO.setStatus(video.getStatus());
 
-        // setting video tags
-        List<String> tagNames = video.getVideoTags().stream()
-                .map(videoTag -> videoTag.getTag().getName())
-                .collect(Collectors.toList());
-        videoUpdateDTO.setTags(tagNames);
+        List<String> tags = new ArrayList<>();
+        for (VideoTag videoTag : video.getVideoTags()) {
+            tags.add(videoTag.getTag().getName());
+        }
+        videoUpdateDTO.setTags(tags);
 
         videoUpdateDTO.setScheduledDate(video.getScheduledDate());
-        videoUpdateDTO.setUpdatedDate(video.getUpdatedDate());
 
         return videoUpdateDTO;
     }
@@ -575,3 +574,7 @@ public class VideoService {
 
     }
 }
+
+
+// setting video tags
+
