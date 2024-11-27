@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VideoUpdateDTO {
 
 
@@ -30,7 +30,6 @@ public class VideoUpdateDTO {
     private ContentStatus status;
     private List<String> tags;
 
-    private LocalDateTime updatedDate;
     @Future
     private LocalDateTime scheduledDate;
 }

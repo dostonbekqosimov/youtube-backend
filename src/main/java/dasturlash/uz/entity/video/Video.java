@@ -97,7 +97,7 @@ public class Video {
     private LocalDateTime updatedDate;
 
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
-    private List<VideoTag> videoTags = new ArrayList<>();
+    private List<VideoTag> videoTags;
 
 
 }
