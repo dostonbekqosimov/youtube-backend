@@ -28,8 +28,8 @@ public class TagController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Tag> updateById(@PathVariable("id") String id,
-                                          @RequestBody Tag request) {
-        return ResponseEntity.ok().body(tagService.updateById(id, request));
+                                          @RequestParam("tag") String tag) {
+        return ResponseEntity.ok().body(tagService.updateById(id, tag));
     }
 
     // Delete Tag by id
@@ -42,7 +42,7 @@ public class TagController {
     // Get the list of Tags with pagination
     @GetMapping({"", "/"})
     public ResponseEntity<PageImpl<Tag>> getAll(
-            @RequestParam(value = "page", defaultValue = "1") String page,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size) {
         return ResponseEntity.ok().body(tagService.getTagsList(page, size));
     }

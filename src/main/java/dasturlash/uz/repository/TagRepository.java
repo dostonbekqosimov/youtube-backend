@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface TagRepository extends CrudRepository<Tag, String> {
 
+    Optional<Tag> findByNameIgnoreCase(String normalizedName);
+    Optional<Tag> findByNormalizedName(String normalizedName);
     Optional<Tag> findByNameAndVisibleTrue(String name);
     Optional<Tag> findByIdAndVisibleTrue(String id);
     boolean existsByNameAndVisibleTrue(String name);
