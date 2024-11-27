@@ -87,6 +87,24 @@ public class AttachService {
         return null;
     }
 
+    public String openStreamURL(String fileName) {
+        if (fileName == null) {
+            log.warn("Attempt to create URL for streaming with null fileName");
+            return null;
+        }
+
+        log.debug("Attempting to create URL for streaming for file: {}", fileName);
+
+        if (isExist(fileName)) {
+            String url = attachUrl + "/stream/" + fileName;
+            log.debug("Successfully generated URL for streaming: {}", url);
+            return url;
+        }
+
+        log.warn("File not found for streaming: {}", fileName);
+        return null;
+    }
+
 
     public ResponseEntity<Resource> open(String attachId) {
         log.info("Opening file with ID: {}", attachId);
@@ -232,7 +250,7 @@ public class AttachService {
 
         VideoMediaDTO videoMediaDTO = new VideoMediaDTO();
         videoMediaDTO.setVideoId(attachId);
-        videoMediaDTO.setUrl(openURL(attachId));
+        videoMediaDTO.setUrl(openStreamURL(attachId));
         videoMediaDTO.setDuration(getDurationFromEntity(attachId));
 
         log.debug("Video URL generated successfully for ID: {}", attachId);
