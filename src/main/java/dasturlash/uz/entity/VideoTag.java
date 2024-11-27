@@ -23,6 +23,7 @@ public class VideoTag {
 
     @Column(name = "tag_id")
     private String tagId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", updatable = false, insertable = false)
     private Tag tag;

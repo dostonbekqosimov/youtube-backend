@@ -23,6 +23,10 @@ public class Tag {
     @Column(nullable = false)
     private LocalDateTime createdDate;
 
+    private LocalDateTime updatedDate;
+
+    private Boolean visible;
+
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL)
     private List<VideoTag> videoTags = new ArrayList<>();
 
