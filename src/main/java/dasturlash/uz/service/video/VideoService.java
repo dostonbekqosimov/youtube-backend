@@ -15,6 +15,7 @@ import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
+import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
@@ -25,6 +26,7 @@ import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,19 @@ public class VideoService {
         video.setTitle(dto.getTitle());
         video.setCategoryId(dto.getCategoryId());
         video.setPlaylistId(dto.getPlaylistId());
+
+        // video bilan previewlar db da attach table da bo'lishi kerak
+        // bu bo'ladi albatta lekin extra checking
+        if (!attachService.validateAttachment(dto.getAttachId())) {
+            throw new AppBadRequestException("Invalid video attachment");
+        }
+
+        // Validate preview attachment (if provided)
+        if (dto.getPreviewAttachId() != null &&
+                !attachService.validateAttachment(dto.getPreviewAttachId())) {
+            throw new AppBadRequestException("Invalid preview attachment");
+        }
+
         video.setAttachId(dto.getAttachId());
         video.setPreviewAttachId(dto.getPreviewAttachId());
         video.setDescription(dto.getDescription());
@@ -452,7 +467,7 @@ public class VideoService {
     private Video getVideoEntityById(String videoId) {
         log.info("Fetching video with ID: {}", videoId);
 
-        Video video = videoRepository.findById(videoId).orElseThrow(() -> {
+        Video video = videoRepository.findByIdAndVisibleTrue(videoId).orElseThrow(() -> {
             log.error("Video not found with ID: {}", videoId);
             return new DataNotFoundException("Video not found");
         });
@@ -551,6 +566,32 @@ public class VideoService {
 
     public VideoInfoInPlaylist getVideoInfoInPlaylist(String playlistId) {
         return videoRepository.findVideoInfoById(playlistId);
+    }
+
+    @Transactional
+    public String deleteVideoById(String videoId) {
+
+        if (videoId == null) {
+            throw new AppBadRequestException("VideoId cannot be null or empty");
+        }
+
+        Video video = getVideoAndCheckOwnership(videoId);
+
+        videoTagService.updateVideoTags(video, Collections.emptyList());
+
+        boolean isAttachmentDeleted = attachService.deleteVideo(video.getAttachId(), video.getPreviewAttachId());
+
+        Integer rows = videoRepository.changeVisibility(videoId, Boolean.FALSE);
+
+        if (rows > 0 && isAttachmentDeleted) {
+            log.info("Video with ID {} successfully soft-deleted", videoId);
+            return "Video successfully deleted";
+        } else {
+            log.error("Error deleting video with ID {}: ", videoId);
+            throw new SomethingWentWrongException("Failed to update video visibility");
+        }
+
+
     }
 }
 
