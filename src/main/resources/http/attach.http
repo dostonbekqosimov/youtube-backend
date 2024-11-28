@@ -29,12 +29,12 @@ Authorization: Bearer token
 ### streaming just for fun(only applicable for .mp4)
 
 ### Stream Video with Range Header (Partial Content)
-GET http://localhost:8090/api/attach/stream/a803150b-468b-4c2b-af36-a31484c0afb1.mp4
+GET http://localhost:8090/api/attach/stream/b76da40b-1680-402f-9c1b-ab3f890f7048.mp4
 Range: bytes=0-1000000
 
 ### Stream Video without Range Header (Full Content)
-GET http://localhost:8090/api/attach/stream/61ec4ab9-4b89-4d26-b376-356c0da45c23.mkv
+GET http://localhost:8090/api/attach/stream/b76da40b-1680-402f-9c1b-ab3f890f7048.mp4
 
 ### Stream Video with Specific Range
-GET http://localhost:8090/api/attach/stream/a803150b-468b-4c2b-af36-a31484c0afb1.mp4
+GET http://localhost:8090/api/attach/stream/b76da40b-1680-402f-9c1b-ab3f890f7048.mp4
 Range: bytes=5000000-10000000

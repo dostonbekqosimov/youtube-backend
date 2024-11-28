@@ -457,7 +457,7 @@ public class AttachService {
         }
 
         try {
-            // Retrieve the attach entity
+            // Retrieve the Attach entity
             Attach entity = getById(attachId);
             Path filePath = Paths.get(getPath(entity)).normalize();
 
