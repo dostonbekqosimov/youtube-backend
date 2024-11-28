@@ -86,6 +86,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("api/videos/tag").permitAll()
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers("/playlist/get-channel-playlist/**").permitAll()
+                            .requestMatchers("/playlist/get-playlist-basic-info/**").permitAll()
 
 
                             //Authentication APIs - open to authenticated users
