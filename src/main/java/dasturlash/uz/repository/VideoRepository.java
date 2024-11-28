@@ -3,6 +3,7 @@ package dasturlash.uz.repository;
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.mapper.AdminVideoProjection;
+import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -91,5 +92,7 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "WHERE v.visible = true" )
     Page<AdminVideoProjection> findAdminVideoInfo(Pageable pageable);
 
+    @Query("select count(v.id) as videoCount, sum(v.viewCount)as totalViewCount from Video v where v.playlistId = ?1")
+    VideoInfoInPlaylist findVideoInfoById(String playlistId);
 
 }
