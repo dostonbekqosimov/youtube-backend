@@ -63,6 +63,19 @@ public class VideoService {
         video.setTitle(dto.getTitle());
         video.setCategoryId(dto.getCategoryId());
         video.setPlaylistId(dto.getPlaylistId());
+
+        // video bilan previewlar db da attach table da bo'lishi kerak
+        // bu bo'ladi albatta lekin extra checking
+        if (!attachService.validateAttachment(dto.getAttachId())) {
+            throw new AppBadRequestException("Invalid video attachment");
+        }
+
+        // Validate preview attachment (if provided)
+        if (dto.getPreviewAttachId() != null &&
+                !attachService.validateAttachment(dto.getPreviewAttachId())) {
+            throw new AppBadRequestException("Invalid preview attachment");
+        }
+
         video.setAttachId(dto.getAttachId());
         video.setPreviewAttachId(dto.getPreviewAttachId());
         video.setDescription(dto.getDescription());
