@@ -1,5 +1,6 @@
 package dasturlash.uz.entity.video;
 
+import dasturlash.uz.entity.Attach;
 import dasturlash.uz.entity.Channel;
 import dasturlash.uz.enums.ContentStatus;
 import jakarta.persistence.*;
@@ -44,4 +45,10 @@ public class Playlist {
 
     @Column(name = "visible")
     private Boolean visible;
+
+    @Column(name = "preview_id")
+    private String previewId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "preview_id", updatable = false, insertable = false)
+    private Attach attach;
 }

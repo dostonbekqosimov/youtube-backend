@@ -16,6 +16,7 @@ import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.mapper.AdminVideoProjection;
+import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.repository.VideoTagRepository;
@@ -546,6 +547,10 @@ public class VideoService {
 
         return toVideoUpdateDTO(video);
 
+    }
+
+    public VideoInfoInPlaylist getVideoInfoInPlaylist(String playlistId) {
+        return videoRepository.findVideoInfoById(playlistId);
     }
 }
 
