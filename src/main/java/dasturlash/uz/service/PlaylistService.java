@@ -5,12 +5,15 @@ import dasturlash.uz.dto.request.playlist.PlaylistDTO;
 import dasturlash.uz.dto.response.channel.ChannelResponseDTO;
 import dasturlash.uz.dto.response.playlist.PlayListShortInfoAdmin;
 import dasturlash.uz.dto.response.playlist.PlayListShortInfoUser;
+import dasturlash.uz.dto.response.playlist.PlaylistBasicInfo;
 import dasturlash.uz.entity.video.Playlist;
 import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
+import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.repository.ChannelRepository;
 import dasturlash.uz.repository.PlaylistRepository;
 import dasturlash.uz.security.SpringSecurityUtil;
+import dasturlash.uz.service.video.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +35,11 @@ public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final ChannelService channelService;
-    private static final Logger log = LoggerFactory.getLogger(PlaylistService.class);
     private final ChannelRepository channelRepository;
+    private final VideoService videoService;
+
+    private static final Logger log = LoggerFactory.getLogger(PlaylistService.class);
+
 
     public PlaylistDTO create(PlaylistDTO dto) {
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
@@ -196,5 +202,23 @@ public class PlaylistService {
             listPlaylist.add(toShortInfoUser(playlist));
         }
         return new PageImpl<>(listPlaylist, pageable, listPlaylist.size());
+    }
+
+    public PlaylistBasicInfo getPlaylistBasicInfo(String playlistId) {
+        Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+        if (!optionalPlaylist.isPresent()) {
+            log.error("Playlist not found for playlistId: {}", playlistId);
+            throw new AppBadRequestException("Playlist not found");
+        }
+        Playlist playlist = optionalPlaylist.get();
+        PlaylistBasicInfo playlistBasicInfo = new PlaylistBasicInfo();
+        //shu playlist-dagi video-larni soni va umumiy qancha korilganligi
+        VideoInfoInPlaylist videoInfoInPlaylist = videoService.getVideoInfoInPlaylist(playlistId);
+
+        playlistBasicInfo.setId(playlist.getId());
+        playlistBasicInfo.setName(playlist.getName());
+        playlistBasicInfo.setVideo_count(videoInfoInPlaylist.getVideoCount());
+        playlistBasicInfo.setTotal_view_count(videoInfoInPlaylist.getTotalViewCount());
+        return playlistBasicInfo;
     }
 }

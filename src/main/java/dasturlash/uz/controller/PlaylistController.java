@@ -4,6 +4,7 @@ import dasturlash.uz.dto.request.playlist.ChangeStatusDTO;
 import dasturlash.uz.dto.request.playlist.PlaylistDTO;
 import dasturlash.uz.dto.response.playlist.PlayListShortInfoAdmin;
 import dasturlash.uz.dto.response.playlist.PlayListShortInfoUser;
+import dasturlash.uz.dto.response.playlist.PlaylistBasicInfo;
 import dasturlash.uz.repository.PlaylistRepository;
 import dasturlash.uz.service.PlaylistService;
 import lombok.RequiredArgsConstructor;
@@ -118,5 +119,11 @@ public class   PlaylistController {
                                                                               @RequestParam(defaultValue = "10")int size) {
         log.info("Getting playlist by channel");
         return ResponseEntity.ok(service.getPlaylistByChannelId(channelId, size, page));
+    }
+
+    @GetMapping("/get-playlist-basic-info/{playlistId}")
+    public ResponseEntity<PlaylistBasicInfo> getPlaylistBasicInfo(@PathVariable String playlistId) {
+        log.info("Getting playlist basic info");
+        return ResponseEntity.ok(service.getPlaylistBasicInfo(playlistId));
     }
 }
