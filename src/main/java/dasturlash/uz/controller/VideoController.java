@@ -135,7 +135,7 @@ public class VideoController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Page<AdminVideoInfoDTO>> getVideosByCategory(
+    public ResponseEntity<Page<AdminVideoInfoDTO>> getAdminVideoList(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "20") int size
     ) {
