@@ -16,4 +16,6 @@ public interface AttachRepository extends CrudRepository<Attach, String>, Paging
 
     @Query("SELECT a.duration FROM Attach a WHERE a.id = ?1")
     String findAttachDurationById(String id);
+
+    boolean existsByIdAndVisibleTrue(String attachId);
 }

@@ -5,15 +5,18 @@ import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface VideoRepository extends CrudRepository<Video, String>, PagingAndSortingRepository<Video, String> {
@@ -89,10 +92,16 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "LEFT JOIN c.profile o " + // Assuming `Channel` has a relationship with the `Owner`
             "LEFT JOIN v.playlist pl " + // Assuming videos can have a playlist
             "LEFT JOIN v.video a " +
-            "WHERE v.visible = true" )
+            "WHERE v.visible = true")
     Page<AdminVideoProjection> findAdminVideoInfo(Pageable pageable);
 
     @Query("select count(v.id) as videoCount, sum(v.viewCount)as totalViewCount from Video v where v.playlistId = ?1")
     VideoInfoInPlaylist findVideoInfoById(String playlistId);
 
+    Optional<Video> findByIdAndVisibleTrue(String videoId);
+
+    @Modifying
+    @Transactional
+    @Query("update Video set visible = :visible where id = :videoId")
+    Integer changeVisibility(@Param("videoId") String videoId, @Param("visible") Boolean visible);
 }

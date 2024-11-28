@@ -8,6 +8,7 @@ import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.VideoProcessingException;
 import dasturlash.uz.repository.AttachRepository;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -175,6 +176,16 @@ public class AttachService {
         }
 
         return isDeleted;
+    }
+
+    public Boolean deleteVideo(String videoId, String previewId) {
+
+        boolean video = delete(videoId);
+
+        boolean preview = delete(previewId);
+
+        return video && preview;
+
     }
 
 
@@ -442,7 +453,7 @@ public class AttachService {
             return false;
         }
 
-        boolean exists = attachRepository.existsById(attachId);
+        boolean exists = attachRepository.existsByIdAndVisibleTrue(attachId);
         log.debug("Attach exists: {}", exists);
         return exists;
     }
@@ -518,5 +529,26 @@ public class AttachService {
             log.error("Error streaming video: {}", attachId, e);
             throw new AppBadRequestException("Could not stream video: " + attachId);
         }
+    }
+
+    public boolean validateAttachment(String attachId) {
+        // If attachId is null or empty, return false
+        if (StringUtils.isEmpty(attachId)) {
+            return false;
+        }
+
+        // Check if attachment exists in the database
+        return isExist(attachId);
+    }
+
+    public boolean validateAttachments(List<String> attachIds) {
+        // If list is null or empty, return false
+        if (attachIds == null || attachIds.isEmpty()) {
+            return false;
+        }
+
+        // Check if ALL attachments exist
+        return attachIds.stream()
+                .allMatch(this::validateAttachment);
     }
 }
