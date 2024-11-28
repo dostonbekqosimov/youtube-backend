@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 public class AdminVideoInfoDTO {
-    private VideoShortInfoDTO videoShortInfo; // Video details
-    private OwnerInfoDTO owner;              // Owner details
-    private PlaylistInfoDTO playlist;        // Playlist details
+    private VideoShortInfoDTO videoShortInfo;
+    private OwnerInfoDTO owner;
+    private PlaylistInfoDTO playlist;
 
     public AdminVideoInfoDTO(VideoShortInfoDTO videoShortInfo, OwnerInfoDTO owner, PlaylistInfoDTO playlist) {
         this.videoShortInfo = videoShortInfo;
