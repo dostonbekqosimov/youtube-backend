@@ -26,6 +26,7 @@ import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -554,21 +555,27 @@ public class VideoService {
         return videoRepository.findVideoInfoById(playlistId);
     }
 
+    @Transactional
     public String deleteVideoById(String videoId) {
 
         if (videoId == null) {
-            throw new AppBadRequestException("VideoId is null");
+            throw new AppBadRequestException("VideoId cannot be null or empty");
         }
+
         Video video = getVideoAndCheckOwnership(videoId);
 
-        boolean isDeleted = attachService.deleteVideo(video.getAttachId(), video.getPreviewAttachId());
+        videoTagService.updateVideoTags(video, Collections.emptyList());
 
+        boolean isAttachmentDeleted = attachService.deleteVideo(video.getAttachId(), video.getPreviewAttachId());
 
         Integer rows = videoRepository.changeVisibility(videoId, Boolean.FALSE);
-        if (rows > 0 && isDeleted) {
-            return "Video successfully deleted ";
+
+        if (rows > 0 && isAttachmentDeleted) {
+            log.info("Video with ID {} successfully soft-deleted", videoId);
+            return "Video successfully deleted";
         } else {
-            throw new SomethingWentWrongException("Oops");
+            log.error("Error deleting video with ID {}: ", videoId);
+            throw new SomethingWentWrongException("Failed to update video visibility");
         }
 
 
