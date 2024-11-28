@@ -15,6 +15,7 @@ import dasturlash.uz.enums.ProfileRole;
 import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
+import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
@@ -452,7 +453,7 @@ public class VideoService {
     private Video getVideoEntityById(String videoId) {
         log.info("Fetching video with ID: {}", videoId);
 
-        Video video = videoRepository.findById(videoId).orElseThrow(() -> {
+        Video video = videoRepository.findByIdAndVisibleTrue(videoId).orElseThrow(() -> {
             log.error("Video not found with ID: {}", videoId);
             return new DataNotFoundException("Video not found");
         });
@@ -551,6 +552,26 @@ public class VideoService {
 
     public VideoInfoInPlaylist getVideoInfoInPlaylist(String playlistId) {
         return videoRepository.findVideoInfoById(playlistId);
+    }
+
+    public String deleteVideoById(String videoId) {
+
+        if (videoId == null) {
+            throw new AppBadRequestException("VideoId is null");
+        }
+        Video video = getVideoAndCheckOwnership(videoId);
+
+        boolean isDeleted = attachService.deleteVideo(video.getAttachId(), video.getPreviewAttachId());
+
+
+        Integer rows = videoRepository.changeVisibility(videoId, Boolean.FALSE);
+        if (rows > 0 && isDeleted) {
+            return "Video successfully deleted ";
+        } else {
+            throw new SomethingWentWrongException("Oops");
+        }
+
+
     }
 }
 

@@ -143,5 +143,11 @@ public class VideoController {
         return ResponseEntity.ok(videoList);
     }
 
+    @DeleteMapping("/{videoId}")
+    public ResponseEntity<String> deleteVideoById(@PathVariable("videoId") String videoId){
+
+        return ResponseEntity.ok(videoService.deleteVideoById(videoId));
+    }
+
 
 }

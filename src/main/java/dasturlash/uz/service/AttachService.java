@@ -177,6 +177,16 @@ public class AttachService {
         return isDeleted;
     }
 
+    public Boolean deleteVideo(String videoId, String previewId) {
+
+        boolean video = delete(videoId);
+
+        boolean preview = delete(previewId);
+
+        return video && preview;
+
+    }
+
 
     public Attach getById(String id) {
         log.debug("Retrieving attach by ID: {}", id);
