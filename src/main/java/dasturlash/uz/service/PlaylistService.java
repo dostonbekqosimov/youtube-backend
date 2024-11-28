@@ -217,8 +217,9 @@ public class PlaylistService {
 
         playlistBasicInfo.setId(playlist.getId());
         playlistBasicInfo.setName(playlist.getName());
-        playlistBasicInfo.setVideo_count(videoInfoInPlaylist.getVideoCount());
-        playlistBasicInfo.setTotal_view_count(videoInfoInPlaylist.getTotalViewCount());
+        playlistBasicInfo.setVideoCount(videoInfoInPlaylist.getVideoCount());
+        playlistBasicInfo.setTotalViewCount(videoInfoInPlaylist.getTotalViewCount());
+        playlistBasicInfo.setUpdatedDate(playlist.getUpdatedDate());
         return playlistBasicInfo;
     }
 }
