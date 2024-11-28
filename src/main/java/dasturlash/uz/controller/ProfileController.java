@@ -6,6 +6,7 @@ import dasturlash.uz.dto.ProfileDTO;
 import dasturlash.uz.dto.ProfileShortInfo;
 import dasturlash.uz.dto.request.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
+import dasturlash.uz.dto.response.ResponseCustom;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.service.AttachService;
 import dasturlash.uz.service.ProfileService;
@@ -53,7 +54,7 @@ public class ProfileController {
     }
 
     @GetMapping("/confirm/{code}")
-    public ResponseEntity<String> confirm(@PathVariable String code){
+    public ResponseEntity<ResponseCustom> confirm(@PathVariable String code){
         return ResponseEntity.ok(service.confirm(code));
     }
 

@@ -15,6 +15,7 @@ import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.security.SpringSecurityUtil;
 import dasturlash.uz.service.email.EmailHistoryService;
 import dasturlash.uz.service.email.EmailSendingService;
+import dasturlash.uz.util.JwtUtil;
 import dasturlash.uz.util.RandomUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -138,7 +139,7 @@ public class ProfileService {
         return "Profile not found";
     }
 
-    public String confirm(String code) {
+    public ResponseCustom confirm(String code) {
         ResponseCustom responseCustom = emailHistoryService.getHistoryByCode(code);
         Long currentUserId = SpringSecurityUtil.getCurrentUserId();
         Profile currentProfile = findById(currentUserId);
@@ -146,9 +147,10 @@ public class ProfileService {
         if (responseCustom.getSuccess() && currentProfile != null) {
             currentProfile.setEmail(responseCustom.getMessage());
             repository.save(currentProfile);
-            return "Profile updated successfully";
+            String token = JwtUtil.encode(currentProfile.getEmail(), currentProfile.getRole().toString());
+            return new ResponseCustom("New token-> "+token, true);
         }
-        return responseCustom.getMessage();
+        return new ResponseCustom("Not completed", false);
     }
 
     public String updateProfilePhoto(String photoId) {
