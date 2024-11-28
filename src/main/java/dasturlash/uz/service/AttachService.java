@@ -11,22 +11,18 @@ import dasturlash.uz.repository.AttachRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,6 +84,24 @@ public class AttachService {
         }
 
         log.warn("File not found: {}", fileName);
+        return null;
+    }
+
+    public String openStreamURL(String fileName) {
+        if (fileName == null) {
+            log.warn("Attempt to create URL for streaming with null fileName");
+            return null;
+        }
+
+        log.debug("Attempting to create URL for streaming for file: {}", fileName);
+
+        if (isExist(fileName)) {
+            String url = attachUrl + "/stream/" + fileName;
+            log.debug("Successfully generated URL for streaming: {}", url);
+            return url;
+        }
+
+        log.warn("File not found for streaming: {}", fileName);
         return null;
     }
 
@@ -236,7 +250,7 @@ public class AttachService {
 
         VideoMediaDTO videoMediaDTO = new VideoMediaDTO();
         videoMediaDTO.setVideoId(attachId);
-        videoMediaDTO.setUrl(openURL(attachId));
+        videoMediaDTO.setUrl(openStreamURL(attachId));
         videoMediaDTO.setDuration(getDurationFromEntity(attachId));
 
         log.debug("Video URL generated successfully for ID: {}", attachId);
@@ -431,5 +445,78 @@ public class AttachService {
         boolean exists = attachRepository.existsById(attachId);
         log.debug("Attach exists: {}", exists);
         return exists;
+    }
+
+    public ResponseEntity<Resource> streamVideo(String attachId, HttpHeaders headers) {
+        log.info("Streaming video for attachId: {}", attachId);
+
+        // Validate attachId
+        if (attachId == null) {
+            log.error("Null attachId provided for streaming");
+            throw new AppBadRequestException("The given id must not be null");
+        }
+
+        try {
+            // Retrieve the attach entity
+            Attach entity = getById(attachId);
+            Path filePath = Paths.get(getPath(entity)).normalize();
+
+            // Create a resource from the file
+            Resource resource = new UrlResource(filePath.toUri());
+
+            // Check if resource exists and is readable
+            if (!resource.exists() || !resource.isReadable()) {
+                log.error("Could not read file: {}", attachId);
+                throw new DataNotFoundException("File not found or not readable");
+            }
+
+            // Get file size
+            long fileSize = resource.contentLength();
+
+            // Prepare range header
+            List<HttpRange> ranges = headers.getRange();
+
+            // Default to full file if no range specified
+            if (ranges.isEmpty()) {
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                        .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileSize))
+                        .body(resource);
+            }
+
+            // Process the first range (most video players send only one range)
+            HttpRange range = ranges.get(0);
+            long start = range.getRangeStart(fileSize);
+            long end = range.getRangeEnd(fileSize);
+            long rangeLength = end - start + 1;
+
+            log.info("Streaming video range: {}-{}/{}", start, end, fileSize);
+
+            // Use Spring's InputStreamResource to support partial content
+            InputStreamResource inputStreamResource = new InputStreamResource(
+                    new BufferedInputStream(new FileInputStream(resource.getFile())) {
+                        {
+                            skip(start);
+                        }
+                    }
+            ) {
+                @Override
+                public long contentLength() {
+                    return rangeLength;
+                }
+            };
+
+            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                    .header(HttpHeaders.CONTENT_RANGE,
+                            String.format("bytes %d-%d/%d", start, end, fileSize))
+                    .header(HttpHeaders.ACCEPT_RANGES, "bytes")
+                    .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(rangeLength))
+                    .body(inputStreamResource);
+
+        } catch (IOException e) {
+            log.error("Error streaming video: {}", attachId, e);
+            throw new AppBadRequestException("Could not stream video: " + attachId);
+        }
     }
 }

@@ -20,10 +20,7 @@ import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.repository.VideoTagRepository;
-import dasturlash.uz.service.AttachService;
-import dasturlash.uz.service.CategoryService;
-import dasturlash.uz.service.ChannelService;
-import dasturlash.uz.service.TagService;
+import dasturlash.uz.service.*;
 import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
@@ -56,7 +51,7 @@ public class VideoService {
     private final CategoryService categoryService;
     private final VideoInfoMapper videoInfoMapper;
     private final TagService tagService;
-    private final VideoTagRepository videoTagRepository;
+    private final VideoTagService videoTagService;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -85,27 +80,17 @@ public class VideoService {
 
         video = videoRepository.save(video);
         log.info("Video created with ID: {}", video.getId());
+
         if (dto.getTags() != null && !dto.getTags().isEmpty()) {
             List<Tag> tags = tagService.findOrCreateTags(dto.getTags());
-            List<VideoTag> videoTags = createVideoTags(video, tags);
-            videoTagRepository.saveAll(videoTags);
+
+            videoTagService.createNewVideoTags(video, tags);
         }
 
         // Build and return response
         VideoCreateResponseDTO response = buildVideoCreateResponse(video);
         log.info("Exiting createVideo with response: {}", response);
         return response;
-    }
-
-    private List<VideoTag> createVideoTags(Video video, List<Tag> tags) {
-        return tags.stream()
-                .map(tag -> {
-                    VideoTag videoTag = new VideoTag();
-                    videoTag.setVideo(video);
-                    videoTag.setTag(tag);
-                    return videoTag;
-                })
-                .collect(Collectors.toList());
     }
 
     private VideoCreateResponseDTO buildVideoCreateResponse(Video video) {
@@ -134,8 +119,7 @@ public class VideoService {
             }
             case SCHEDULED -> {
                 response.setPublic(false);
-                response.setMessage("Video scheduled for " +
-                        video.getScheduledDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm a")));
+                response.setMessage("Video scheduled for " + video.getScheduledDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy, h:mm a")));
                 response.setScheduledDate(video.getScheduledDate());
                 response.setAllowedSharePlatforms(Collections.emptyList());
             }
@@ -188,69 +172,72 @@ public class VideoService {
 
         Video video = getVideoAndCheckOwnership(videoId);
 
-        video.setTitle(dto.getTitle());
-        video.setDescription(dto.getDescription());
+        // Only update title if new title is different
+        if (dto.getTitle() != null && !dto.getTitle().equals(video.getTitle())) {
+            video.setTitle(dto.getTitle());
+        }
 
-        if (dto.getCategoryId() != null) {
+        // Only update description if new description is different
+        if (dto.getDescription() != null && !dto.getDescription().equals(video.getDescription())) {
+            video.setDescription(dto.getDescription());
+        }
+
+        // Only update category if new category is different
+        if (dto.getCategoryId() != null && !dto.getCategoryId().equals(video.getCategoryId())) {
             video.setCategoryId(dto.getCategoryId());
         }
 
-        if (dto.getPlaylistId() != null) {
+        // Only update playlist if new playlist is different
+        if (dto.getPlaylistId() != null && !dto.getPlaylistId().equals(video.getPlaylistId())) {
             video.setPlaylistId(dto.getPlaylistId());
         }
 
-        if (dto.getPreviewAttachId() != null) {
+        // Only update preview attach if new preview is different
+        if (dto.getPreviewAttachId() != null && !dto.getPreviewAttachId().equals(video.getPreviewAttachId())) {
             video.setPreviewAttachId(dto.getPreviewAttachId());
         }
 
-        if (dto.getType() != null) {
+        // Only update type if new type is different
+        if (dto.getType() != null && dto.getType() != video.getType()) {
             video.setType(dto.getType());
         }
 
+        // Handle status and scheduled date
         if (dto.getStatus() != null) {
-            // If video is scheduled, set scheduled date
             log.info("Updating status and dates for video ID: {} with request: {}", videoId, dto);
             updateVideoStatusAndDates(video, dto.getStatus(), dto.getScheduledDate());
         }
 
         if (dto.getTags() != null) {
-            updateVideoTags(video, dto.getTags());
+            // Fetch existing tags from the database
+            List<String> currentTags = videoTagService.getVisibleTagNamesForVideo(video);
+
+            // Convert both lists to sets for comparison
+            Set<String> existingTagSet = new HashSet<>(currentTags);
+            Set<String> incomingTagSet = new HashSet<>(dto.getTags());
+
+            // Check if tags have changed
+            if (!existingTagSet.equals(incomingTagSet)) {
+                if (dto.getTags().isEmpty()) {
+                    // If tags is an empty list, remove all existing tags
+                    videoTagService.updateVideoTags(video, Collections.emptyList());
+                } else {
+                    // If tags are provided, create or find tags and update
+                    List<Tag> tags = tagService.findOrCreateTags(dto.getTags());
+                    videoTagService.updateVideoTags(video, tags);
+                }
+            } else {
+                log.info("Tags are unchanged; skipping tag update process.");
+            }
         }
+
 
         video.setUpdatedDate(LocalDateTime.now());
 
-        VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
+        Video video1 = videoRepository.save(video);
+        VideoUpdateDTO updatedVideo = toVideoUpdateDTO(video1);
         log.info("Video updated with response: {}", updatedVideo);
         return updatedVideo;
-    }
-
-    private void updateVideoTags(Video video, List<String> newTagNames) {
-        // Validate tag count
-        final int MAX_TAGS = 10;
-        if (newTagNames.size() > MAX_TAGS) {
-            throw new AppBadRequestException("Too many tags. Maximum allowed: " + MAX_TAGS);
-        }
-
-        // Remove duplicates and normalize
-        List<String> uniqueTagNames = newTagNames.stream()
-                .map(String::trim)
-                .distinct()
-                .collect(Collectors.toList());
-
-        // Clear existing tags
-        video.getVideoTags().clear();
-
-        // Find or create tags using TagService
-        List<Tag> tags = tagService.findOrCreateTags(uniqueTagNames);
-
-        // Create video tag relationships
-        for (Tag tag : tags) {
-            VideoTag videoTag = new VideoTag();
-            videoTag.setVideo(video);
-            videoTag.setTag(tag);
-
-            video.getVideoTags().add(videoTag);
-        }
     }
 
     private void updateVideoStatusAndDates(Video video, ContentStatus status, LocalDateTime scheduledDate) {
@@ -453,14 +440,11 @@ public class VideoService {
         videoUpdateDTO.setType(video.getType());
         videoUpdateDTO.setStatus(video.getStatus());
 
-        // setting video tags
-        List<String> tagNames = video.getVideoTags().stream()
-                .map(videoTag -> videoTag.getTag().getName())
-                .collect(Collectors.toList());
-        videoUpdateDTO.setTags(tagNames);
+        // Get the visible tag names using the VideoTagService
+        List<String> tags = videoTagService.getVisibleTagNamesForVideo(video);
+        videoUpdateDTO.setTags(tags);
 
         videoUpdateDTO.setScheduledDate(video.getScheduledDate());
-        videoUpdateDTO.setUpdatedDate(video.getUpdatedDate());
 
         return videoUpdateDTO;
     }
@@ -468,11 +452,10 @@ public class VideoService {
     private Video getVideoEntityById(String videoId) {
         log.info("Fetching video with ID: {}", videoId);
 
-        Video video = videoRepository.findById(videoId)
-                .orElseThrow(() -> {
-                    log.error("Video not found with ID: {}", videoId);
-                    return new DataNotFoundException("Video not found");
-                });
+        Video video = videoRepository.findById(videoId).orElseThrow(() -> {
+            log.error("Video not found with ID: {}", videoId);
+            return new DataNotFoundException("Video not found");
+        });
 
         log.info("Successfully fetched video: {}", video);
         return video;
@@ -488,9 +471,7 @@ public class VideoService {
         log.debug("Fetched {} videos for category ID: {}", projections.getContent().size(), categoryId);
 
         // Map projections to DTOs
-        List<VideoShortInfoDTO> response = projections.stream()
-                .map(videoInfoMapper::toVideShortInfoDTO)
-                .toList();
+        List<VideoShortInfoDTO> response = projections.stream().map(videoInfoMapper::toVideShortInfoDTO).toList();
 
         log.info("Mapped {} videos to VideoShortInfoDTO for category ID: {}", response.size(), categoryId);
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
@@ -506,9 +487,7 @@ public class VideoService {
         log.debug("Fetched {} videos matching title: '{}'", projections.getContent().size(), title);
 
         // Map projections to DTOs
-        List<VideoShortInfoDTO> response = projections.stream()
-                .map(videoInfoMapper::toVideShortInfoDTO)
-                .toList();
+        List<VideoShortInfoDTO> response = projections.stream().map(videoInfoMapper::toVideShortInfoDTO).toList();
 
         log.info("Mapped {} videos to VideoShortInfoDTO for title: '{}'", response.size(), title);
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
@@ -523,9 +502,7 @@ public class VideoService {
         Page<VideoShortInfoProjection> videoPage = videoRepository.findVideosByTagName(tagName, pageable);
 
         // Convert to DTO
-        List<VideoShortInfoDTO> videoDTOs = videoPage.getContent().stream()
-                .map(videoInfoMapper::toVideShortInfoDTO)
-                .collect(Collectors.toList());
+        List<VideoShortInfoDTO> videoDTOs = videoPage.getContent().stream().map(videoInfoMapper::toVideShortInfoDTO).collect(Collectors.toList());
 
         // Return as PageImpl
         log.warn("Returning videos based on tag: '{}'", tagName);
@@ -542,9 +519,7 @@ public class VideoService {
         log.debug("Fetched {} videos for channel ID: {}", videos.getContent().size(), channelId);
 
         // Map projections to DTOs
-        List<VideoPlayListInfoDTO> response = videos.stream()
-                .map(videoInfoMapper::videoPlayListInfoDTODTO)
-                .toList();
+        List<VideoPlayListInfoDTO> response = videos.stream().map(videoInfoMapper::videoPlayListInfoDTODTO).toList();
 
         log.info("Mapped {} videos to VideoPlayListInfoDTO for channel ID: {}", response.size(), channelId);
         return new PageImpl<>(response, pageRequest, videos.getTotalElements());
@@ -560,9 +535,7 @@ public class VideoService {
         log.debug("Fetched {} videos for admin list.", videos.getContent().size());
 
         // Map projections to DTOs
-        List<AdminVideoInfoDTO> response = videos.stream()
-                .map(videoInfoMapper::toAdminVideoInfoDTO)
-                .toList();
+        List<AdminVideoInfoDTO> response = videos.stream().map(videoInfoMapper::toAdminVideoInfoDTO).toList();
 
         log.info("Mapped {} videos to AdminVideoInfoDTO.", response.size());
         return new PageImpl<>(response, pageRequest, videos.getTotalElements());
@@ -580,3 +553,6 @@ public class VideoService {
         return videoRepository.findVideoInfoById(playlistId);
     }
 }
+
+
+
