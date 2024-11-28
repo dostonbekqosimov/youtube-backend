@@ -37,3 +37,16 @@ Authorization: token
 DELETE http://localhost:8090/profile/delete/<playlist-id>
 Content-Type: application/json
 Authorization: Bearer token
+
+### Get Pagination for Admin
+GET http://localhost:8090/playlist/get-pagination-admin?page=<>&size=<>
+Authorization: Bearer token
+
+### Get Pagination for User
+GET http://localhost:8090/playlist/get-pagination-user?page<>&size=<>
+
+### Get Channel Playlists
+GET http://localhost:8090/playlist/get-channel-playlist/<channel_id>
+
+### Get Playlist Basic Info
+GET http://localhost:8090/playlist/get-playlist-basic-info/<playlist_id>
