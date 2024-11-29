@@ -4,6 +4,7 @@ import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
+import dasturlash.uz.mapper.VideoShareProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -105,8 +106,15 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
     @Query("update Video set visible = :visible where id = :videoId")
     Integer changeVisibility(@Param("videoId") String videoId, @Param("visible") Boolean visible);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Video SET viewCount = GREATEST(COALESCE(viewCount, 0) + 1, 0) WHERE id = :videoId")
-    void increaseViewCount(String videoId);
+    @Query("SELECT " +
+            "v.id AS id, " +
+            "v.title AS title, " +
+            "c.name AS channelName, " +
+            "v.sharedCount AS sharedCount, " +
+            "v.previewAttachId AS previewAttachId, " +
+            "v.attachId AS attachId " +
+            "FROM Video v " +
+            "LEFT JOIN v.channel c " +
+            "WHERE v.id = :videoId")
+    Optional<VideoShareProjection> findVideoShareInfoById(@Param("videoId") String videoId);
 }

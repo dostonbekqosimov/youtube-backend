@@ -6,14 +6,19 @@ import dasturlash.uz.dto.response.PlaylistInfoDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.dto.response.video.AdminVideoInfoDTO;
 import dasturlash.uz.dto.response.video.VideoPlayListInfoDTO;
+import dasturlash.uz.dto.response.video.VideoShareDto;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import dasturlash.uz.mapper.AdminVideoProjection;
+import dasturlash.uz.mapper.VideoShareProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.service.AttachService;
 import dasturlash.uz.service.ChannelService;
+import dasturlash.uz.service.video.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,6 +28,9 @@ public class VideoInfoMapper {
 
     private final AttachService attachService;
     private final ChannelService channelService;
+    @Autowired
+    @Lazy
+    private VideoService videoService;
 
     public VideoShortInfoDTO toVideShortInfoDTO(VideoShortInfoProjection projection) {
         if (projection == null) {
@@ -125,5 +133,23 @@ public class VideoInfoMapper {
             logger.error("Error mapping AdminVideoInfoDTO for projection: {}", projection, e);
             throw e;
         }
+    }
+
+    public VideoShareDto toVideoShareDto(VideoShareProjection projection) {
+        if (projection == null) {
+            return null;
+        }
+
+        VideoShareDto dto = new VideoShareDto();
+        dto.setVideoId(projection.getId());
+        dto.setVideoTitle(projection.getTitle());
+        dto.setChannelName(projection.getChannelName());
+        dto.setSharedCount(projection.getSharedCount());
+
+        // Construct URLs using your attachment service
+        dto.setPreviewUrl(attachService.getUrlOfMedia(projection.getPreviewAttachId()));
+        dto.setVideoUrl(videoService.generateVideoWatchUrl(projection.getId()));
+
+        return dto;
     }
 }
