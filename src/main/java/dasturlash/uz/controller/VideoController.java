@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -175,9 +176,10 @@ public class VideoController {
     })
     public ResponseEntity<VideoFullInfoDTO> watchVideo(
             @Parameter(description = "Video ID", required = true, example = "video123")
-            @RequestParam("v") String videoId) {
+            @RequestParam("v") String videoId,
+            HttpServletRequest request) {
         log.info("Entering watchVideo with videoId: {}", videoId);
-        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.getVideoById(videoId));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.getVideoById(videoId, request));
         log.info("Exiting watchVideo with response: OK");
         return response;
     }
@@ -295,5 +297,14 @@ public class VideoController {
         String result = videoService.deleteVideoById(videoId);
         log.info("Exiting deleteVideoById with result: {}", result);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/{videoId}/share")
+    public ResponseEntity<VideoShareDto> shareVideo(@PathVariable String videoId, HttpServletRequest request) {
+        // Increment the shared count
+        VideoShareDto response = videoService.shareVideoById(videoId, request);
+
+
+        return ResponseEntity.ok(response);
     }
 }

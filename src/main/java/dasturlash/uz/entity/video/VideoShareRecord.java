@@ -2,16 +2,23 @@ package dasturlash.uz.entity.video;
 
 import dasturlash.uz.entity.Profile;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
-@Table(name = "video_view_record")
-public class VideoViewRecord {
+@Table(name = "video_share_record")
+public class VideoShareRecord {
+
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,7 +30,6 @@ public class VideoViewRecord {
     @ManyToOne
     @JoinColumn(name = "video_id", updatable = false, insertable = false)
     private Video video;
-
 
     @Column(name = "profile_id")
     private Long profileId;
@@ -37,6 +43,7 @@ public class VideoViewRecord {
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
+    }
 
 
-}
+
