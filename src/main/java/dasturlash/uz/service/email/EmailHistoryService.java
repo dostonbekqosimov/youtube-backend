@@ -9,9 +9,12 @@ import dasturlash.uz.enums.EmailStatus;
 import dasturlash.uz.mapper.EmailHistoryInfoMapper;
 import dasturlash.uz.repository.EmailHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,5 +61,17 @@ public class EmailHistoryService {
         responseCustom.setMessage("Code is incorrect");
         responseCustom.setSuccess(false);
         return responseCustom;
+    }
+
+    public List<EmailHistory> getEmailHistoryByEmail(String email) {
+        return emailHistoryRepository.findByEmail(email);
+    }
+
+    public List<EmailHistory> getEmailHistoryByDate(LocalDateTime date) {
+        return null;
+    }
+
+    public Page<EmailHistory> getEmailHistoryWithPagination(Pageable pageable) {
+        return emailHistoryRepository.findAll(pageable);
     }
 }
