@@ -301,9 +301,8 @@ public class VideoController {
 
     @PostMapping("/{videoId}/share")
     public ResponseEntity<VideoShareDto> shareVideo(@PathVariable String videoId, HttpServletRequest request) {
-        // Increment the shared count
-        VideoShareDto response = videoService.shareVideoById(videoId, request);
 
+        VideoShareDto response = videoService.shareVideoById(videoId, request);
 
         return ResponseEntity.ok(response);
     }

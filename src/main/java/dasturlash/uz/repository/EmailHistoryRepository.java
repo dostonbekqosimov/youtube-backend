@@ -15,8 +15,6 @@ import java.util.Optional;
 
 @Repository
 public interface EmailHistoryRepository extends JpaRepository<EmailHistory, String> {
-    List<EmailHistory> findByProfileIdOrderBySentAtDesc(Long profileId);
-    List<EmailHistory> findByToAccountOrderBySentAtDesc(String email);
 
     List<EmailHistory> findByStatus(EmailStatus status);
 

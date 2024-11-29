@@ -18,6 +18,7 @@ import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
+import dasturlash.uz.mapper.VideoShareProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.service.*;
@@ -62,7 +63,7 @@ public class VideoService {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setCategoryId(dto.getCategoryId());
-        video.setPlaylistId(dto.getPlaylistId());
+//        video.setPlaylistId(dto.getPlaylistId());
 
         // video bilan previewlar db da attach table da bo'lishi kerak
         // bu bo'ladi albatta lekin extra checking
@@ -112,7 +113,7 @@ public class VideoService {
         VideoCreateResponseDTO response = new VideoCreateResponseDTO();
         response.setId(video.getId());
         response.setTitle(video.getTitle());
-        response.setVideoLink(domain + "/api/videos/watch?v=" + video.getId());
+        response.setVideoLink(generateVideoWatchUrl(video.getId()));
 
         switch (video.getStatus()) {
             case PUBLIC -> {
@@ -214,8 +215,9 @@ public class VideoService {
         }
 
         // Only update playlist if new playlist is different
-        if (dto.getPlaylistId() != null && !dto.getPlaylistId().equals(video.getPlaylistId())) {
-            video.setPlaylistId(dto.getPlaylistId());
+        if (dto.getPlaylistIds() != null && !dto.getPlaylistIds().equals(video.getPlaylistId())) {
+//            video.setPlaylistId(dto.getPlaylistId());
+            System.out.println("Playlist should be updated...");
         }
 
         // Only update preview attach if new preview is different
@@ -461,7 +463,7 @@ public class VideoService {
         videoUpdateDTO.setTitle(video.getTitle());
         videoUpdateDTO.setDescription(video.getDescription());
         videoUpdateDTO.setCategoryId(video.getCategoryId());
-        videoUpdateDTO.setPlaylistId(video.getPlaylistId());
+        videoUpdateDTO.setPlaylistIds(Collections.emptyList());
         videoUpdateDTO.setPreviewAttachId(video.getPreviewAttachId());
         videoUpdateDTO.setType(video.getType());
         videoUpdateDTO.setStatus(video.getStatus());
@@ -617,6 +619,10 @@ public class VideoService {
 
         String ipAddress = getUserIP(request);
 
+        VideoShareProjection video = videoRepository.findVideoShareInfoById(videoId)
+                .orElseThrow(() -> new DataNotFoundException("Video not found"));
+
+
         Long currentUserId = null;
         try {
             currentUserId = getCurrentUserId();
@@ -628,7 +634,12 @@ public class VideoService {
 
         videoRecordService.increaseShareCount(videoId, ipAddress, currentUserId);
 
-        return null;
+        return videoInfoMapper.toVideoShareDto(video);
+
+    }
+
+    public String generateVideoWatchUrl(String videoId) {
+        return domain + "/api/videos/watch?v=" + videoId;
     }
 }
 

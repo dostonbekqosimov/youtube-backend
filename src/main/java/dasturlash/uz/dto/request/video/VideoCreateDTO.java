@@ -22,7 +22,7 @@ public class VideoCreateDTO {
     private Long categoryId;
 
     // playlist can be null
-    private String playlistId;
+    private List<String> playlistId;
 
     @NotBlank
     private String attachId;
