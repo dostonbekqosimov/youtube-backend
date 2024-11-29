@@ -1,11 +1,8 @@
 package dasturlash.uz.dto.request.video;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import dasturlash.uz.enums.ContentStatus;
 import dasturlash.uz.enums.VideoType;
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -24,7 +21,7 @@ public class VideoUpdateDTO {
     private String description;
 
     private Long categoryId;
-    private String playlistId;
+    private List<String> playlistIds;
     private String previewAttachId;
     private VideoType type;
     private ContentStatus status;

@@ -63,7 +63,7 @@ public class VideoService {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setCategoryId(dto.getCategoryId());
-        video.setPlaylistId(dto.getPlaylistId());
+//        video.setPlaylistId(dto.getPlaylistId());
 
         // video bilan previewlar db da attach table da bo'lishi kerak
         // bu bo'ladi albatta lekin extra checking
@@ -215,8 +215,9 @@ public class VideoService {
         }
 
         // Only update playlist if new playlist is different
-        if (dto.getPlaylistId() != null && !dto.getPlaylistId().equals(video.getPlaylistId())) {
-            video.setPlaylistId(dto.getPlaylistId());
+        if (dto.getPlaylistIds() != null && !dto.getPlaylistIds().equals(video.getPlaylistId())) {
+//            video.setPlaylistId(dto.getPlaylistId());
+            System.out.println("Playlist should be updated...");
         }
 
         // Only update preview attach if new preview is different
@@ -462,7 +463,7 @@ public class VideoService {
         videoUpdateDTO.setTitle(video.getTitle());
         videoUpdateDTO.setDescription(video.getDescription());
         videoUpdateDTO.setCategoryId(video.getCategoryId());
-        videoUpdateDTO.setPlaylistId(video.getPlaylistId());
+        videoUpdateDTO.setPlaylistIds(Collections.emptyList());
         videoUpdateDTO.setPreviewAttachId(video.getPreviewAttachId());
         videoUpdateDTO.setType(video.getType());
         videoUpdateDTO.setStatus(video.getStatus());
