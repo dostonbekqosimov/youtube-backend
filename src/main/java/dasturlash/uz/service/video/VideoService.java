@@ -20,13 +20,12 @@ import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
-import dasturlash.uz.repository.VideoTagRepository;
 import dasturlash.uz.service.*;
 import dasturlash.uz.util.VideoInfoMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -54,6 +53,7 @@ public class VideoService {
     private final VideoInfoMapper videoInfoMapper;
     private final TagService tagService;
     private final VideoTagService videoTagService;
+    private final VideoViewService videoViewService;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -143,9 +143,12 @@ public class VideoService {
         return response;
     }
 
-    public VideoFullInfoDTO getVideoById(String videoId) {
+    public VideoFullInfoDTO getVideoById(String videoId, HttpServletRequest request) {
+
+        String ipAddress = getUserIP(request);
         // Fetch the video entity
         Video video = getVideoEntityById(videoId);
+
 
         // If the video is visible or has PRIVATE status
         if (video.getVisible() || video.getStatus() == ContentStatus.PRIVATE) {
@@ -157,13 +160,14 @@ public class VideoService {
                 Long currentUserId = getCurrentUserId();
 
                 // Allow only if the current user is the owner or an admin
-                if (!currentUserId.equals(channel.getProfileId()) && !isAdmin()) {
+                if (!currentUserId.equals(channel.getProfileId()) || !isAdmin()) {
                     throw new ForbiddenException("Access to this video is restricted.");
                 }
             }
 
             // Increment view count and save changes
-            video.setViewCount(video.getViewCount() + 1);
+            videoViewService.addViewRecord(videoId, ipAddress);
+
             videoRepository.save(video);
 
             // Convert and return the video details
@@ -592,6 +596,14 @@ public class VideoService {
         }
 
 
+    }
+
+    public static String getUserIP(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
     }
 }
 

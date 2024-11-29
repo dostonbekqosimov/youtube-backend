@@ -104,4 +104,9 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
     @Transactional
     @Query("update Video set visible = :visible where id = :videoId")
     Integer changeVisibility(@Param("videoId") String videoId, @Param("visible") Boolean visible);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Video SET viewCount = GREATEST(COALESCE(viewCount, 0) + 1, 0) WHERE id = :videoId")
+    void increaseViewCount(String videoId);
 }
