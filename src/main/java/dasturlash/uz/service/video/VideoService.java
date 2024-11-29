@@ -53,7 +53,7 @@ public class VideoService {
     private final VideoInfoMapper videoInfoMapper;
     private final TagService tagService;
     private final VideoTagService videoTagService;
-    private final VideoViewService videoViewService;
+    private final VideoRecordService videoRecordService;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -146,7 +146,14 @@ public class VideoService {
     public VideoFullInfoDTO getVideoById(String videoId, HttpServletRequest request) {
 
         String ipAddress = getUserIP(request);
-        // Fetch the video entity
+
+        Long currentUserId = null;
+        try {
+            currentUserId = getCurrentUserId();
+        } catch (Exception e) {
+            // If authentication fails, currentUserId will remain null
+            log.warn("No authenticated user found when getting video");
+        }
         Video video = getVideoEntityById(videoId);
 
 
@@ -157,7 +164,7 @@ public class VideoService {
             if (video.getStatus() == ContentStatus.PRIVATE) {
                 // get only profile id here no need for whole channel [...]
                 Channel channel = channelService.getById(video.getChannelId());
-                Long currentUserId = getCurrentUserId();
+
 
                 // Allow only if the current user is the owner or an admin
                 if (!currentUserId.equals(channel.getProfileId()) || !isAdmin()) {
@@ -166,7 +173,7 @@ public class VideoService {
             }
 
             // Increment view count and save changes
-            videoViewService.addViewRecord(videoId, ipAddress);
+            videoRecordService.addViewRecord(videoId, ipAddress, currentUserId);
 
             videoRepository.save(video);
 
@@ -604,6 +611,24 @@ public class VideoService {
             ipAddress = request.getRemoteAddr();
         }
         return ipAddress;
+    }
+
+    public VideoShareDto shareVideoById(String videoId, HttpServletRequest request) {
+
+        String ipAddress = getUserIP(request);
+
+        Long currentUserId = null;
+        try {
+            currentUserId = getCurrentUserId();
+        } catch (Exception e) {
+            // If authentication fails, currentUserId will remain null
+            log.warn("No authenticated user found when sharing video");
+        }
+
+
+        videoRecordService.increaseShareCount(videoId, ipAddress, currentUserId);
+
+        return null;
     }
 }
 
