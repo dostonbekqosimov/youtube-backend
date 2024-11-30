@@ -583,7 +583,6 @@ public class VideoService {
 
     @Transactional
     public String deleteVideoById(String videoId) {
-
         if (videoId == null) {
             throw new AppBadRequestException("VideoId cannot be null or empty");
         }
