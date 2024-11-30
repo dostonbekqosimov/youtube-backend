@@ -22,6 +22,7 @@ import dasturlash.uz.mapper.VideoShareProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.service.*;
+import dasturlash.uz.util.UserInfoUtil;
 import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -36,8 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
-import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
+import static dasturlash.uz.security.SpringSecurityUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +54,7 @@ public class VideoService {
     private final VideoInfoMapper videoInfoMapper;
     private final TagService tagService;
     private final VideoTagService videoTagService;
+    private final VideoWatchedService videoWatchedService;
     private final VideoRecordService videoRecordService;
 
     public String hello(){
@@ -160,6 +161,7 @@ public class VideoService {
             log.warn("No authenticated user found when getting video");
         }
         Video video = getVideoEntityById(videoId);
+        UserInfoUtil userInfoUtil = currentUserInfo(request);
 
 
         // If the video is visible or has PRIVATE status
@@ -184,6 +186,9 @@ public class VideoService {
 
             // Convert and return the video details
             VideoFullInfoDTO videoFullInfoDTO = toVideoFullInfoDTO(video);
+
+
+            videoWatchedService.addHistoryWatch(videoId,userInfoUtil, request);
             log.info("Returning video details for ID: {}", videoId);
             return videoFullInfoDTO;
 
@@ -587,6 +592,7 @@ public class VideoService {
 
     @Transactional
     public String deleteVideoById(String videoId) {
+
         if (videoId == null) {
             throw new AppBadRequestException("VideoId cannot be null or empty");
         }
