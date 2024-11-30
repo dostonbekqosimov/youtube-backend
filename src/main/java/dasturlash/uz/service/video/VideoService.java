@@ -20,13 +20,13 @@ import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
-import dasturlash.uz.repository.VideoTagRepository;
 import dasturlash.uz.service.*;
+import dasturlash.uz.util.UserInfoUtil;
 import dasturlash.uz.util.VideoInfoMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
+import static dasturlash.uz.security.SpringSecurityUtil.currentUserInfo;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +55,7 @@ public class VideoService {
     private final VideoInfoMapper videoInfoMapper;
     private final TagService tagService;
     private final VideoTagService videoTagService;
+    private final VideoWatchedService videoWatchedService;
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -143,9 +145,10 @@ public class VideoService {
         return response;
     }
 
-    public VideoFullInfoDTO getVideoById(String videoId) {
+    public VideoFullInfoDTO getVideoById(String videoId, HttpServletRequest request) {
         // Fetch the video entity
         Video video = getVideoEntityById(videoId);
+        UserInfoUtil userInfoUtil = currentUserInfo(request);
 
         // If the video is visible or has PRIVATE status
         if (video.getVisible() || video.getStatus() == ContentStatus.PRIVATE) {
@@ -168,6 +171,9 @@ public class VideoService {
 
             // Convert and return the video details
             VideoFullInfoDTO videoFullInfoDTO = toVideoFullInfoDTO(video);
+
+
+            videoWatchedService.addHistoryWatch(videoId,userInfoUtil, request);
             log.info("Returning video details for ID: {}", videoId);
             return videoFullInfoDTO;
 
