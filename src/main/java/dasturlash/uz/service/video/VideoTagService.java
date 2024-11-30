@@ -1,4 +1,4 @@
-package dasturlash.uz.service;
+package dasturlash.uz.service.video;
 
 import dasturlash.uz.entity.Tag;
 import dasturlash.uz.entity.VideoTag;

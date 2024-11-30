@@ -87,3 +87,10 @@ Authorization: Bearer token
 {
   "previewAttachId": "<new preview attach id>"
 }
+
+### Share video
+POST http://localhost:8090/api/videos/<video_id>/share
+Content-Type: application/json
+Authorization: Bearer token
+
+
