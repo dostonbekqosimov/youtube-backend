@@ -31,6 +31,6 @@ public interface ChannelRepository extends CrudRepository<Channel, String> {
     @Query("select c.id from Channel c where c.profileId = ?1")
     String findChannelIdByProfileId(Long profileId);
 
-    @Query("select c.profileId from Channel as c where c.id = :channeldId")
+    @Query("select c.profileId from Channel as c where c.id = :channelId")
     Long getChannelOwnerId(String channelId);
 }

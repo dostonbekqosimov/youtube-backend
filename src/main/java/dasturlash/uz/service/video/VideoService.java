@@ -56,6 +56,10 @@ public class VideoService {
     private final VideoTagService videoTagService;
     private final VideoRecordService videoRecordService;
 
+    public String hello(){
+        return "hello";
+    }
+
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
         log.info("Entering createVideo with request: {}", dto);
