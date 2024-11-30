@@ -16,8 +16,8 @@ public class VideoWatched {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "profile_id", nullable = false)
-    private Integer profileId;
+    @Column(name = "profile_id")
+    private Long profileId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", insertable = false, updatable = false)
     private Profile profile;
@@ -27,6 +27,12 @@ public class VideoWatched {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "video_id", insertable = false, updatable = false)
     private Video video;
+
+    @Column(name = "ip_address")
+    private String ipAddress;
+
+    @Column(name = "user_browser")
+    private String userBrowser;
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
