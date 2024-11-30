@@ -164,11 +164,11 @@ public class VideoService {
             // Check if the video is PRIVATE and ensure access is limited to owner or admin
             if (video.getStatus() == ContentStatus.PRIVATE) {
                 // get only profile id here no need for whole channel [...]
-                Channel channel = channelService.getById(video.getChannelId());
+                Long videoOwnerId = channelService.getChannelOwnerId(video.getChannelId());
 
 
                 // Allow only if the current user is the owner or an admin
-                if (!currentUserId.equals(channel.getProfileId()) || !isAdmin()) {
+                if (!currentUserId.equals(videoOwnerId) || !isAdmin()) {
                     throw new ForbiddenException("Access to this video is restricted.");
                 }
             }
@@ -373,8 +373,8 @@ public class VideoService {
 
         Video video = getVideoEntityById(videoId);
 
-        Channel channel = channelService.getById(video.getChannelId());
-        if (!channel.getProfileId().equals(getCurrentUserId())) {
+        Long videoOwnerId = channelService.getChannelOwnerId(video.getChannelId());
+        if (!videoOwnerId.equals(getCurrentUserId())) {
             log.error("User does not have permission to update video ID: {}", videoId);
             throw new AppBadRequestException("You don't have permission to update this video");
         }
