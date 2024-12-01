@@ -4,6 +4,8 @@ import dasturlash.uz.entity.video.Video;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "comments")
 @Data
@@ -14,7 +16,6 @@ public class Comment {
     private String id;
 
     private String content;
-
 
     @Column(name = "profile_id")
     private Long profileId;
@@ -42,4 +43,12 @@ public class Comment {
 
     @Column(name = "dislike_count")
     private Integer dislikeCount;
+
+    private Boolean visible;
+
+    private LocalDateTime createdDate;
+
+    private LocalDateTime updatedDate;
+
+
 }
