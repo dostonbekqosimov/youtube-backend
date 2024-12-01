@@ -22,6 +22,7 @@ import dasturlash.uz.mapper.VideoShareProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.service.*;
+import dasturlash.uz.util.UserInfoUtil;
 import dasturlash.uz.util.VideoInfoMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserRole;
+import static dasturlash.uz.security.SpringSecurityUtil.currentUserInfo;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +48,7 @@ public class VideoService {
 
     @Value("${app.domain}")
     private String domain;
-
+    private final VideoWatchedService videoWatchedService;
     private final VideoRepository videoRepository;
     private final ChannelService channelService;
     private final AttachService attachService;
@@ -149,8 +151,8 @@ public class VideoService {
     }
 
     public VideoFullInfoDTO getVideoById(String videoId, HttpServletRequest request) {
-
-        String ipAddress = getUserIP(request);
+        UserInfoUtil userInfoUtil1 = new UserInfoUtil();
+        String ipAddress = userInfoUtil1.getIpAddress();
 
         Long currentUserId = null;
         try {
@@ -160,7 +162,7 @@ public class VideoService {
             log.warn("No authenticated user found when getting video");
         }
         Video video = getVideoEntityById(videoId);
-
+        UserInfoUtil userInfoUtil = currentUserInfo(request);
 
         // If the video is visible or has PRIVATE status
         if (video.getVisible() || video.getStatus() == ContentStatus.PRIVATE) {
@@ -184,6 +186,9 @@ public class VideoService {
 
             // Convert and return the video details
             VideoFullInfoDTO videoFullInfoDTO = toVideoFullInfoDTO(video);
+
+
+            videoWatchedService.addHistoryWatch(videoId,userInfoUtil, request);
             log.info("Returning video details for ID: {}", videoId);
             return videoFullInfoDTO;
 
