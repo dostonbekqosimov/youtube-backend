@@ -40,7 +40,7 @@ public class VideoWatchedService {
     //Shu user shu videoni korganligini va qachon korganligini tekshirish
     public boolean checkTime(String videoId, UserInfoUtil user) {
         VideoWatched watchedByVideoId = getWatchedByVideoId(videoId, user);
-        LocalDateTime now = LocalDateTime.now().minusMinutes(2);
+        LocalDateTime now = LocalDateTime.now().minusMinutes(1);
 
         if (watchedByVideoId != null) {
             if (watchedByVideoId.getCreatedDate().isAfter(now) &&
@@ -51,6 +51,7 @@ public class VideoWatchedService {
                 return false;
             }
         }
+        if (watchedByVideoId != null) {repository.delete(watchedByVideoId);}
         return true;
     }
     
