@@ -179,7 +179,7 @@ public class VideoController {
             @RequestParam("v") String videoId,
             HttpServletRequest request) {
         log.info("Entering watchVideo with videoId: {}", videoId);
-        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.getVideoById(videoId,request));
+        ResponseEntity<VideoFullInfoDTO> response = ResponseEntity.ok(videoService.getVideoById(videoId, request));
         log.info("Exiting watchVideo with response: OK");
         return response;
     }
@@ -297,5 +297,13 @@ public class VideoController {
         String result = videoService.deleteVideoById(videoId);
         log.info("Exiting deleteVideoById with result: {}", result);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/{videoId}/share")
+    public ResponseEntity<VideoShareDto> shareVideo(@PathVariable String videoId, HttpServletRequest request) {
+
+        VideoShareDto response = videoService.shareVideoById(videoId, request);
+
+        return ResponseEntity.ok(response);
     }
 }

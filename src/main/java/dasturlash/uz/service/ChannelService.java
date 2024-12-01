@@ -302,4 +302,11 @@ public class ChannelService {
     private String makeShareLink(String handle) {
         return domain + "/api/channels/handle/" + handle;
     }
+
+    public Long getChannelOwnerId(String channelId) {
+        if (channelId == null) {
+            return null;
+        }
+        return channelRepository.getChannelOwnerId(channelId);
+    }
 }

@@ -18,6 +18,7 @@ import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
 import dasturlash.uz.mapper.AdminVideoProjection;
 import dasturlash.uz.mapper.VideoInfoInPlaylist;
+import dasturlash.uz.mapper.VideoShareProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.service.*;
@@ -47,7 +48,7 @@ public class VideoService {
 
     @Value("${app.domain}")
     private String domain;
-
+    private final VideoWatchedService videoWatchedService;
     private final VideoRepository videoRepository;
     private final ChannelService channelService;
     private final AttachService attachService;
@@ -55,7 +56,11 @@ public class VideoService {
     private final VideoInfoMapper videoInfoMapper;
     private final TagService tagService;
     private final VideoTagService videoTagService;
-    private final VideoWatchedService videoWatchedService;
+    private final VideoRecordService videoRecordService;
+
+    public String hello(){
+        return "hello";
+    }
 
 
     public VideoCreateResponseDTO createVideo(VideoCreateDTO dto) {
@@ -64,7 +69,7 @@ public class VideoService {
         Video video = new Video();
         video.setTitle(dto.getTitle());
         video.setCategoryId(dto.getCategoryId());
-        video.setPlaylistId(dto.getPlaylistId());
+//        video.setPlaylistId(dto.getPlaylistId());
 
         // video bilan previewlar db da attach table da bo'lishi kerak
         // bu bo'ladi albatta lekin extra checking
@@ -114,7 +119,7 @@ public class VideoService {
         VideoCreateResponseDTO response = new VideoCreateResponseDTO();
         response.setId(video.getId());
         response.setTitle(video.getTitle());
-        response.setVideoLink(domain + "/api/videos/watch?v=" + video.getId());
+        response.setVideoLink(generateVideoWatchUrl(video.getId()));
 
         switch (video.getStatus()) {
             case PUBLIC -> {
@@ -146,7 +151,16 @@ public class VideoService {
     }
 
     public VideoFullInfoDTO getVideoById(String videoId, HttpServletRequest request) {
-        // Fetch the video entity
+        UserInfoUtil userInfoUtil1 = new UserInfoUtil();
+        String ipAddress = userInfoUtil1.getIpAddress();
+
+        Long currentUserId = null;
+        try {
+            currentUserId = getCurrentUserId();
+        } catch (Exception e) {
+            // If authentication fails, currentUserId will remain null
+            log.warn("No authenticated user found when getting video");
+        }
         Video video = getVideoEntityById(videoId);
         UserInfoUtil userInfoUtil = currentUserInfo(request);
 
@@ -156,17 +170,18 @@ public class VideoService {
             // Check if the video is PRIVATE and ensure access is limited to owner or admin
             if (video.getStatus() == ContentStatus.PRIVATE) {
                 // get only profile id here no need for whole channel [...]
-                Channel channel = channelService.getById(video.getChannelId());
-                Long currentUserId = getCurrentUserId();
+                Long videoOwnerId = channelService.getChannelOwnerId(video.getChannelId());
+
 
                 // Allow only if the current user is the owner or an admin
-                if (!currentUserId.equals(channel.getProfileId()) && !isAdmin()) {
+                if (!currentUserId.equals(videoOwnerId) || !isAdmin()) {
                     throw new ForbiddenException("Access to this video is restricted.");
                 }
             }
 
             // Increment view count and save changes
-            video.setViewCount(video.getViewCount() + 1);
+            videoRecordService.addViewRecord(videoId, ipAddress, currentUserId);
+
             videoRepository.save(video);
 
             // Convert and return the video details
@@ -209,8 +224,9 @@ public class VideoService {
         }
 
         // Only update playlist if new playlist is different
-        if (dto.getPlaylistId() != null && !dto.getPlaylistId().equals(video.getPlaylistId())) {
-            video.setPlaylistId(dto.getPlaylistId());
+        if (dto.getPlaylistIds() != null && !dto.getPlaylistIds().equals(video.getPlaylistId())) {
+//            video.setPlaylistId(dto.getPlaylistId());
+            System.out.println("Playlist should be updated...");
         }
 
         // Only update preview attach if new preview is different
@@ -366,8 +382,8 @@ public class VideoService {
 
         Video video = getVideoEntityById(videoId);
 
-        Channel channel = channelService.getById(video.getChannelId());
-        if (!channel.getProfileId().equals(getCurrentUserId())) {
+        Long videoOwnerId = channelService.getChannelOwnerId(video.getChannelId());
+        if (!videoOwnerId.equals(getCurrentUserId())) {
             log.error("User does not have permission to update video ID: {}", videoId);
             throw new AppBadRequestException("You don't have permission to update this video");
         }
@@ -456,7 +472,7 @@ public class VideoService {
         videoUpdateDTO.setTitle(video.getTitle());
         videoUpdateDTO.setDescription(video.getDescription());
         videoUpdateDTO.setCategoryId(video.getCategoryId());
-        videoUpdateDTO.setPlaylistId(video.getPlaylistId());
+        videoUpdateDTO.setPlaylistIds(Collections.emptyList());
         videoUpdateDTO.setPreviewAttachId(video.getPreviewAttachId());
         videoUpdateDTO.setType(video.getType());
         videoUpdateDTO.setStatus(video.getStatus());
@@ -576,7 +592,6 @@ public class VideoService {
 
     @Transactional
     public String deleteVideoById(String videoId) {
-
         if (videoId == null) {
             throw new AppBadRequestException("VideoId cannot be null or empty");
         }
@@ -598,6 +613,41 @@ public class VideoService {
         }
 
 
+    }
+
+    public static String getUserIP(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
+    }
+
+    public VideoShareDto shareVideoById(String videoId, HttpServletRequest request) {
+
+        String ipAddress = getUserIP(request);
+
+        VideoShareProjection video = videoRepository.findVideoShareInfoById(videoId)
+                .orElseThrow(() -> new DataNotFoundException("Video not found"));
+
+
+        Long currentUserId = null;
+        try {
+            currentUserId = getCurrentUserId();
+        } catch (Exception e) {
+            // If authentication fails, currentUserId will remain null
+            log.warn("No authenticated user found when sharing video");
+        }
+
+
+        videoRecordService.increaseShareCount(videoId, ipAddress, currentUserId);
+
+        return videoInfoMapper.toVideoShareDto(video);
+
+    }
+
+    public String generateVideoWatchUrl(String videoId) {
+        return domain + "/api/videos/watch?v=" + videoId;
     }
 }
 
