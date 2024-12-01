@@ -1,5 +1,5 @@
 ### Create a new comment
-POST http://localhost:8090/api/comments/comment
+POST http://localhost:8090/api/comments
 Content-Type: application/json
 Authorization: Bearer token
 
@@ -9,4 +9,11 @@ Authorization: Bearer token
   "replyId": "<reply_id(can be null)>"
 }
 
+### Update comment by commentId
+PATCH http://localhost:8090/api/comments
+Content-Type: application/json
+Authorization: Bearer token
 
+{
+  "content": "<content>"
+}
