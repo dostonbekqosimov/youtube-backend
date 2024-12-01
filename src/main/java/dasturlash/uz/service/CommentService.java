@@ -32,7 +32,6 @@ public class CommentService {
 
         commentRepository.save(newComment);
 
-
         return "New comment created with id: " + newComment.getId();
     }
 
