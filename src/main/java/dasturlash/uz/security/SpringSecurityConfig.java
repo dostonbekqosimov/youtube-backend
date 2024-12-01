@@ -108,6 +108,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("/profile/create").hasRole("ADMIN")
                             .requestMatchers("/profile/getAll").hasRole("ADMIN")
                             .requestMatchers("/playlist/get-pagination-admin").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/api/comments/comment").authenticated()
 
 
                             .anyRequest()
