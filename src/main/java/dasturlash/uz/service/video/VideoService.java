@@ -46,7 +46,7 @@ public class VideoService {
 
     @Value("${app.domain}")
     private String domain;
-
+    private final VideoWatchedService videoWatchedService;
     private final VideoRepository videoRepository;
     private final ChannelService channelService;
     private final AttachService attachService;
@@ -54,7 +54,6 @@ public class VideoService {
     private final VideoInfoMapper videoInfoMapper;
     private final TagService tagService;
     private final VideoTagService videoTagService;
-    private final VideoWatchedService videoWatchedService;
     private final VideoRecordService videoRecordService;
 
     public String hello(){
