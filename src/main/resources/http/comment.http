@@ -1,0 +1,12 @@
+### Create a new comment
+POST http://localhost:8090/api/comments/comment
+Content-Type: application/json
+Authorization: Bearer token
+
+{
+  "content": "<content>",
+  "videoId": "<videoId>",
+  "replyId": "<reply_id(can be null)>"
+}
+
+
