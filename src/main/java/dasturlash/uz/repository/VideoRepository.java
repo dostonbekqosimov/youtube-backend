@@ -2,10 +2,7 @@ package dasturlash.uz.repository;
 
 import dasturlash.uz.entity.video.Video;
 import dasturlash.uz.enums.ContentStatus;
-import dasturlash.uz.mapper.AdminVideoProjection;
-import dasturlash.uz.mapper.VideoInfoInPlaylist;
-import dasturlash.uz.mapper.VideoShareProjection;
-import dasturlash.uz.mapper.VideoShortInfoProjection;
+import dasturlash.uz.mapper.*;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -117,4 +114,13 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "LEFT JOIN v.channel c " +
             "WHERE v.id = :videoId")
     Optional<VideoShareProjection> findVideoShareInfoById(@Param("videoId") String videoId);
+
+    @Query("select v.title as title, " +
+            "c.name as name, " +
+            "v.viewCount as viewCount, " +
+            "v.attachId as attachId " +
+            "from Video v " +
+            "join v.channel c " +
+            "where v.id = ?1")
+    VideoWatchedHistory findVideoById(String videoId);
 }
