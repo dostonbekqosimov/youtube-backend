@@ -102,6 +102,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("/playlist/change-status").authenticated()
                             .requestMatchers("/playlist/update/*").authenticated()
                             .requestMatchers("/playlist/get-pagination-users/**").authenticated()
+                            .requestMatchers("/videoWatched/get-history").authenticated()
                             //Authentication APIs - open to ADMIN and USER role
                             .requestMatchers("/playlist/delete").hasAnyRole("USER", "ADMIN")
                             //Authentication APIs - open to ADMIN role
