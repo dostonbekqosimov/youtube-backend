@@ -17,3 +17,8 @@ Authorization: Bearer token
 {
   "content": "<content>"
 }
+
+### Delete comment by ID
+DELETE http://localhost:8090/api/comments/<id>
+Content-Type: application/json
+Authorization: Bearer token
