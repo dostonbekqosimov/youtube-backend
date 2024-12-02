@@ -44,7 +44,6 @@ public class Comment {
     @Column(name = "dislike_count")
     private Integer dislikeCount;
 
-    private Boolean visible;
 
     private LocalDateTime createdDate;
 
