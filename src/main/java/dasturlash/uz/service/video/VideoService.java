@@ -16,10 +16,7 @@ import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.exceptions.SomethingWentWrongException;
-import dasturlash.uz.mapper.AdminVideoProjection;
-import dasturlash.uz.mapper.VideoInfoInPlaylist;
-import dasturlash.uz.mapper.VideoShareProjection;
-import dasturlash.uz.mapper.VideoShortInfoProjection;
+import dasturlash.uz.mapper.*;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.service.*;
 import dasturlash.uz.util.UserInfoUtil;
@@ -648,6 +645,10 @@ public class VideoService {
 
     public String generateVideoWatchUrl(String videoId) {
         return domain + "/api/videos/watch?v=" + videoId;
+    }
+
+    public VideoWatchedHistory getVideoWatchedHistory(String videoId) {
+        return videoRepository.findVideoById(videoId);
     }
 }
 

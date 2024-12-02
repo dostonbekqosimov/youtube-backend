@@ -435,7 +435,7 @@ public class AttachService {
     }
 
 
-    private String getDurationFromEntity(String attachId) {
+    public String getDurationFromEntity(String attachId) {
         log.debug("Getting duration for attach ID: {}", attachId);
 
         String duration = attachRepository.findAttachDurationById(attachId);
