@@ -115,8 +115,9 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "WHERE v.id = :videoId")
     Optional<VideoShareProjection> findVideoShareInfoById(@Param("videoId") String videoId);
 
-    @Query("select v.title as title, " +
-            "c.name as name, " +
+    @Query("select " +
+            "v.title as title, " +
+            "c.name as channelName, " +
             "v.viewCount as viewCount, " +
             "v.attachId as attachId " +
             "from Video v " +
