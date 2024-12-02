@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,7 +28,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class VideoWatchedService {
     private final VideoWatchedRepository repository;
-    private final VideoService videoService;
+    @Lazy
+    @Autowired
+    private VideoService videoService;
     private final AttachService attachService;
     private static Logger log = LoggerFactory.getLogger(VideoWatchedService.class);
 
