@@ -7,7 +7,8 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "playlist_video")
+@Table(name = "playlist_video",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"playlist_id", "video_id"})})
 @Getter
 @Setter
 public class PlaylistVideo {
@@ -28,8 +29,8 @@ public class PlaylistVideo {
     private Video video;
 
     @Column(nullable = false)
-    private LocalDateTime createdTime;
+    private LocalDateTime createdDate;
 
     @Column(nullable = false)
-    private Integer order_num;
+    private Integer orderNumber;
 }

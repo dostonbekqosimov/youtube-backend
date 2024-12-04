@@ -1,5 +1,6 @@
 package dasturlash.uz.service.video;
 
+import dasturlash.uz.dto.PlaylistVideoDTO;
 import dasturlash.uz.dto.request.video.*;
 import dasturlash.uz.dto.response.CategoryResponseDTO;
 import dasturlash.uz.dto.response.MediaUrlDTO;
@@ -54,6 +55,7 @@ public class VideoService {
     private final TagService tagService;
     private final VideoTagService videoTagService;
     private final VideoRecordService videoRecordService;
+    private final PlaylistVideoService playlistVideoService;
 
     public String hello(){
         return "hello";
@@ -108,6 +110,12 @@ public class VideoService {
 
         // Build and return response
         VideoCreateResponseDTO response = buildVideoCreateResponse(video);
+        // Create playlistVideo call service create method
+        PlaylistVideoDTO dto1 = new PlaylistVideoDTO();
+        dto1.setPlaylistId(video.getPlaylistId());
+        dto1.setVideoId(video.getId());
+        playlistVideoService.create(dto1);
+
         log.info("Exiting createVideo with response: {}", response);
         return response;
     }
