@@ -1,12 +1,12 @@
 package dasturlash.uz.controller;
 
-import dasturlash.uz.dto.AdminCommentInfoDTO;
+import dasturlash.uz.dto.response.comment.AdminCommentInfoDTO;
 import dasturlash.uz.dto.request.CommentCreateDTO;
 import dasturlash.uz.dto.request.comment.CommentUpdateDTO;
+import dasturlash.uz.dto.response.comment.CommentInfoDTO;
 import dasturlash.uz.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,5 +44,18 @@ public class CommentController {
             @RequestParam(value = "size", defaultValue = "5") int size) {
 
         return ResponseEntity.ok().body(commentService.getAllComments(page - 1, size));
+    }
+
+    @GetMapping("/admin/list/profile")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<PageImpl<CommentInfoDTO>> getCommentListByProfileId(
+            @RequestParam("profileId") Long profileId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size) {
+
+        commentService.getCommentListByProfileId(profileId);
+
+        return null;
+
     }
 }

@@ -1,8 +1,9 @@
 package dasturlash.uz.service;
 
-import dasturlash.uz.dto.AdminCommentInfoDTO;
+import dasturlash.uz.dto.response.comment.AdminCommentInfoDTO;
 import dasturlash.uz.dto.request.CommentCreateDTO;
 import dasturlash.uz.dto.request.comment.CommentUpdateDTO;
+import dasturlash.uz.dto.response.comment.CommentInfoDTO;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import dasturlash.uz.entity.Comment;
 import dasturlash.uz.enums.ProfileRole;
@@ -148,7 +149,6 @@ public class CommentService {
     }
 
 
-
     private AdminCommentInfoDTO toAdminCommentInfoDTO(Comment comment) {
         AdminCommentInfoDTO dto = new AdminCommentInfoDTO();
         dto.setId(comment.getId());
@@ -163,5 +163,8 @@ public class CommentService {
     }
 
 
+    public PageImpl<CommentInfoDTO> getCommentListByProfileId(Long profileId) {
 
+        return null;
+    }
 }

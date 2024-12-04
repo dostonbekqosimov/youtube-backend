@@ -1,19 +1,21 @@
-package dasturlash.uz.dto;
+package dasturlash.uz.dto.response.comment;
 
-import dasturlash.uz.dto.response.video.CommentVideoDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class AdminCommentInfoDTO {
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CommentInfoDTO {
     private String id;
 
     private String content;
 
     private VideoShortInfoDTO videoDetails;
+
+    private CommentOwnerInfo profile;
 
     private Integer likeCount;
 
@@ -22,8 +24,4 @@ public class AdminCommentInfoDTO {
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedDate;
-
- 
-
-
 }
