@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,4 +27,9 @@ public class PlaylistVideoService {
         video.setCreatedDate(LocalDateTime.now());
         repository.save(video);
     }
+
+    public int deleteSelectedPlaylist(String videoId, List<String> playlistIds){
+        return repository.deleteByPlaylistIdAndVideoId(videoId, playlistIds);
+    }
+
 }
