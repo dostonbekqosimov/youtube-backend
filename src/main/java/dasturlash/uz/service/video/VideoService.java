@@ -57,7 +57,7 @@ public class VideoService {
     private final VideoRecordService videoRecordService;
     private final PlaylistVideoService playlistVideoService;
 
-    public String hello(){
+    public String hello() {
         return "hello";
     }
 
@@ -196,7 +196,7 @@ public class VideoService {
             VideoFullInfoDTO videoFullInfoDTO = toVideoFullInfoDTO(video);
 
 
-            videoWatchedService.addHistoryWatch(videoId,userInfoUtil, request);
+            videoWatchedService.addHistoryWatch(videoId, userInfoUtil, request);
             log.info("Returning video details for ID: {}", videoId);
             return videoFullInfoDTO;
 
@@ -672,6 +672,15 @@ public class VideoService {
     public VideoWatchedHistory getVideoWatchedHistory(String videoId) {
         return videoRepository.findVideoById(videoId);
     }
+
+    // need to add check and logs
+    public List<VideoShortInfoDTO> getVideoShortInfoByVideoIds(List<String> videoIds) {
+        List<VideoShortInfoProjection> projections = videoRepository.findVideosByVideoIds(videoIds);
+        return projections.stream()
+                .map(videoInfoMapper::toVideShortInfoDTO)
+                .collect(Collectors.toList());
+    }
+
 }
 
 

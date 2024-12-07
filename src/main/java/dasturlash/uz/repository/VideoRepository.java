@@ -124,4 +124,37 @@ public interface VideoRepository extends CrudRepository<Video, String>, PagingAn
             "join v.channel c " +
             "where v.id = ?1")
     VideoWatchedHistory findVideoById(String videoId);
+
+    @Query("SELECT v.id AS id, v.title AS title, " +
+            "p.id AS previewAttachId, " +
+            "c.id AS channelId, " +
+            "v.viewCount AS viewCount, a.duration AS duration, " +
+            "v.publishedDate AS publishedDate " +
+            "FROM Video v " +
+            "LEFT JOIN v.preview p " +
+            "LEFT JOIN v.channel c " +
+            "LEFT JOIN c.photo cp " +
+            "LEFT JOIN v.video a " +
+            "JOIN v.videoTags vt " +
+            "JOIN vt.tag t " +
+            "WHERE v.id = :videoId AND t.visible = true " +
+            "ORDER BY v.publishedDate DESC")
+    Page<VideoShortInfoProjection> findVideosByVideoId(@Param("videoId") String videoId, Pageable pageable);
+
+    @Query("SELECT v.id AS id, v.title AS title, " +
+            "p.id AS previewAttachId, " +
+            "c.id AS channelId, " +
+            "v.viewCount AS viewCount, a.duration AS duration, " +
+            "v.publishedDate AS publishedDate " +
+            "FROM Video v " +
+            "LEFT JOIN v.preview p " +
+            "LEFT JOIN v.channel c " +
+            "LEFT JOIN c.photo cp " +
+            "LEFT JOIN v.video a " +
+            "JOIN v.videoTags vt " +
+            "JOIN vt.tag t " +
+            "WHERE v.id IN :videoIds AND t.visible = true " +
+            "ORDER BY v.publishedDate DESC")
+    List<VideoShortInfoProjection> findVideosByVideoIds(@Param("videoIds") List<String> videoIds);
+
 }

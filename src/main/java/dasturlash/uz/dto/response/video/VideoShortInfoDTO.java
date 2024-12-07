@@ -1,5 +1,6 @@
 package dasturlash.uz.dto.response.video;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import lombok.Data;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VideoShortInfoDTO {
 
     private String id;
