@@ -21,7 +21,8 @@ public class VideoUpdateDTO {
     private String description;
 
     private Long categoryId;
-    private List<String> playlistIds;
+    private List<String> newPlaylistIds;
+    private List<String> removePlaylistIds;
     private String previewAttachId;
     private VideoType type;
     private ContentStatus status;

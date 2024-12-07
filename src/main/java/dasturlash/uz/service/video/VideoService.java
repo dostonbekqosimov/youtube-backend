@@ -111,10 +111,13 @@ public class VideoService {
         // Build and return response
         VideoCreateResponseDTO response = buildVideoCreateResponse(video);
         // Create playlistVideo call service create method
-        PlaylistVideoDTO dto1 = new PlaylistVideoDTO();
-        dto1.setPlaylistId(video.getPlaylistId());
-        dto1.setVideoId(video.getId());
-        playlistVideoService.create(dto1);
+        for (String playlistId : dto.getPlaylistId()) {
+
+            PlaylistVideoDTO dto1 = new PlaylistVideoDTO();
+            dto1.setPlaylistId(playlistId);
+            dto1.setVideoId(video.getId());
+            playlistVideoService.create(dto1);
+        }
 
         log.info("Exiting createVideo with response: {}", response);
         return response;
@@ -228,11 +231,11 @@ public class VideoService {
             video.setCategoryId(dto.getCategoryId());
         }
 
-        // Only update playlist if new playlist is different
-        if (dto.getPlaylistIds() != null && !dto.getPlaylistIds().equals(video.getPlaylistId())) {
-//            video.setPlaylistId(dto.getPlaylistId());
+        /*// Only update playlist if new playlist is different
+        if (dto.getNewPlaylistIds() != null && !dto.getNewPlaylistIds().equals(video.getPlaylistId())) {
+            video.setPlaylistId(dto.getPlaylistId());
             System.out.println("Playlist should be updated...");
-        }
+        }*/
 
         // Only update preview attach if new preview is different
         if (dto.getPreviewAttachId() != null && !dto.getPreviewAttachId().equals(video.getPreviewAttachId())) {
@@ -346,8 +349,19 @@ public class VideoService {
 
         Video video = getVideoAndCheckOwnership(videoId);
 
-        video.setPlaylistId(dto.getPlaylistId());
-        video.setUpdatedDate(LocalDateTime.now());
+        //delete user selected playlist
+        int i = playlistVideoService.deleteSelectedPlaylist(videoId, dto.getRemovePlaylistIds());
+        log.info("size: {}", i);
+
+        //update new selected playlists
+        PlaylistVideoDTO playlistVideoDTO = new PlaylistVideoDTO();
+        for (String newPlaylistId : dto.getNewPlaylistIds()) {
+            playlistVideoDTO.setVideoId(videoId);
+            playlistVideoDTO.setPlaylistId(newPlaylistId);
+            playlistVideoDTO.setOrderNumber(null);
+            playlistVideoService.create(playlistVideoDTO);
+        }
+
 
         VideoUpdateDTO updatedVideo = toVideoUpdateDTO(videoRepository.save(video));
         log.info("Playlist updated for video ID: {} with response: {}", videoId, updatedVideo);
@@ -477,7 +491,7 @@ public class VideoService {
         videoUpdateDTO.setTitle(video.getTitle());
         videoUpdateDTO.setDescription(video.getDescription());
         videoUpdateDTO.setCategoryId(video.getCategoryId());
-        videoUpdateDTO.setPlaylistIds(Collections.emptyList());
+        videoUpdateDTO.setNewPlaylistIds(Collections.emptyList());
         videoUpdateDTO.setPreviewAttachId(video.getPreviewAttachId());
         videoUpdateDTO.setType(video.getType());
         videoUpdateDTO.setStatus(video.getStatus());

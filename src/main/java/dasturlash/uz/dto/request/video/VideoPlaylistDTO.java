@@ -4,7 +4,10 @@ import dasturlash.uz.enums.ContentStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class VideoPlaylistDTO {
-    private String playlistId;
+    private List<String> newPlaylistIds;
+    private List<String> removePlaylistIds;
 }
