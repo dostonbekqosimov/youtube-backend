@@ -8,6 +8,7 @@ import dasturlash.uz.service.CommentService;
 import jakarta.validation.Valid;
 import jdk.dynalink.linker.LinkerServices;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,10 +53,21 @@ public class CommentController {
 
     @GetMapping("/admin/list/profile")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<CommentInfoDTO>> getCommentListByProfileId(
+    public ResponseEntity<List<AdminCommentInfoDTO>> getCommentListByProfileId(
             @RequestParam("profileId") Long profileId) {
 
         return ResponseEntity.ok().body(commentService.getCommentListByProfileId(profileId));
 
+    }
+
+    @GetMapping("/video/{videoId}")
+    public ResponseEntity<PageImpl<CommentInfoDTO>> getCommentListByVideoId(
+            @PathVariable("videoId") String videoId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "50") int size
+    ) {
+
+
+        return ResponseEntity.ok(commentService.getCommentListByVideoId(page - 1, size, videoId));
     }
 }

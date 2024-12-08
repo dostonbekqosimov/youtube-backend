@@ -149,7 +149,7 @@ public class CommentService {
         return new PageImpl<>(adminCommentInfoList, pageRequest, commentList.getTotalElements());
     }
 
-    public List<CommentInfoDTO> getCommentListByProfileId(Long profileId) {
+    public List<AdminCommentInfoDTO> getCommentListByProfileId(Long profileId) {
 
         // Check if the user is an admin
         if (isAdmin()) {
@@ -172,9 +172,9 @@ public class CommentService {
 
 
         // Map comments to DTOs, setting video details
-        List<CommentInfoDTO> commentInfoList = new ArrayList<>();
+        List<AdminCommentInfoDTO> commentInfoList = new ArrayList<>();
         for (Comment comment : commentList) {
-            CommentInfoDTO commentInfoDTO = toCommentInfoDTO(comment);
+            AdminCommentInfoDTO commentInfoDTO = toAdminCommentInfoDTO(comment);
 
             // Find the corresponding video details
             VideoShortInfoDTO videoDetails = null;
@@ -188,8 +188,7 @@ public class CommentService {
 
             commentInfoDTO.setVideoDetails(videoDetails);
 
-            // shu yerda bir yana o'ylab ko'rish kerak
-            commentInfoDTO.setProfile(profileService.getShortInfo(comment.getProfileId()));
+
             commentInfoList.add(commentInfoDTO);
 
 
@@ -228,4 +227,8 @@ public class CommentService {
     }
 
 
+    public PageImpl<CommentInfoDTO> getCommentListByVideoId(int page, int size, String videoId) {
+
+        return null;
+    }
 }
