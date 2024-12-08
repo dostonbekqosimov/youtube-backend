@@ -161,7 +161,7 @@ public class VideoService {
 
     public VideoFullInfoDTO getVideoById(String videoId, HttpServletRequest request) {
         UserInfoUtil userInfoUtil1 = new UserInfoUtil();
-        String ipAddress = userInfoUtil1.getIpAddress();
+        String ipAddress = getUserIP(request);
 
         Long currentUserId = null;
         try {
