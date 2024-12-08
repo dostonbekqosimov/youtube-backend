@@ -1,8 +1,9 @@
 package dasturlash.uz.service;
 
-import dasturlash.uz.dto.AdminCommentInfoDTO;
+import dasturlash.uz.dto.response.comment.AdminCommentInfoDTO;
 import dasturlash.uz.dto.request.CommentCreateDTO;
 import dasturlash.uz.dto.request.comment.CommentUpdateDTO;
+import dasturlash.uz.dto.response.comment.CommentInfoDTO;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import dasturlash.uz.entity.Comment;
 import dasturlash.uz.enums.ProfileRole;
@@ -31,6 +32,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     private final VideoService videoService;
+    private final ProfileService profileService;
 
     public String createComment(CommentCreateDTO request) {
 
@@ -147,6 +149,69 @@ public class CommentService {
         return new PageImpl<>(adminCommentInfoList, pageRequest, commentList.getTotalElements());
     }
 
+    public List<CommentInfoDTO> getCommentListByProfileId(Long profileId) {
+
+        // Check if the user is an admin
+        if (isAdmin()) {
+            throw new ForbiddenException("You are not authorized to access this resource");
+        }
+
+        List<Comment> commentList = commentRepository.findAllByProfileId(profileId);
+
+        // Extract unique video IDs from comments
+        List<String> videoIdList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            String videoId = comment.getVideoId();
+            if (!videoIdList.contains(videoId)) {
+                videoIdList.add(videoId); // Ensure uniqueness
+            }
+        }
+
+        // Fetch video details for all video IDs in a batch
+        List<VideoShortInfoDTO> videoList = videoService.getVideoShortInfoByVideoIds(videoIdList);
+
+
+        // Map comments to DTOs, setting video details
+        List<CommentInfoDTO> commentInfoList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            CommentInfoDTO commentInfoDTO = toCommentInfoDTO(comment);
+
+            // Find the corresponding video details
+            VideoShortInfoDTO videoDetails = null;
+            for (VideoShortInfoDTO video : videoList) {
+                if (video.getId().equals(comment.getVideoId())) {
+                    videoDetails = video;
+                    video.setChannel(null);
+                    break;
+                }
+            }
+
+            commentInfoDTO.setVideoDetails(videoDetails);
+
+            // shu yerda bir yana o'ylab ko'rish kerak
+            commentInfoDTO.setProfile(profileService.getShortInfo(comment.getProfileId()));
+            commentInfoList.add(commentInfoDTO);
+
+
+        }
+        return commentInfoList;
+
+
+    }
+
+
+    private CommentInfoDTO toCommentInfoDTO(Comment comment) {
+        CommentInfoDTO dto = new CommentInfoDTO();
+        dto.setId(comment.getId());
+        dto.setContent(comment.getContent());
+        dto.setCreatedDate(comment.getCreatedDate());
+        dto.setUpdatedDate(comment.getUpdatedDate());
+        dto.setLikeCount(comment.getLikeCount());
+        dto.setDislikeCount(comment.getDislikeCount());
+
+        // Exclude video details; handled in the main method
+        return dto;
+    }
 
 
     private AdminCommentInfoDTO toAdminCommentInfoDTO(Comment comment) {
@@ -161,7 +226,6 @@ public class CommentService {
         // Exclude video details; handled in the main method
         return dto;
     }
-
 
 
 }

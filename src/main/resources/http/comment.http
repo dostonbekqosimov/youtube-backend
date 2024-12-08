@@ -22,3 +22,8 @@ Authorization: Bearer token
 DELETE http://localhost:8090/api/comments/<id>
 Content-Type: application/json
 Authorization: Bearer token
+
+### Get all comments (admin)
+GET http://localhost:8090/api/comments/admin/list
+Content-Type: application/json
+Authorization: Bearer token

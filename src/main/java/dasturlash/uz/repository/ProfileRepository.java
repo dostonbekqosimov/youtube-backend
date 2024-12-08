@@ -1,6 +1,7 @@
 package dasturlash.uz.repository;
 
 import dasturlash.uz.entity.Profile;
+import dasturlash.uz.mapper.CommentOwnerInfoProjection;
 import dasturlash.uz.mapper.ProfileShortInfoMapper;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,4 +19,6 @@ public interface ProfileRepository extends CrudRepository<Profile, Long> {
             "from Profile p where p.email = ?1")
     ProfileShortInfoMapper getProfileShortInfoMapper(String id);
 
+    @Query("select p.id as id, p.name as name, p.surname as surname, p.photoId as photoId from Profile p where p.id = :profileId")
+    CommentOwnerInfoProjection findProfileById(Long profileId);
 }
