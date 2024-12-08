@@ -7,7 +7,6 @@ import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.TagResponseDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
 import dasturlash.uz.dto.response.video.*;
-import dasturlash.uz.entity.Channel;
 import dasturlash.uz.entity.Tag;
 import dasturlash.uz.entity.VideoTag;
 import dasturlash.uz.entity.video.Video;
@@ -21,7 +20,7 @@ import dasturlash.uz.mapper.*;
 import dasturlash.uz.repository.VideoRepository;
 import dasturlash.uz.service.*;
 import dasturlash.uz.util.UserInfoUtil;
-import dasturlash.uz.util.VideoInfoMapper;
+import dasturlash.uz.util.CustomProjectionMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +50,7 @@ public class VideoService {
     private final ChannelService channelService;
     private final AttachService attachService;
     private final CategoryService categoryService;
-    private final VideoInfoMapper videoInfoMapper;
+    private final CustomProjectionMapper customProjectionMapper;
     private final TagService tagService;
     private final VideoTagService videoTagService;
     private final VideoRecordService videoRecordService;
@@ -111,10 +110,10 @@ public class VideoService {
         // Build and return response
         VideoCreateResponseDTO response = buildVideoCreateResponse(video);
         // Create playlistVideo call service create method
-        PlaylistVideoDTO dto1 = new PlaylistVideoDTO();
-        dto1.setPlaylistId(video.getPlaylistId());
-        dto1.setVideoId(video.getId());
-        playlistVideoService.create(dto1);
+//        PlaylistVideoDTO dto1 = new PlaylistVideoDTO();
+//        dto1.setPlaylistId(video.getPlaylistId());
+//        dto1.setVideoId(video.getId());
+//        playlistVideoService.create(dto1);
 
         log.info("Exiting createVideo with response: {}", response);
         return response;
@@ -513,7 +512,7 @@ public class VideoService {
         log.debug("Fetched {} videos for category ID: {}", projections.getContent().size(), categoryId);
 
         // Map projections to DTOs
-        List<VideoShortInfoDTO> response = projections.stream().map(videoInfoMapper::toVideShortInfoDTO).toList();
+        List<VideoShortInfoDTO> response = projections.stream().map(customProjectionMapper::toVideShortInfoDTO).toList();
 
         log.info("Mapped {} videos to VideoShortInfoDTO for category ID: {}", response.size(), categoryId);
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
@@ -529,7 +528,7 @@ public class VideoService {
         log.debug("Fetched {} videos matching title: '{}'", projections.getContent().size(), title);
 
         // Map projections to DTOs
-        List<VideoShortInfoDTO> response = projections.stream().map(videoInfoMapper::toVideShortInfoDTO).toList();
+        List<VideoShortInfoDTO> response = projections.stream().map(customProjectionMapper::toVideShortInfoDTO).toList();
 
         log.info("Mapped {} videos to VideoShortInfoDTO for title: '{}'", response.size(), title);
         return new PageImpl<>(response, pageRequest, projections.getTotalElements());
@@ -544,7 +543,7 @@ public class VideoService {
         Page<VideoShortInfoProjection> videoPage = videoRepository.findVideosByTagName(tagName, pageable);
 
         // Convert to DTO
-        List<VideoShortInfoDTO> videoDTOs = videoPage.getContent().stream().map(videoInfoMapper::toVideShortInfoDTO).collect(Collectors.toList());
+        List<VideoShortInfoDTO> videoDTOs = videoPage.getContent().stream().map(customProjectionMapper::toVideShortInfoDTO).collect(Collectors.toList());
 
         // Return as PageImpl
         log.warn("Returning videos based on tag: '{}'", tagName);
@@ -561,7 +560,7 @@ public class VideoService {
         log.debug("Fetched {} videos for channel ID: {}", videos.getContent().size(), channelId);
 
         // Map projections to DTOs
-        List<VideoPlayListInfoDTO> response = videos.stream().map(videoInfoMapper::videoPlayListInfoDTODTO).toList();
+        List<VideoPlayListInfoDTO> response = videos.stream().map(customProjectionMapper::videoPlayListInfoDTODTO).toList();
 
         log.info("Mapped {} videos to VideoPlayListInfoDTO for channel ID: {}", response.size(), channelId);
         return new PageImpl<>(response, pageRequest, videos.getTotalElements());
@@ -577,7 +576,7 @@ public class VideoService {
         log.debug("Fetched {} videos for admin list.", videos.getContent().size());
 
         // Map projections to DTOs
-        List<AdminVideoInfoDTO> response = videos.stream().map(videoInfoMapper::toAdminVideoInfoDTO).toList();
+        List<AdminVideoInfoDTO> response = videos.stream().map(customProjectionMapper::toAdminVideoInfoDTO).toList();
 
         log.info("Mapped {} videos to AdminVideoInfoDTO.", response.size());
         return new PageImpl<>(response, pageRequest, videos.getTotalElements());
@@ -647,7 +646,7 @@ public class VideoService {
 
         videoRecordService.increaseShareCount(videoId, ipAddress, currentUserId);
 
-        return videoInfoMapper.toVideoShareDto(video);
+        return customProjectionMapper.toVideoShareDto(video);
 
     }
 
@@ -663,7 +662,7 @@ public class VideoService {
     public List<VideoShortInfoDTO> getVideoShortInfoByVideoIds(List<String> videoIds) {
         List<VideoShortInfoProjection> projections = videoRepository.findVideosByVideoIds(videoIds);
         return projections.stream()
-                .map(videoInfoMapper::toVideShortInfoDTO)
+                .map(customProjectionMapper::toVideShortInfoDTO)
                 .collect(Collectors.toList());
     }
 

@@ -6,11 +6,15 @@ import dasturlash.uz.dto.request.comment.CommentUpdateDTO;
 import dasturlash.uz.dto.response.comment.CommentInfoDTO;
 import dasturlash.uz.service.CommentService;
 import jakarta.validation.Valid;
+import jdk.dynalink.linker.LinkerServices;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -48,14 +52,10 @@ public class CommentController {
 
     @GetMapping("/admin/list/profile")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<PageImpl<CommentInfoDTO>> getCommentListByProfileId(
-            @RequestParam("profileId") Long profileId,
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "5") int size) {
+    public ResponseEntity<List<CommentInfoDTO>> getCommentListByProfileId(
+            @RequestParam("profileId") Long profileId) {
 
-        commentService.getCommentListByProfileId(profileId);
-
-        return null;
+        return ResponseEntity.ok().body(commentService.getCommentListByProfileId(profileId));
 
     }
 }

@@ -1,15 +1,16 @@
 package dasturlash.uz.service;
 
-import dasturlash.uz.dto.AttachDTO;
 import dasturlash.uz.dto.MessageDTO;
 import dasturlash.uz.dto.ProfileDTO;
 import dasturlash.uz.dto.ProfileShortInfo;
 import dasturlash.uz.dto.request.UpdateProfileDetailDTO;
 import dasturlash.uz.dto.request.ChangePasswordRequest;
 import dasturlash.uz.dto.response.ResponseCustom;
+import dasturlash.uz.dto.response.comment.CommentOwnerInfo;
 import dasturlash.uz.entity.Profile;
 import dasturlash.uz.enums.ProfileStatus;
 import dasturlash.uz.exceptions.AppBadRequestException;
+import dasturlash.uz.mapper.CommentOwnerInfoProjection;
 import dasturlash.uz.mapper.ProfileShortInfoMapper;
 import dasturlash.uz.repository.ProfileRepository;
 import dasturlash.uz.security.SpringSecurityUtil;
@@ -17,13 +18,12 @@ import dasturlash.uz.service.email.EmailHistoryService;
 import dasturlash.uz.service.email.EmailSendingService;
 import dasturlash.uz.util.JwtUtil;
 import dasturlash.uz.util.RandomUtil;
+import dasturlash.uz.util.CustomProjectionMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.result.UpdateCountOutput;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class ProfileService {
 
     private final ProfileRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final ResourceBundleService resourceBundleService;
+    private final CustomProjectionMapper projectionMapper;
     private final EmailSendingService emailSendingService;
     private final EmailHistoryService emailHistoryService;
     private final AttachService attachService;
@@ -120,7 +120,7 @@ public class ProfileService {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setToAccount(email);
         messageDTO.setSubject("");
-        messageDTO.setText("Your code is: "+ code);
+        messageDTO.setText("Your code is: " + code);
 
         emailSendingService.sendMimeMessage(messageDTO, currentProfile, code);
         return "Sent code your email";
@@ -148,7 +148,7 @@ public class ProfileService {
             currentProfile.setEmail(responseCustom.getMessage());
             repository.save(currentProfile);
             String token = JwtUtil.encode(currentProfile.getEmail(), currentProfile.getRole().toString());
-            return new ResponseCustom("New token-> "+token, true);
+            return new ResponseCustom("New token-> " + token, true);
         }
         return new ResponseCustom("Not completed", false);
     }
@@ -158,7 +158,7 @@ public class ProfileService {
         Profile currentProfile = findById(currentUserId);
 
         if (currentProfile != null) {
-            if(currentProfile.getPhotoId() != null) {
+            if (currentProfile.getPhotoId() != null) {
                 attachService.delete(currentProfile.getPhotoId());
             }
             currentProfile.setPhotoId(photoId);
@@ -175,6 +175,19 @@ public class ProfileService {
 
         ProfileShortInfoMapper shortInfoMapper = repository.getProfileShortInfoMapper(currentProfile.getEmail());
         return toShortInfo(shortInfoMapper);
+    }
+
+    public CommentOwnerInfo getShortInfo(Long profileId) {
+
+        if (profileId == null) {
+            throw new AppBadRequestException("Profile id is null");
+        }
+
+        CommentOwnerInfoProjection profile = repository.findProfileById(profileId);
+
+        return projectionMapper.toCommentOwnerInfo(profile);
+
+
     }
 
     public ProfileShortInfo toShortInfo(ProfileShortInfoMapper mapper) {

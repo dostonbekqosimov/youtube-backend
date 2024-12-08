@@ -2,6 +2,7 @@ package dasturlash.uz.dto.response.comment;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
+import dasturlash.uz.entity.Profile;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -24,4 +25,6 @@ public class CommentInfoDTO {
     private LocalDateTime createdDate;
 
     private LocalDateTime updatedDate;
+
+
 }

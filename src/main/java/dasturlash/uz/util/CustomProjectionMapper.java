@@ -4,11 +4,13 @@ import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.OwnerInfoDTO;
 import dasturlash.uz.dto.response.PlaylistInfoDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
+import dasturlash.uz.dto.response.comment.CommentOwnerInfo;
 import dasturlash.uz.dto.response.video.AdminVideoInfoDTO;
 import dasturlash.uz.dto.response.video.VideoPlayListInfoDTO;
 import dasturlash.uz.dto.response.video.VideoShareDto;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import dasturlash.uz.mapper.AdminVideoProjection;
+import dasturlash.uz.mapper.CommentOwnerInfoProjection;
 import dasturlash.uz.mapper.VideoShareProjection;
 import dasturlash.uz.mapper.VideoShortInfoProjection;
 import dasturlash.uz.service.AttachService;
@@ -23,8 +25,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class VideoInfoMapper {
-    private static final Logger logger = LoggerFactory.getLogger(VideoInfoMapper.class);
+public class CustomProjectionMapper {
+    private static final Logger logger = LoggerFactory.getLogger(CustomProjectionMapper.class);
 
     private final AttachService attachService;
     private final ChannelService channelService;
@@ -151,5 +153,16 @@ public class VideoInfoMapper {
         dto.setVideoUrl(videoService.generateVideoWatchUrl(projection.getId()));
 
         return dto;
+    }
+
+    public CommentOwnerInfo toCommentOwnerInfo(CommentOwnerInfoProjection projection) {
+
+        CommentOwnerInfo info = new CommentOwnerInfo();
+        info.setId(projection.getId());
+        info.setName(projection.getName());
+        info.setSurname(projection.getSurname());
+        info.setPhoto(attachService.getUrlOfMedia(projection.getPhotoId()));
+
+        return info;
     }
 }
