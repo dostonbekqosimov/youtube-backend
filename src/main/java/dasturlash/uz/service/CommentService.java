@@ -198,6 +198,51 @@ public class CommentService {
 
     }
 
+    public PageImpl<CommentInfoDTO> getCommentListByVideoId(int page, int size, String videoId) {
+
+        // Fetch comments with pagination
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate"));
+        Page<Comment> commentList = commentRepository.findAllByVideoId(pageRequest, videoId);
+
+        // Extract unique video IDs from comments
+        List<String> videoIdList = new ArrayList<>();
+        for (Comment comment : commentList.getContent()) {
+            String videoIdInComment = comment.getVideoId();
+            if (!videoIdList.contains(videoIdInComment)) {
+                videoIdList.add(videoIdInComment); // Ensure uniqueness
+            }
+        }
+
+        // Fetch video details for all video IDs in a batch
+        List<VideoShortInfoDTO> videoList = videoService.getVideoShortInfoByVideoIds(videoIdList);
+
+
+        // Map comments to DTOs, setting video details
+        List<CommentInfoDTO> commentInfoList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            CommentInfoDTO commentInfoDTO = toCommentInfoDTO(comment);
+
+            // Find the corresponding video details
+            VideoShortInfoDTO videoDetails = null;
+            for (VideoShortInfoDTO video : videoList) {
+                if (video.getId().equals(comment.getVideoId())) {
+                    videoDetails = video;
+                    video.setChannel(null);
+                    break;
+                }
+            }
+
+            commentInfoDTO.setVideoDetails(videoDetails);
+
+            commentInfoDTO.setProfile(profileService.getShortInfo(comment.getProfileId()));
+
+            commentInfoList.add(commentInfoDTO);
+
+
+        }
+        return new PageImpl<>(commentInfoList, pageRequest, commentList.getTotalElements());
+    }
+
 
     private CommentInfoDTO toCommentInfoDTO(Comment comment) {
         CommentInfoDTO dto = new CommentInfoDTO();
@@ -227,8 +272,4 @@ public class CommentService {
     }
 
 
-    public PageImpl<CommentInfoDTO> getCommentListByVideoId(int page, int size, String videoId) {
-
-        return null;
-    }
 }
