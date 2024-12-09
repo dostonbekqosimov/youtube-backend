@@ -36,3 +36,7 @@ Authorization: Bearer token
 ### Get all comments by videoId
 GET http://localhost:8090/api/comments/video/<videoId>
 Content-Type: application/json
+
+### Get all comments by videoId
+GET http://localhost:8090/api/comments/reply/<commentId>
+Content-Type: application/json

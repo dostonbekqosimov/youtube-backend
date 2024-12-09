@@ -86,6 +86,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("api/videos/tag").permitAll()
                             .requestMatchers("/api/videos/*/share").permitAll()
                             .requestMatchers("/api/comments/video/**").permitAll()
+                            .requestMatchers("/api/comments/reply/**").permitAll()
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers("/playlist/get-channel-playlist/**").permitAll()
                             .requestMatchers("/playlist/get-playlist-basic-info/**").permitAll()

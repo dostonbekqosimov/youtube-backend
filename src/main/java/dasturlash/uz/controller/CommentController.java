@@ -60,6 +60,7 @@ public class CommentController {
 
     }
 
+    // bunda pagination qilmasaham bo'ladi
     @GetMapping("/video/{videoId}")
     public ResponseEntity<PageImpl<CommentInfoDTO>> getCommentListByVideoId(
             @PathVariable("videoId") String videoId,
@@ -69,5 +70,12 @@ public class CommentController {
 
 
         return ResponseEntity.ok(commentService.getCommentListByVideoId(page - 1, size, videoId));
+    }
+
+    @GetMapping("/reply/{commentId}")
+    public ResponseEntity<List<CommentInfoDTO>> getReplyCommentListByCommentId(
+            @PathVariable("commentId") String commentId
+    ) {
+        return ResponseEntity.ok(commentService.getReplyCommentListByCommentId(commentId));
     }
 }

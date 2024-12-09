@@ -11,4 +11,6 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
     List<Comment> findAllByProfileId(Long profileId);
 
     Page<Comment> findAllByVideoId(Pageable pageable, String videoId);
+
+    List<Comment> findAllByReplyId(String replyId);
 }
