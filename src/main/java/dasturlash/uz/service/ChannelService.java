@@ -309,4 +309,8 @@ public class ChannelService {
         }
         return channelRepository.getChannelOwnerId(channelId);
     }
+
+    public List<String> getChannelOwnerIds(Long profileId) {
+        return channelRepository.getChannelIdsByProfileId(profileId);
+    }
 }
