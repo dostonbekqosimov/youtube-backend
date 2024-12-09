@@ -15,7 +15,7 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @Column(name = "profile_id",nullable = false)
-    private Integer profileId;
+    private Long profileId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", insertable = false, updatable = false)
     private Profile profile;
@@ -29,7 +29,7 @@ public class Subscription {
     @Column(nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime unsubscribedDate;
 
     @Column(nullable = false)
