@@ -7,6 +7,7 @@ import dasturlash.uz.dto.response.comment.CommentInfoDTO;
 import dasturlash.uz.dto.response.video.VideoShortInfoDTO;
 import dasturlash.uz.entity.Comment;
 import dasturlash.uz.enums.ProfileRole;
+import dasturlash.uz.exceptions.AppBadRequestException;
 import dasturlash.uz.exceptions.DataNotFoundException;
 import dasturlash.uz.exceptions.ForbiddenException;
 import dasturlash.uz.repository.CommentRepository;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static dasturlash.uz.security.SpringSecurityUtil.getCurrentUserId;
@@ -149,7 +151,7 @@ public class CommentService {
         return new PageImpl<>(adminCommentInfoList, pageRequest, commentList.getTotalElements());
     }
 
-    public List<CommentInfoDTO> getCommentListByProfileId(Long profileId) {
+    public List<AdminCommentInfoDTO> getCommentListByProfileId(Long profileId) {
 
         // Check if the user is an admin
         if (isAdmin()) {
@@ -157,6 +159,99 @@ public class CommentService {
         }
 
         List<Comment> commentList = commentRepository.findAllByProfileId(profileId);
+
+        // Extract unique video IDs from comments
+        List<String> videoIdList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            String videoId = comment.getVideoId();
+            if (!videoIdList.contains(videoId)) {
+                videoIdList.add(videoId); // Ensure uniqueness
+            }
+        }
+
+        // Fetch video details for all video IDs in a batch
+        List<VideoShortInfoDTO> videoList = videoService.getVideoShortInfoByVideoIds(videoIdList);
+
+
+        // Map comments to DTOs, setting video details
+        List<AdminCommentInfoDTO> commentInfoList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            AdminCommentInfoDTO commentInfoDTO = toAdminCommentInfoDTO(comment);
+
+            // Find the corresponding video details
+            VideoShortInfoDTO videoDetails = null;
+            for (VideoShortInfoDTO video : videoList) {
+                if (video.getId().equals(comment.getVideoId())) {
+                    videoDetails = video;
+                    video.setChannel(null);
+                    break;
+                }
+            }
+
+            commentInfoDTO.setVideoDetails(videoDetails);
+
+
+            commentInfoList.add(commentInfoDTO);
+
+
+        }
+        return commentInfoList;
+
+
+    }
+
+    public PageImpl<CommentInfoDTO> getCommentListByVideoId(int page, int size, String videoId) {
+
+        // Fetch comments with pagination
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdDate"));
+        Page<Comment> commentList = commentRepository.findAllByVideoId(pageRequest, videoId);
+
+        // Extract unique video IDs from comments
+        List<String> videoIdList = new ArrayList<>();
+        for (Comment comment : commentList.getContent()) {
+            String videoIdInComment = comment.getVideoId();
+            if (!videoIdList.contains(videoIdInComment)) {
+                videoIdList.add(videoIdInComment); // Ensure uniqueness
+            }
+        }
+
+        // Fetch video details for all video IDs in a batch
+        List<VideoShortInfoDTO> videoList = videoService.getVideoShortInfoByVideoIds(videoIdList);
+
+
+        // Map comments to DTOs, setting video details
+        List<CommentInfoDTO> commentInfoList = new ArrayList<>();
+        for (Comment comment : commentList) {
+            CommentInfoDTO commentInfoDTO = toCommentInfoDTO(comment);
+
+            // Find the corresponding video details
+            VideoShortInfoDTO videoDetails = null;
+            for (VideoShortInfoDTO video : videoList) {
+                if (video.getId().equals(comment.getVideoId())) {
+                    videoDetails = video;
+                    video.setChannel(null);
+                    break;
+                }
+            }
+
+            commentInfoDTO.setVideoDetails(videoDetails);
+
+            commentInfoDTO.setProfile(profileService.getShortInfo(comment.getProfileId()));
+
+            commentInfoList.add(commentInfoDTO);
+
+
+        }
+        return new PageImpl<>(commentInfoList, pageRequest, commentList.getTotalElements());
+    }
+
+    public List<CommentInfoDTO> getReplyCommentListByCommentId(String commentId) {
+
+        List<Comment> commentList = commentRepository.findAllByReplyId(commentId);
+
+        if (commentList.isEmpty()) {
+            return List.of();
+        }
 
         // Extract unique video IDs from comments
         List<String> videoIdList = new ArrayList<>();
@@ -188,15 +283,13 @@ public class CommentService {
 
             commentInfoDTO.setVideoDetails(videoDetails);
 
-            // shu yerda bir yana o'ylab ko'rish kerak
             commentInfoDTO.setProfile(profileService.getShortInfo(comment.getProfileId()));
+
             commentInfoList.add(commentInfoDTO);
 
 
         }
         return commentInfoList;
-
-
     }
 
 
