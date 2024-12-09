@@ -27,9 +27,14 @@ public class SubscriptionService {
         //Tizimdagi userni kanallarini id si
         List<String> channelOwnerIds = channelService.getChannelOwnerIds(currentUserId);
 
+        if (checkSubscription(currentUserId, dto.getChannelId())) {
+            repository.deleteByProfileIdAndChannelId(currentUserId, dto.getChannelId());
+            return resourceBundleService.getMessage("subscription.unsubscription", lang);
+        }
+
         for (String channelOwnerId : channelOwnerIds) {
             if (channelOwnerId.equals(dto.getChannelId())){
-                resourceBundleService.getMessage("subscription.wrong", lang);
+                return resourceBundleService.getMessage("subscription.wrong", lang);
             }
         }
         Subscription subscription = new Subscription();
@@ -41,4 +46,9 @@ public class SubscriptionService {
         repository.save(subscription);
         return resourceBundleService.getMessage("subscription.created", lang);
     }
+
+    public boolean checkSubscription(Long profileId, String channelId) {
+        return repository.findByProfileIdAndChannelId(profileId, channelId) != null;
+    }
+
 }
