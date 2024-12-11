@@ -1,6 +1,7 @@
 package dasturlash.uz.entity;
 
 import dasturlash.uz.enums.ChannelStatus;
+import dasturlash.uz.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.cglib.core.Local;
@@ -37,5 +38,6 @@ public class Subscription {
     private ChannelStatus status;
 
     @Column(nullable = false)
-    private String notificationType;
+    @Enumerated(EnumType.STRING)
+    private NotificationType notificationType;
 }
