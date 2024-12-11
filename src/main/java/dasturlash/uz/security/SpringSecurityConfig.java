@@ -107,6 +107,9 @@ public class SpringSecurityConfig {
                             .requestMatchers("/videoWatched/get-history").authenticated()
                             .requestMatchers("/subscription/create").authenticated()
                             .requestMatchers("/subscription/change-status").authenticated()
+                            .requestMatchers("/video-like/create").authenticated()
+                            .requestMatchers("/video-like/get-user-liked-videos").authenticated()
+                            .requestMatchers("/api/comments/**").authenticated()
 
                             //Authentication APIs - open to ADMIN and USER role
                             .requestMatchers("/playlist/delete").hasAnyRole("USER", "ADMIN")
@@ -115,7 +118,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("/profile/create").hasRole("ADMIN")
                             .requestMatchers("/profile/getAll").hasRole("ADMIN")
                             .requestMatchers("/playlist/get-pagination-admin").hasRole("ADMIN")
-                            .requestMatchers("/api/comments/**").authenticated()
+                            .requestMatchers("/video-like/get-user-liked-videos-Admin/**").hasRole("ADMIN")
 
 
                             .anyRequest()

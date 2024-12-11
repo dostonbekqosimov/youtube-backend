@@ -5,6 +5,7 @@ import dasturlash.uz.dto.response.MediaUrlDTO;
 import dasturlash.uz.dto.response.TagResponseDTO;
 import dasturlash.uz.dto.response.VideoPlaylistDTO;
 import dasturlash.uz.dto.response.channel.VideoChannelDTO;
+import dasturlash.uz.dto.response.video.like.VideoLikeDTO;
 import dasturlash.uz.enums.ContentStatus;
 import lombok.Data;
 

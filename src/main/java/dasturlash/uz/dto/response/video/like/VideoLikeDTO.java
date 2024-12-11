@@ -1,4 +1,4 @@
-package dasturlash.uz.dto.response.video;
+package dasturlash.uz.dto.response.video.like;
 
 import lombok.Data;
 
