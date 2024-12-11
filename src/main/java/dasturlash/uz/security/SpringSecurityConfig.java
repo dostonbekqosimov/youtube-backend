@@ -106,10 +106,12 @@ public class SpringSecurityConfig {
                             .requestMatchers("/playlist/get-pagination-users/**").authenticated()
                             .requestMatchers("/videoWatched/get-history").authenticated()
                             .requestMatchers("/subscription/create").authenticated()
+                            .requestMatchers("/subscription/change-status").authenticated()
 
                             //Authentication APIs - open to ADMIN and USER role
                             .requestMatchers("/playlist/delete").hasAnyRole("USER", "ADMIN")
                             //Authentication APIs - open to ADMIN role
+                            .requestMatchers("/subscription/get-subscribed-channels-Admin/**").hasRole("ADMIN")
                             .requestMatchers("/profile/create").hasRole("ADMIN")
                             .requestMatchers("/profile/getAll").hasRole("ADMIN")
                             .requestMatchers("/playlist/get-pagination-admin").hasRole("ADMIN")
